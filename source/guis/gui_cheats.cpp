@@ -633,7 +633,7 @@ void GuiCheats::draw()
   Gui::drawTextAligned(font14, 700, 142, currTheme.textColor, "Others", ALIGNED_LEFT);
 
   ss.str("");
-  ss << "EdiZon SE : 3.7.6";
+  ss << "EdiZon SE : 3.7.7x";
   if (m_32bitmode)
     ss << "     32 bit pointer mode";
   Gui::drawTextAligned(font14, 900, 62, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
@@ -873,7 +873,7 @@ void GuiCheats::draw()
 
           if (m_frozenAddresses.find(address) != m_frozenAddresses.end())
             ss << " \uE130";
-          if (bookmark.pointer.depth > 1) // have pointer
+          if (bookmark.pointer.depth > 0) // have pointer
             ss << " *";
         }
         else
@@ -1305,7 +1305,7 @@ void GuiCheats::drawSearchRAMMenu()
   Gui::drawTextAligned(font20, 1010, 160, m_searchMenuLocation == SEARCH_VALUE ? currTheme.selectedColor : currTheme.textColor, "VALUE", ALIGNED_CENTER);
 
   static const char *const typeNames[] = {"u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "flt", "dbl", "void*"};
-  static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR"};
+  static const char *const modeNames[] = {"==", "!=", "=X", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR"};
   static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM"};
 
   switch (m_searchMenuLocation)
@@ -2550,7 +2550,7 @@ void GuiCheats::onInput(u32 kdown)
             m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &bookmark, sizeof(bookmark_t));
             // printf("m_selectedEntry + m_addresslist_offset %ld\n", m_selectedEntry + m_addresslist_offset);
             // u64 index = m_selectedEntry + m_addresslist_offset;
-            if (bookmark.pointer.depth > 1)
+            if (bookmark.pointer.depth > 0)
             {
               addcodetofile(m_selectedEntry + m_addresslist_offset);
             }
@@ -3317,6 +3317,7 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
       debugger->readMemory(buffer, bufferSize, meminfo.addr + offset);
 
       searchValue_t realValue = {0};
+      searchValue_t realValuep = {0};
       u32 inc_i;
       if (searchMode == SEARCH_MODE_POINTER)
         inc_i = 4;
@@ -3331,6 +3332,7 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
           memcpy(&realValue, buffer + i, 4);
         else
           memcpy(&realValue, buffer + i, dataTypeSizes[searchType]);
+        memcpy(&realValuep, buffer + i + dataTypeSizes[searchType], dataTypeSizes[searchType]);
 
         switch (searchMode)
         {
@@ -3349,6 +3351,13 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
           }
           break;
         case SEARCH_MODE_GT:
+          realValue._s64 = realValue._s64 ^ realValuep._s64;
+          if (realValue._s64 == searchValue1._s64)
+          {
+            (*displayDump)->addData((u8 *)&address, sizeof(u64));
+            helperinfo.count++;
+          }
+          break;
           if (searchType & (SEARCH_TYPE_SIGNED_8BIT | SEARCH_TYPE_SIGNED_16BIT | SEARCH_TYPE_SIGNED_32BIT | SEARCH_TYPE_SIGNED_64BIT | SEARCH_TYPE_FLOAT_32BIT | SEARCH_TYPE_FLOAT_64BIT))
           {
             if (realValue._s64 > searchValue1._s64)
@@ -3429,23 +3438,24 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
           }
           break;
         case SEARCH_MODE_POINTER: //m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize
-          // if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
-          if ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= m_heapEnd))
-          {
-            if ((m_forwarddump) && (address > realValue._u64) && (meminfo.type == MemType_Heap))
-              break;
-            (*displayDump)->addData((u8 *)&address, sizeof(u64));
-            newdataDump->addData((u8 *)&realValue, sizeof(u64));
-            helperinfo.count++;
-            // printf("%lx,%lx\n",address,realValue);
-            // std::stringstream ss; // replace the printf
-            // ss.str("");
-            // ss << "0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << address;
-            // ss << ",0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << realValue._u64;
-            // char st[27];
-            // snprintf(st, 27, "%s\n", ss.str().c_str());    //
-            // newstringDump->addData((u8 *)&st, sizeof(st)); //
-          }
+          if ((realValue._u64 != 0))
+            if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+            // if ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= m_heapEnd))
+            {
+              if ((m_forwarddump) && (address > realValue._u64) && (meminfo.type == MemType_Heap))
+                break;
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              newdataDump->addData((u8 *)&realValue, sizeof(u64));
+              helperinfo.count++;
+              // printf("%lx,%lx\n",address,realValue);
+              // std::stringstream ss; // replace the printf
+              // ss.str("");
+              // ss << "0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << address;
+              // ss << ",0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << realValue._u64;
+              // char st[27];
+              // snprintf(st, 27, "%s\n", ss.str().c_str());    //
+              // newstringDump->addData((u8 *)&st, sizeof(st)); //
+            }
           break;
         case SEARCH_MODE_NONE:
         case SEARCH_MODE_SAME:
@@ -3572,12 +3582,14 @@ void GuiCheats::searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t
         debugger->readMemory(ram_buffer, helperinfo.size, helperinfo.address);
       }
       searchValue_t value = {0};
+      searchValue_t valuep = {0};
       // searchValue_t testing = {0}; // temp
       u64 address = 0;
 
       address = *reinterpret_cast<u64 *>(&buffer[i]); //(*displayDump)->getData(i * sizeof(u64), &address, sizeof(u64));
 
       memcpy(&value, ram_buffer + address - helperinfo.address, dataTypeSizes[searchType]); // extrat from buffer instead of making call
+      memcpy(&valuep, ram_buffer + address - helperinfo.address + dataTypeSizes[searchType], dataTypeSizes[searchType]);
       helperinfo.count--;                                                                   // each fetch dec
       // testing = value;                                                                      // temp
       // debugger->readMemory(&value, dataTypeSizes[searchType], address);
@@ -3625,6 +3637,13 @@ void GuiCheats::searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t
         }
         break;
       case SEARCH_MODE_GT:
+        value._s64 = value._s64 ^ valuep._s64;
+        if (value._s64 == searchValue1._s64)
+        {
+          newDump->addData((u8 *)&address, sizeof(u64));
+          newhelperinfo.count++;
+        }
+        break;
         if (value._s64 > searchValue1._s64)
         {
           newDump->addData((u8 *)&address, sizeof(u64));
@@ -5103,7 +5122,7 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
         printf("+%lx z=%d ", m_bookmark.pointer.offset[z], z);
       printf("\n\n");
       m_pointer_found++;
-      return; // consider don't return to find more
+      // return; // consider don't return to find more
     };
     if (PS_depth == m_max_depth)
     {
@@ -6330,42 +6349,42 @@ void GuiCheats::searchMemoryAddressesPrimary2(Debugger *debugger, searchValue_t 
           memcpy(&realValue, buffer + i, 4); //dataTypeSizes[searchType]);
         else
           memcpy(&realValue, buffer + i, dataTypeSizes[searchType]);
+        if (realValue._u64 != 0)
+          if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+          // if ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= m_heapEnd))
+          {
+            if ((m_forwarddump) && (address > realValue._u64) && (meminfo.type == MemType_Heap))
+              break;
+            // (*displayDump)->addData((u8 *)&address, sizeof(u64));
+            // newdataDump->addData((u8 *)&realValue, sizeof(u64));
+            // helperinfo.count++;
 
-        // if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
-        if ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= m_heapEnd))
-        {
-          if ((m_forwarddump) && (address > realValue._u64) && (meminfo.type == MemType_Heap))
-            break;
-          // (*displayDump)->addData((u8 *)&address, sizeof(u64));
-          // newdataDump->addData((u8 *)&realValue, sizeof(u64));
-          // helperinfo.count++;
+            // realValue._u64 = realValue._u64 - m_heapBaseAddr;
+            // MemoryType fromtype;
+            // if (meminfo.type == MemType_Heap)
+            // {
+            //   address = address - m_heapBaseAddr;
+            //   fromtype = HEAP;
+            // }
+            // else
+            // {
+            //   address = address - m_mainBaseAddr;
+            //   fromtype = MAIN;
+            // }
+            // PCDump->addData((u8 *)&fromtype, sizeof(fromtype));
 
-          // realValue._u64 = realValue._u64 - m_heapBaseAddr;
-          // MemoryType fromtype;
-          // if (meminfo.type == MemType_Heap)
-          // {
-          //   address = address - m_heapBaseAddr;
-          //   fromtype = HEAP;
-          // }
-          // else
-          // {
-          //   address = address - m_mainBaseAddr;
-          //   fromtype = MAIN;
-          // }
-          // PCDump->addData((u8 *)&fromtype, sizeof(fromtype));
-
-          PCDump->addData((u8 *)&address, sizeof(u64));
-          PCDump->addData((u8 *)&realValue, sizeof(u64));
-          counting_pointers++;
-          // printf("0x%lx,0x%lx\n",address,realValue);
-          // std::stringstream ss; // replace the printf
-          // ss.str("");
-          // ss << "0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << address;
-          // ss << ",0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << realValue._u64;
-          // char st[27];
-          // snprintf(st, 27, "%s\n", ss.str().c_str());    //
-          // newstringDump->addData((u8 *)&st, sizeof(st)); //
-        }
+            PCDump->addData((u8 *)&address, sizeof(u64));
+            PCDump->addData((u8 *)&realValue, sizeof(u64));
+            counting_pointers++;
+            // printf("0x%lx,0x%lx\n",address,realValue);
+            // std::stringstream ss; // replace the printf
+            // ss.str("");
+            // ss << "0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << address;
+            // ss << ",0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << realValue._u64;
+            // char st[27];
+            // snprintf(st, 27, "%s\n", ss.str().c_str());    //
+            // newstringDump->addData((u8 *)&st, sizeof(st)); //
+          }
       }
 
       offset += bufferSize;
