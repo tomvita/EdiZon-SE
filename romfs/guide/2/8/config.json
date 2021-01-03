@@ -1,7 +1,7 @@
 {
 	"images" : [
 		{
-			"title" : "Save file selection",
+			"title" : "存档文件选择",
 			"path" : "editor1.bin",
 			"x" : 100,
 			"y" : 216,
@@ -9,7 +9,7 @@
 			"h" : 288
 		},
 		{
-			"title" : "Editor screen",
+			"title" : "编辑器屏幕",
 			"path" : "editor2.bin",
 			"x" : 668,
 			"y" : 216,

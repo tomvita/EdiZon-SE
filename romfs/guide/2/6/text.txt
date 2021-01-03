@@ -1,6 +1,5 @@
-EdiZon features a integrated and easily expandable save file editor based on user-made script files. 
-At this time more than thirty different games are supported and can be edited at any time without 
-the need for a computer. The most noticable ones include The Legend of Zelda: Breath of the Wild, 
-Super Mario Odyssey, Super Smash Bros Ultimate and New Super Mario Bros. U Deluxe. 
- 
-Thanks a lot to the awesome community who developed all of these scripts!
+EdiZon具有基于用户制作的脚本文件的集成且易于扩展的存档文件编辑器。
+目前，支持30多种不同的游戏，无需计算机即可随时进行编辑。
+最引人注目的游戏包括《塞尔达传说：旷野之息》，《超级马里奥奥德赛》，《超级粉碎兄弟终极版》和《新超级马里奥兄弟U豪华版》。
+
+非常感谢开发所有这些脚本的社区！

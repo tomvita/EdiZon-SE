@@ -63,7 +63,7 @@ void ListSelector::draw(Gui *gui) {
     for (u8 currItem = 0; currItem < m_listItems.size(); currItem++)
       gui->drawText(font20, 270, fmax(440 + 60 * currItem - yOffset, 220) + startYOffset, currTheme.textColor, m_listItems[currItem].c_str());
 
-  } else gui->drawText(font20, 300, 340 + 60 * 2 + startYOffset, currTheme.textColor, "No items present!");
+  } else gui->drawText(font20, 300, 340 + 60 * 2 + startYOffset, currTheme.textColor, "没有项目！");
 
   gui->drawRectangle(0, 220 + startYOffset, Gui::g_framebuffer_width, 80, currTheme.backgroundColor);
   gui->drawRectangle(0, Gui::g_framebuffer_height - 73 + startYOffset, Gui::g_framebuffer_width, 73, currTheme.backgroundColor);

@@ -39,14 +39,14 @@ void MessageBox::draw(Gui *gui) {
     gui->drawRectangle(250, Gui::g_framebuffer_height - 260, Gui::g_framebuffer_width - 500, 80, currTheme.selectedButtonColor);
     gui->drawRectangled(245, Gui::g_framebuffer_height - 265, Gui::g_framebuffer_width - 490, 90, currTheme.highlightColor);
     gui->drawRectangle(250, Gui::g_framebuffer_height - 260, Gui::g_framebuffer_width - 500, 80, currTheme.selectedButtonColor);
-    gui->drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height - 237, currTheme.selectedColor, "Okay", ALIGNED_CENTER);
+    gui->drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height - 237, currTheme.selectedColor, "确认", ALIGNED_CENTER);
   }
   else if (m_options == MessageBox::YES_NO) {
     gui->drawRectangle(250, Gui::g_framebuffer_height - 260, Gui::g_framebuffer_width - 500, 80, currTheme.selectedButtonColor);
     gui->drawRectangled(245 + ((Gui::g_framebuffer_width - 490) / 2) * m_selectedOption, Gui::g_framebuffer_height - 265, (Gui::g_framebuffer_width - 490) / 2, 90, currTheme.highlightColor);
     gui->drawRectangle(250, Gui::g_framebuffer_height - 260, (Gui::g_framebuffer_width - 500) / 2 - 6, 80, currTheme.selectedButtonColor);
     gui->drawRectangle(250 + ((Gui::g_framebuffer_width - 490) / 2), Gui::g_framebuffer_height - 260, (Gui::g_framebuffer_width - 500) / 2 - 6, 80, currTheme.selectedButtonColor);
-    gui->drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height - 237, currTheme.selectedColor, "No                                            Yes", ALIGNED_CENTER);
+    gui->drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height - 237, currTheme.selectedColor, "否                                            是", ALIGNED_CENTER);
   }
 
   if (m_progress >= 0) {

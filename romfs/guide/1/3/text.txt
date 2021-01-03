@@ -1,5 +1,2 @@
-Save file backups are useful if you want to save your current progress in a game so you can 
-return back to it at a later point or if you're worried about your switch getting stolen or 
-destroyed in some way. EdiZon is particularly helpful in for the latter since it's possible 
-to create a batch backup which includes all save files for all games and all users on the 
-system. 
+如果您想将当前游戏中的进度保存以便稍后再返回，或者担心您的SWITCH被盗或被某种方式损毁，则保存文件备份很有用。
+EdiZon对后者特别有用，因为可以创建一个批量备份，其中包括所有游戏和系统上所有用户的所有存档文件。

@@ -23,19 +23,19 @@ void WidgetString::draw(Gui *gui, u16 x, u16 y) {
 void WidgetString::onInput(u32 kdown) {
   if (kdown & KEY_A) {
     char out_string[m_maxLength + 1];
-    Gui::requestKeyboardInput("Input string value", "Enter a string for this value to be set to.", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
+    Gui::requestKeyboardInput("输入字符串值", "输入要设置的字符串值。", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
 
     if (std::strlen(out_string) > m_minLength)
       Widget::setStringValue(out_string);
-    else (new Snackbar("Input string has to be longer than " + std::to_string(m_minLength) + " characters!"))->show();
+    else (new Snackbar("输入字符串必须长于 " + std::to_string(m_minLength) + " 个字符！"))->show();
   }
 }
 
 void WidgetString::onTouch(touchPosition &touch) {
   char out_string[m_maxLength + 1];
-  Gui::requestKeyboardInput("Input string value", "Enter a string for this value to be set to.", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
+  Gui::requestKeyboardInput("输入字符串值", "输入要设置的字符串值。", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
 
   if (std::strlen(out_string) > m_minLength)
     Widget::setStringValue(out_string);
-  else (new Snackbar("Input string has to be longer than " + std::to_string(m_minLength) + " characters!"))->show();
+  else (new Snackbar("输入字符串必须长于 " + std::to_string(m_minLength) + " 个字符！"))->show();
 }

@@ -1,7 +1,7 @@
 {
 	"images" : [
 		{
-			"title" : "Edited save file values",
+			"title" : "编辑的存档文件值",
 			"path" : "editor1.bin",
 			"x" : 100,
 			"y" : 216,
@@ -9,7 +9,7 @@
 			"h" : 288
 		},
 		{
-			"title" : "Inject changes",
+			"title" : "注入修改",
 			"path" : "editor2.bin",
 			"x" : 668,
 			"y" : 216,

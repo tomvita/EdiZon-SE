@@ -41,7 +41,7 @@ static void getdb()
 {
   mkdir(CHEATS_DIR, 0777);
   // status = "Downloading cheat database, this may take a while ";
-  (new MessageBox("Updating cheat database.\n \nThis may take a while...", MessageBox::NONE))->show();
+  (new MessageBox("更新金手指数据库。\n \n这需要一点时间...", MessageBox::NONE))->show();
   requestDraw();
   CURL *curl = curl_easy_init();
   struct curl_slist *headers = NULL;
@@ -61,7 +61,7 @@ static void getdb()
     curl_easy_cleanup(curl);
     printf("remove(APP_OUTPUT) = %d\n", remove(APP_OUTPUT));
     // status = "Cheat database downloaded";
-    (new MessageBox("Updated cheat code database\n\n Enjoy!", MessageBox::OKAY))->show();
+    (new MessageBox("金手指代码数据库已更新\n\n 请享受！", MessageBox::OKAY))->show();
     printf("rename(TEMP_FILE, APP_OUTPUT) = %d\n", rename(TEMP_FILE, APP_OUTPUT));
     updateAvailable = false;
     for (int i = 0; i < 6; i++)
@@ -71,7 +71,7 @@ static void getdb()
   else
   {
     // status = "Cheat database download failed";
-    (new MessageBox("Not able to updated cheat database\n Please try again later!", MessageBox::OKAY))->show();
+    (new MessageBox("无法更新金手指数据库\n 请稍后再试！", MessageBox::OKAY))->show();
     fclose(fp);
     curl_easy_cleanup(curl);
   }
@@ -82,26 +82,26 @@ void Guifirstrun::draw() {
   Gui::drawRectangle((u32)((Gui::g_framebuffer_width - 1220) / 2), 87, 1220, 1, currTheme.textColor);
   Gui::drawRectangle((u32)((Gui::g_framebuffer_width - 1220) / 2), Gui::g_framebuffer_height - 73, 1220, 1, currTheme.textColor);
   Gui::drawTextAligned(fontTitle, 70, 60, currTheme.textColor, "\uE017", ALIGNED_LEFT);
-  Gui::drawTextAligned(font24, 70, 23, currTheme.textColor, "        Welcome to EdiZon SE", ALIGNED_LEFT);
+  Gui::drawTextAligned(font24, 70, 23, currTheme.textColor, "        欢迎使用EdiZon SE", ALIGNED_LEFT);
     Gui::drawTextAligned(fontHuge, 100, 180, Gui::makeColor(0xFB, 0xA6, 0x15, 0xFF), "EdiZon SE v" VERSION_STRING, ALIGNED_LEFT);
-  Gui::drawTextAligned(font20, 130, 190, currTheme.separatorColor, "by Tomvita", ALIGNED_LEFT);
-  Gui::drawTextAligned(font20, 50, Gui::g_framebuffer_height - 51, Config::getConfig()->easymode ? currTheme.textColor : COLOR_RED, Config::getConfig()->easymode ? "\uE0E2 Easy Mode" : "\uE0E2 Expert Mode", ALIGNED_LEFT);
+  Gui::drawTextAligned(font20, 130, 190, currTheme.separatorColor, "由Tomvita制作", ALIGNED_LEFT);
+  Gui::drawTextAligned(font20, 50, Gui::g_framebuffer_height - 51, Config::getConfig()->easymode ? currTheme.textColor : COLOR_RED, Config::getConfig()->easymode ? "\uE0E2 建议模式" : "\uE0E2 专家模式", ALIGNED_LEFT);
   if (updateAvailable)
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0EF App update Check                       \uE0F0 Install update     \uE0E1 Skip", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0EF 程序更新检查                       \uE0F0 安装更新     \uE0E1 忽略", ALIGNED_RIGHT);
   else
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0EF App update Check                                                 \uE0E1 Exit", ALIGNED_RIGHT);
-  Gui::drawTextAligned(font14, 120, 250, currTheme.textColor, "Checking Cheat database. Special thank to everyone who has contributed at Gbatemp Switch cheat code forum.", ALIGNED_LEFT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0EF 程序更新检查                                                 \uE0E1 退出", ALIGNED_RIGHT);
+  Gui::drawTextAligned(font14, 120, 250, currTheme.textColor, "正在检查金手指数据库。特别感谢在Gbatemp Switch作弊代码论坛上做出的贡献的所有人。", ALIGNED_LEFT);
   Gui::drawRectangled(50, 350, Gui::g_framebuffer_width - 100, 250, currTheme.textColor);
   Gui::drawRectangled(51, 351, Gui::g_framebuffer_width - 102, updateAvailable ? 210 : 248, currTheme.backgroundColor);
   Gui::drawShadow(52, 352, Gui::g_framebuffer_width - 104, 248);
   if (updateAvailable)
   {
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 565, currTheme.backgroundColor, "A update for Cheat database is available!", ALIGNED_CENTER);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 565, currTheme.backgroundColor, "金手指数据库更新可用！", ALIGNED_CENTER);
     
     // getdb();
   }
-  Gui::drawTextAligned(font20, 60, 360, currTheme.selectedColor, "Cheat database Update", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 80, 400, currTheme.textColor, std::string("Latest cheat database version: " + (remoteVersion == "" ? "..." : remoteVersion)).c_str(), ALIGNED_LEFT);
+  Gui::drawTextAligned(font20, 60, 360, currTheme.selectedColor, "金手指数据库更新", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 80, 400, currTheme.textColor, std::string("最新的金手指数据库版本：" + (remoteVersion == "" ? "..." : remoteVersion)).c_str(), ALIGNED_LEFT);
   // Gui::drawTextAligned(font14, 80, 440, currTheme.textColor, status.c_str(), ALIGNED_LEFT);
   Gui::endDraw();
 

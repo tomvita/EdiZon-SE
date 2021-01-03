@@ -1,7 +1,7 @@
 {
 	"images" : [
 		{
-			"title" : "Main menu",
+			"title" : "主菜单",
 			"path" : "homemenu.bin",
 			"x" : 100,
 			"y" : 325,
@@ -9,7 +9,7 @@
 			"h" : 288
 		},
 		{
-			"title" : "Save uploading",
+			"title" : "存档上传",
 			"path" : "save_upload.bin",
 			"x" : 650,
 			"y" : 325,
@@ -19,7 +19,7 @@
 	],
 	"text" : [
 		{
-			"title" : "How to create a save file backup?",
+			"title" : "如何创建存档文件备份？",
 			"path" : "text.txt",
 			"x" : 50,
 			"y" : 100

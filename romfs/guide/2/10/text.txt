@@ -1,17 +1,14 @@
-The different kinds of widgets are Numbers, On-Off-Switches, Text, Lists, Buttons and Comments.
+不同种类的小部件为数字，开关，文本，列表，按钮和注释。
  
-Number values can be changed using the left and right dpad buttons. To enter a value using the
-keyboard, use the (A) button. To increase the step size multiplier, press the right stick button. 
+可以使用左右dpad按钮更改数字值。请使用（A）按钮以使用键盘来输入值。要增加步长乘数，请按右摇杆按钮。
 
-On-off-Switches can be either enabled or disabled by selecting them and pressing the (A) button. 
+可以通过选择开关并按（A）按钮来启用或禁用开关。
 
-Text values allow you to enter your own text using the keyboard. Press the (A) button to open it. 
+文本值允许您使用键盘输入自己的文本。按（A）按钮将其打开。
 
-Lists allow you to choose from a preselected list of values to set the value to. Press the (A) button
-to open the list and press the (A) button again to confirm your choice. 
+列表使您可以从预先选择的值列表中进行选择，以将值设置为。按（A）按钮打开列表，然后再次按（A）按钮确认选择。
 
-Buttons allow for custom one-time options to be executed. Be aware that these are often not resetable.
-Press the (A) button to execute the underlying command. 
+按钮允许执行自定义的一次性选项。请注意，这些通常不可重置。
+按下（A）按钮执行基础命令。
 
-Comments are there just to help you. When pressing the (A) button, the entire text will be displayed
-in a popup window.
+评论只是为了帮助您。按下（A）按钮时，整个文本将显示在弹出窗口中。

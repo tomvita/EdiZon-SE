@@ -1,10 +1,7 @@
-For a game save file to be editable, somebody has to make a config/script for it. If you're 
-lucky and your game is supported, editing it is very straight forward. 
+为了使游戏存档文件可编辑，必须有人为其配置或脚本。如果您很幸运您的游戏能被支持，那么直接进行编辑即可。
  
-First of all to find out which ones of your currently installed games are editable, press the 
-(ZL) button in the EdiZon main menu. In this mode only games that have a config installed will 
-get shown. To edit a save file now, select the game in this list as if you wanted to backup it's 
-save file. In the new menu, press the (-) button and select the save file you want to edit. 
-The editor will now pop up where you can edit all the values shown to you. 
+首先，要找出您当前安装的哪些游戏是可编辑的，请按EdiZon主菜单中的（ZL）按钮。在这种模式下，只会显示安装了配置的游戏。
+要立即编辑存档文件，请在此列表中选择游戏，就好像您要备份它的存档文件一样。
+在新菜单中，按（-）按钮，然后选择要编辑的存档文件。现在将弹出编辑器，您可以在其中编辑显示给您的所有值。
 
-Make your changes and once you're done, press the (X) button to apply the changed values.
+进行更改，完成后，按（X）按钮应用更改后的值。

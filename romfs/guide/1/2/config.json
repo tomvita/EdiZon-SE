@@ -3,13 +3,13 @@
 	],
 	"text" : [
 		{
-			"title" : "Built-in updater",
+			"title" : "内置更新器",
 			"path" : "auto_updater.txt",
 			"x" : 50,
 			"y" : 100
 		},
 		{
-			"title" : "Debug logging",
+			"title" : "调试日志",
 			"path" : "debug_logs.txt",
 			"x" : 50,
 			"y" : 300

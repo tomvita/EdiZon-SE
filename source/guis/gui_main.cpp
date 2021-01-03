@@ -85,9 +85,9 @@ void GuiMain::draw() {
     Config::readConfig();
     if ((Config::getConfig()->lasttitle) != 0) lastgamenotfound = true;
     if (lastgamenotfound)
-      Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "Game save for last game title not found on this system! Please press \uE0E1 to exit EdiZon!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "在系统里找不到最后一个游戏title的游戏存档！ 请按 \uE0E1 以退出EdiZon!", ALIGNED_CENTER);
     else
-      Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "No games or saves found on this system! Please press \uE0E1 to exit EdiZon!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "在系统里找不到游戏或存档！ 请按 \uE0E1 以退出EdiZon!", ALIGNED_CENTER);
     Gui::endDraw();
     Config::getConfig()->lasttitle = 0;
     Config::writeConfig();
@@ -147,7 +147,7 @@ void GuiMain::draw() {
   Gui::drawRectangled(Gui::g_framebuffer_width - 75, 8, 13, 18, currTheme.separatorColor);
 
   if (tmpEditableOnly && EditorConfigParser::g_editableTitles.size() == 0) {
-    Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "No editable games found on this system!", ALIGNED_CENTER);
+    Gui::drawTextAligned(font24, (Gui::g_framebuffer_width / 2), (Gui::g_framebuffer_height / 2), currTheme.textColor, "系统里找不到可编译的游戏！", ALIGNED_CENTER);
     Gui::endDraw();
     return;
   }
@@ -183,17 +183,17 @@ void GuiMain::draw() {
     Gui::drawRectangle((u32)((Gui::g_framebuffer_width - 1220) / 2), Gui::g_framebuffer_height - 73, 1220, 1, currTheme.textColor);
 
     if (m_selected.extraOption == 0)
-      Gui::drawTextAligned(font14, 490, 623, currTheme.tooltipTextColor, "Cheats", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, 490, 623, currTheme.tooltipTextColor, "金手指", ALIGNED_CENTER);
     else if (m_selected.extraOption == 1)
-      Gui::drawTextAligned(font14, 640, 623, currTheme.tooltipTextColor, "Guide", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, 640, 623, currTheme.tooltipTextColor, "指南", ALIGNED_CENTER);
     else if (m_selected.extraOption == 2)
-      Gui::drawTextAligned(font14, 790, 623, currTheme.tooltipTextColor, "About", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, 790, 623, currTheme.tooltipTextColor, "关于", ALIGNED_CENTER);
 
     std::string buttonHintStr = "";
 
-    buttonHintStr  = !tmpEditableOnly ? "\uE0E6 Editable titles     " : "\uE0E6 All titles     ";
-    buttonHintStr += m_backupAll ? "(\uE0E7) + \uE0E2 Backup all     " : "(\uE0E7) + \uE0E2 Backup     ";
-    buttonHintStr += "\uE0E1 Back     \uE0E0 OK";
+    buttonHintStr  = !tmpEditableOnly ? "\uE0E6 可编辑的所有title     " : "\uE0E6 所有title     ";
+    buttonHintStr += m_backupAll ? "（\uE0E7） + \uE0E2 备份所有     " : "（\uE0E7） + \uE0E2 备份     ";
+    buttonHintStr += "\uE0E1 返回     \uE0E0 确认";
 
     Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, buttonHintStr.c_str(), ALIGNED_RIGHT);
 
@@ -250,7 +250,7 @@ void GuiMain::onInput(u32 kdown) {
 
     if (kdown & KEY_A) {
       if (m_selected.titleId == Title::g_activeTitle) {
-        (new Snackbar("The save files of a running game cannot be accessed."))->show();
+        (new Snackbar("无法访问正在运行的游戏的存档文件。"))->show();
         return;
       }
       AccountUid userID = Gui::requestPlayerSelection();
@@ -263,7 +263,7 @@ void GuiMain::onInput(u32 kdown) {
         Title::g_currTitle = Title::g_titles[m_selected.titleId];
         Account::g_currAccount = Account::g_accounts[userID];
         Gui::g_nextGui = GUI_EDITOR;
-      } else (new Snackbar("No save file for this user available!"))->show();
+      } else (new Snackbar("没有该用户的存档文件！"))->show();
     }
 
     if (kdown & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) {
@@ -278,12 +278,12 @@ void GuiMain::onInput(u32 kdown) {
 
     if (kdown & KEY_X) {
       if (m_selected.titleId == Title::g_activeTitle) {
-        (new Snackbar("The save files of a running game cannot be accessed."))->show();
+        (new Snackbar("无法访问正在运行的游戏的存档文件。"))->show();
         return;
       }
 
       if (m_backupAll) {
-        (new MessageBox("Are you sure you want to backup all saves \n on this console? \n This might take a while.", MessageBox::YES_NO))->setSelectionAction([&](s8 selection) {
+        (new MessageBox("您确定要备份所有存档 \n 在这个控制台上？ \n 这可能需要一点时间。", MessageBox::YES_NO))->setSelectionAction([&](s8 selection) {
           bool batchFailed = false;
 
           char backupName[65];
@@ -292,10 +292,10 @@ void GuiMain::onInput(u32 kdown) {
           initialText << std::put_time(std::gmtime(&t), "%Y%m%d_%H%M%S");        
 
           if (selection) {
-            if(!Gui::requestKeyboardInput("Backup name", "Please enter a name for the backup to be saved under.", initialText.str(), SwkbdType_QWERTY, backupName, 32))
+            if(!Gui::requestKeyboardInput("备份名", "请输入要保存的存档名称。", initialText.str(), SwkbdType_QWERTY, backupName, 32))
               return;
 
-            (new MessageBox("Creating batch backup. \n \n This might take a while...", MessageBox::NONE))->show();
+            (new MessageBox("创建批量备份。\n \n 这可能需要一点时间。...", MessageBox::NONE))->show();
             requestDraw();
 
             s16 res;
@@ -312,10 +312,10 @@ void GuiMain::onInput(u32 kdown) {
               Gui::g_currMessageBox->hide();
 
               if (!batchFailed)
-                (new Snackbar("Successfully created backups!"))->show();
+                (new Snackbar("成功创建备份！"))->show();
               else {
                 std::stringstream errorMessage;
-                errorMessage << "Failed to backup " << failed_titles << " titles!";
+                errorMessage << "备份失败 " << failed_titles << " title!";
                 (new Snackbar(errorMessage.str()))->show();
               }
             }
@@ -333,7 +333,7 @@ void GuiMain::onInput(u32 kdown) {
         std::stringstream initialText;
         initialText << std::put_time(std::gmtime(&t), "%Y%m%d_%H%M%S");
 
-        if (!Gui::requestKeyboardInput("Backup name", "Please enter a name for the backup to be saved under.", initialText.str(), SwkbdType_QWERTY, backupName, 32))
+        if (!Gui::requestKeyboardInput("备份名", "请输入要保存的备份名称。", initialText.str(), SwkbdType_QWERTY, backupName, 32))
           return;
 
         for (AccountUid userID : Title::g_titles[m_selected.titleId]->getUserIDs()) {
@@ -343,12 +343,12 @@ void GuiMain::onInput(u32 kdown) {
         }
 
         if (!batchFailed)
-          (new Snackbar("Successfully created backup!"))->show();
+          (new Snackbar("成功创建备份！"))->show();
         else {
           switch(res) {
-            case 1: (new Snackbar("Failed to mount save file!"))->show(); break;
-            case 2: (new Snackbar("A backup with this name already exists!"))->show(); break;
-            case 3: (new Snackbar("Failed to create backup!"))->show(); break;
+            case 1: (new Snackbar("无法挂载存档文件！"))->show(); break;
+            case 2: (new Snackbar("该名称的备份已经存在！"))->show(); break;
+            case 3: (new Snackbar("创建备份失败！"))->show(); break;
           }
         }      
       }
@@ -406,7 +406,7 @@ void GuiMain::onTouch(touchPosition &touch) {
       
       if (m_selected.titleIndex == title) {
         if (m_selected.titleId == Title::g_activeTitle) {
-          (new Snackbar("The save files of a running game cannot be accessed."))->show();
+          (new Snackbar("无法访问正在运行的游戏的存档文件。"))->show();
           return;
         }
 
@@ -422,7 +422,7 @@ void GuiMain::onTouch(touchPosition &touch) {
           Title::g_currTitle = Title::g_titles[m_selected.titleId];
           Account::g_currAccount = Account::g_accounts[userID];
           Gui::g_nextGui = GUI_EDITOR;
-        } else (new Snackbar("No save file available for this user!"))->show();      
+        } else (new Snackbar("此用户无存档文件！"))->show();      
       }
 
       m_selected.titleIndex = title;

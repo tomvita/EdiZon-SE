@@ -74,9 +74,9 @@ void GuiGuide::draw() {
   Gui::drawRectangle((u32)((Gui::g_framebuffer_width - 1220) / 2), 87, 1220, 1, currTheme.textColor);
   Gui::drawRectangle((u32)((Gui::g_framebuffer_width - 1220) / 2), Gui::g_framebuffer_height - 73, 1220, 1, currTheme.textColor);
   Gui::drawTextAligned(fontTitle, 70, 60, currTheme.textColor, "\uE142", ALIGNED_LEFT);
-  Gui::drawTextAligned(font24, 70, 23, currTheme.textColor, "        Quick start guide", ALIGNED_LEFT);
+  Gui::drawTextAligned(font24, 70, 23, currTheme.textColor, "        快速入门指南", ALIGNED_LEFT);
 
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0E4 Previous     \uE0E5 Next     \uE0E1 Back", ALIGNED_RIGHT);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0E4 前一个     \uE0E5 后一个     \uE0E1 返回", ALIGNED_RIGHT);
   
   color_t darkened = currTheme.backgroundColor;
   darkened.a = 0x9F;

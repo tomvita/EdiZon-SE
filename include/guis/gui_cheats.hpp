@@ -201,12 +201,12 @@ private:
   remove(file2);                              \
   while (access(file2, F_OK) == 0)            \
   {                                           \
-    printf("waiting for delete %s\n", file2); \
+    printf("removing %s\n", file2); \
   }                                           \
   rename(file1, file2);                       \
   while (access(file2, F_OK) != 0)            \
   {                                           \
-    printf("waiting for rename %s\n", file1); \
+    printf("renaming %s\n", file1); \
   }
 
   bool m_forwardonly = false;
