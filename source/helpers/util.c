@@ -6,7 +6,7 @@
 
 #define MHz *1E6
 
-static u64 g_uniquePadIds[2]; // HidsysUniquePadId was u64 change for new libnx
+static HidsysUniquePadId g_uniquePadIds[2]; // HidsysUniquePadId was u64 change for new libnx
 static s32 g_uniquePadCnt;
 static HidsysNotificationLedPattern g_patternOn, g_patternOff;
 

@@ -24,7 +24,7 @@ void WidgetList::draw(Gui *gui, u16 x, u16 y) {
       ptrdiff_t pos = find(m_intListItemValues.begin(), m_intListItemValues.end(), intValue) - m_intListItemValues.begin();
       ss << m_listItemNames[pos];
     } else {
-      ss << "Unknown value: " << intValue;
+      ss << "未知值：" << intValue;
     }
   } else if (m_widgetDataType == STRING) {
     std::string strValue = Widget::getStringValue();
@@ -32,7 +32,7 @@ void WidgetList::draw(Gui *gui, u16 x, u16 y) {
       ptrdiff_t pos = find(m_strListItemValues.begin(), m_strListItemValues.end(), strValue) - m_strListItemValues.begin();
       ss << m_listItemNames[pos];
     } else {
-      ss << "Unknown value: " << strValue;
+      ss << "未知值：" << strValue;
     }
   }
 
