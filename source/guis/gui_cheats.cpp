@@ -71,7 +71,8 @@ static std::string _getValueDisplayString(searchValue_t searchValue, searchType_
 static searchValue_t _get_entry(searchValue_t value, searchType_t type);
 // static void _moveLonelyCheats(u8 *buildID, u64 titleID);
 static bool _wrongCheatsPresent(u8 *buildID, u64 titleID);
-
+static bool compareentry(MultiSearchEntry_t e1, MultiSearchEntry_t e2);
+static bool comparefromto(fromto32_t e1, fromto32_t e2);
 GuiCheats::GuiCheats() : Gui()
 {
   if (Config::getConfig()->deletebookmark)
@@ -535,6 +536,12 @@ GuiCheats::~GuiCheats()
 
   if (m_cheats != nullptr)
     delete[] m_cheats;
+
+  if (m_PC_Dump != nullptr)
+    delete m_PC_Dump;
+
+  if (m_PC_DumpM != nullptr)
+    delete m_PC_DumpM;
 
   if (m_sysmodulePresent)
   {
@@ -1082,6 +1089,7 @@ void GuiCheats::draw()
     drawEditRAMMenu();
     drawEditRAMMenu2();
     drawEditExtraSearchValues();
+    drawSEARCH_pickjump();
     drawSearchPointerMenu();
     Gui::endDraw();
   }
@@ -1267,12 +1275,18 @@ std::string GuiCheats::buttonStr(u32 buttoncode)
 #define line1 10
 #define line2 80
 #define line3 120
+#define line4 160
+#define line5 195
+
 void GuiCheats::drawEditRAMMenu2()
 {
   std::stringstream ss;
   if (m_searchMenuLocation != SEARCH_editRAM2)
     return;
-  Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, currTheme.backgroundColor);//background
+  if (m_EditorBaseAddr >= m_mainBaseAddr && m_EditorBaseAddr <= m_mainend)
+    Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, Gui::makeColor(0xFF, 0xFF, 0xC0, 0x40));
+  else
+    Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, currTheme.backgroundColor); //background
   Gui::drawText(font24, 30, 10 , currTheme.textColor, "\uE132   Memory Explorer");
   Gui::drawRectangle(10, 70 , Gui::g_framebuffer_width - 10, 1, currTheme.textColor);//the line
 
@@ -1346,6 +1360,65 @@ void GuiCheats::drawEditRAMMenu2()
       Gui::drawTextAligned(font20, 360, line3, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
     }
   };
+
+  // ss.str("");
+  // ss << "Bookmark line 1 drawTextAligned(font20, Gui::g_framebuffer_width - 100, line2, currTheme.text";
+  // Gui::drawTextAligned(font20, 30, line4, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
+  // ss.str("");
+  // ss << "Bookmark line 2 Gui::drawTextAligned(font20, 1010, line2, m_searchMenuLocation == SEARCH_";
+  // Gui::drawTextAligned(font20, 30, line5, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
+//ME1 Memory explorer pointer chain display 
+// if (false)
+  {
+    if (m_bookmark.pointer.depth > 0)
+    {
+      ss.str("");
+      int i = 0;
+      ss << "z=" << std::dec << std::setfill('0') << std::setw(2) << m_depth_count << ((m_bookmark.heap)? " heap":" main"); //[0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_mainBaseAddr << "]";
+      m_depth_count = -1;
+      u64 nextaddress;
+      if (m_bookmark.heap)
+        nextaddress = m_heapBaseAddr;
+      else
+        nextaddress = m_mainBaseAddr;
+      for (int z = m_bookmark.pointer.depth; z >= 0; z--)
+      {
+        ss << "+" << std::uppercase << std::hex << (s32)m_bookmark.pointer.offset[z];
+        if (z == m_z)
+        {
+          if (address + m_addressmod >= nextaddress)
+            ss << "[\uE130 " << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << address - nextaddress + m_addressmod << " ]";
+          else
+            ss << "[\uE130 -" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << nextaddress - address - m_addressmod << " ]";
+        }
+        nextaddress += m_bookmark.pointer.offset[z];
+        m_jump_stack[z].from = nextaddress;
+        MemoryInfo meminfo = m_debugger->queryMemory(nextaddress);
+        if (meminfo.perm == Perm_Rw)
+          m_debugger->readMemory(&nextaddress, ((m_32bitmode) ? sizeof(u32) : sizeof(u64)), nextaddress);
+        else
+        {
+          m_jump_stack[z].to = 0;
+          ss << "(*access denied*)";
+          break;
+        }
+        m_depth_count++;
+        if (z > 0)
+        {
+            ss << "(" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << nextaddress << ")";
+        }
+        m_jump_stack[z].to = nextaddress;
+        i++;
+        if ((i == 6) || (i == 13))
+          ss << "\n";
+      }
+      // ss << " " << dataTypes[m_bookmark.type];
+      Gui::drawTextAligned(font14, 30, line4, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
+    }
+  }
+
+//
+
   // Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, line2, currTheme.textColor, "\uE0A5 \uE14A", ALIGNED_RIGHT); // the end bracket
   // Gui::drawTextAligned(font20, 260, line2, m_searchMenuLocation == SEARCH_TYPE ? currTheme.selectedColor : currTheme.textColor, "U8", ALIGNED_CENTER);
   // Gui::drawTextAligned(font20, 510, line2, m_searchMenuLocation == SEARCH_MODE ? currTheme.selectedColor : currTheme.textColor, "U16", ALIGNED_CENTER);
@@ -1420,9 +1493,9 @@ void GuiCheats::drawEditRAMMenu2()
     }
   }
 
-  // key hits
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 70, currTheme.textColor, "\uE0E3 Follow pointer \uE0EF BM add  \uE0E7 PageDown  \uE0E0 Edit value  \uE0E5 Forward  \uE0E1 Back", ALIGNED_RIGHT); //\uE0E4 Change Mode  
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 Change Type  \uE0E6+\uE0E3 Goto any address  \uE0E6+\uE0E7 PageUp  \uE0E6+\uE0E1 Quit", ALIGNED_RIGHT);
+  // key hints
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 70, currTheme.textColor, "\uE105 MarkSearch \uE0E3 Change offset \uE0EF BM add \uE0E0 Edit value \uE0E4 Backward \uE0E5 Forward \uE0E1 JumpBack", ALIGNED_RIGHT); //\uE0E4 Change Mode  
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 Change Type  \uE0E6+\uE0E3 Goto any address  \uE0E7 PageDown  \uE0E6+\uE0E7 PageUp  \uE0E6+\uE0E1 Quit", ALIGNED_RIGHT);
 }
 void GuiCheats::drawEditExtraSearchValues()
 {
@@ -1453,13 +1526,14 @@ void GuiCheats::drawEditExtraSearchValues()
 #define c6 1010 + shift1 + shift2
 #define linegape 30
 #define M_ENTRY m_multisearch.Entries[i / 6]
+#define M_ENTRYi m_multisearch.Entries[i]
 #define labelline 145
   color_t cellColor;
   Gui::drawTextAligned(font20, c0, labelline, currTheme.textColor, "LABEL", ALIGNED_CENTER);
   Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "OFFSET", ALIGNED_CENTER);
   Gui::drawTextAligned(font20, c2, labelline, currTheme.textColor, "On/OFF", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "TYPE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "MODE", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "MODE", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "TYPE", ALIGNED_CENTER);
   Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "VALUE 1", ALIGNED_CENTER);
   Gui::drawTextAligned(font20, c6, labelline, currTheme.textColor, "VALUE 2", ALIGNED_CENTER);
 
@@ -1481,22 +1555,26 @@ void GuiCheats::drawEditExtraSearchValues()
     }
     else if ((i % 6) == 1)
     {
-      Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, (m_multisearch.Entries[i / 6].on) ? "On" : "OFF", ALIGNED_CENTER);
+      if (M_ENTRY.on == TARGET) //(i / 6 == m_multisearch.target)
+        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, "Target", ALIGNED_CENTER);
+      else
+        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, (m_multisearch.Entries[i / 6].on == ON) ? "On" : "OFF", ALIGNED_CENTER);
     }
     else if ((i % 6) == 2)
     {
-      static const char *const typeNames[] = {"u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "flt", "dbl", "pointer"};
-      Gui::drawTextAligned(font20, c3, 160 + linegape * (1 + i / 6), cellColor, typeNames[m_multisearch.Entries[i / 6].type], ALIGNED_CENTER);
+      static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR", "  ","~PTR"};
+      // if (M_ENTRY.type != SEARCH_TYPE_POINTER)
+      Gui::drawTextAligned(font20, c3, 160 + linegape * (1 + i / 6), cellColor, modeNames[m_multisearch.Entries[i / 6].mode], ALIGNED_CENTER);
     }
     else if ((i % 6) == 3)
     {
-      static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR", "  "};
-      if (M_ENTRY.type != SEARCH_TYPE_POINTER)
-        Gui::drawTextAligned(font20, c4, 160 + linegape * (1 + i / 6), cellColor, modeNames[m_multisearch.Entries[i / 6].mode], ALIGNED_CENTER);
+      static const char *const typeNames[] = {"u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "flt", "dbl", "pointer"};
+      // if (M_ENTRY.mode != SEARCH_MODE_POINTER)
+      Gui::drawTextAligned(font20, c4, 160 + linegape * (1 + i / 6), cellColor, typeNames[m_multisearch.Entries[i / 6].type], ALIGNED_CENTER);
     }
     else if ((i % 6) == 4)
     {
-      if (M_ENTRY.type != SEARCH_TYPE_POINTER)
+      if ((M_ENTRY.mode != SEARCH_MODE_POINTER) && (M_ENTRY.mode != SEARCH_MODE_NOT_POINTER))
         Gui::drawTextAligned(font20, c5, 160 + linegape * (1 + i / 6), cellColor, _getValueDisplayString(m_multisearch.Entries[i / 6].value1, m_multisearch.Entries[i / 6].type).c_str(), ALIGNED_CENTER);
     }
     else if ((i % 6) == 5)
@@ -1517,18 +1595,289 @@ void GuiCheats::drawEditExtraSearchValues()
   //   Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 150, 350, 300, 80, currTheme.selectedButtonColor);
   //   Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.separatorColor, "Search Now!", ALIGNED_CENTER);
   // }
-  Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 520, currTheme.textColor, "Set the value(s) you want to search for. Put the cursor on the primary target and press \uE0B3 to start the search(Chosen target is automatically turn on)\n"
+  Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 520, currTheme.textColor, "Set the value(s) you want to search for. Put the cursor on the target and press \uE0A6 + \uE0B3 to mark it as target. Press \uE0B3 to start the search\n"
                                                                                        "Each line you enable will be used to narrow down the target. Pointer is 64bit values that falls in the range of either main or heap.\n"
                                                                                        "Move the cursor to the field you want to modify. Press \uE0A4 \uE0A5 to modify. Press \uE0A0 to edit numeric Values.\n"
                                                                                        "Use \uE0A6 + \uE0A0 to edit label. Use \uE0A2 to toggle on/off. Use \uE0A6 + \uE0A2 to toggle Hex mode. Use \uE0A3 to jump cursor to value1.\n"
-                                                                                       "Press \uE0A1 to exit this screen.",
+                                                                                       "Press \uE0A7 to jump to target value1. Press \uE0A1 to exit this screen.",
                        ALIGNED_CENTER);
   //  "Press quick set keys to change the search mode \uE0AD SAME \uE0AC DIFF \uE0AB ++ \uE0AE -- \uE0B3 A..B \uE0B4 ==/!=\n"
   //  "If you search type is floating point \uE0A5 negate the number. \uE0C4 cycle float type \uE0C5 presets \uE0A3 cycle integer type",
 }
+// new dev
+void GuiCheats::drawSEARCH_pickjump()
+{
+  std::stringstream ss;
+  if (m_searchMenuLocation != SEARCH_pickjump)
+    return;
+  Gui::drawRectangled(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, Gui::makeColor(0x00, 0x00, 0x00, 0xA0));
+  // Gui::drawRectangle(50, 50, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.backgroundColor);
+  Gui::drawRectangle(0, 50, Gui::g_framebuffer_width, Gui::g_framebuffer_height , currTheme.backgroundColor);
+  Gui::drawRectangle(100, 135, Gui::g_framebuffer_width - 200, 1, currTheme.textColor);
+  {
+      // static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM", "  "};
+      ss.str("");
+      ss << "\uE132   Pick Source for JumpBack";
+      // ss << "   [ " << regionNames[m_searchRegion] << " ]";
+      ss << " line = " << m_selectedJumpSource + m_fromto32_offset + 1 << " / " << m_fromto32_size;
+  }
+  Gui::drawText(font24, 120, 70, currTheme.textColor, ss.str().c_str());
+  ss.str("");
+  color_t cellColor;
+  // Gui::drawTextAligned(font20, c0, labelline, currTheme.textColor, "LABEL", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "OFFSET", ALIGNED_CENTER);
+  // Gui::drawTextAligned(font20, c2, labelline, currTheme.textColor, "On/OFF", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "Source", ALIGNED_CENTER);
+  // Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "TYPE", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "Target", ALIGNED_CENTER);
+  // Gui::drawTextAligned(font20, c6, labelline, currTheme.textColor, "VALUE 2", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 Page UP   \uE0E5 Page Down   \uE0E6+\uE0E2 Rescan pointers      \uE0E3 Pick Source     \uE0E1 Exit", ALIGNED_RIGHT);
+  u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+  for (u8 i = 0; i < 15; i++) // 15 Row 
+  {
+    if (m_selectedJumpSource == i)
+      cellColor = currTheme.selectedColor;
+    else
+      cellColor = currTheme.textColor;
+    if (i + m_fromto32_offset >= m_fromto32_size)
+      break;
+
+    ss.str("");
+    ss << std::uppercase << std::hex << std::setfill('0') << std::setw(3) << address - (m_fromto32[i + m_fromto32_offset].to + m_heapBaseAddr)  ;
+    Gui::drawTextAligned(font20, c1, 160 + linegape * (1 + i), cellColor, ss.str().c_str(), ALIGNED_CENTER);
+
+    ss.str("");
+    if (m_fromto32[i + m_fromto32_offset].from == 0)
+    {
+      u32 temp_offset = get_main_offset32(m_fromto32[i + m_fromto32_offset].to);
+      if (m_selectedJumpSource == i) m_selectedJumpSource_offset = temp_offset;
+      ss << "Main+" << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << temp_offset;
+    }
+    else
+      ss << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_heapBaseAddr + m_fromto32[i + m_fromto32_offset].from;
+    Gui::drawTextAligned(font20, c3, 160 + linegape * (1 + i), cellColor, ss.str().c_str(), ALIGNED_CENTER);
+
+    ss.str("");
+    ss << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_heapBaseAddr + m_fromto32[i + m_fromto32_offset].to;
+    Gui::drawTextAligned(font20, c5, 160 + linegape * (1 + i), cellColor, ss.str().c_str(), ALIGNED_CENTER);
+  }
+}
+//
+void GuiCheats::MTsearchMemoryAddressesPrimary(Debugger *debugger, searchValue_t searchValue1, searchValue_t searchValue2, searchType_t searchType, searchMode_t searchMode, searchRegion_t searchRegion, MemoryDump **displayDump, std::vector<MemoryInfo> memInfos)
+{
+  (*displayDump) = new MemoryDump(EDIZON_DIR "/memdump1.dat", DumpType::ADDR, true);
+  (*displayDump)->setBaseAddresses(m_addressSpaceBaseAddr, m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize);
+  m_use_range = (searchMode == SEARCH_MODE_RANGE);
+  (*displayDump)->setSearchParams(searchType, searchMode, searchRegion, searchValue1, searchValue2, m_use_range);
+  MemoryDump *helperDump = new MemoryDump(EDIZON_DIR "/memdump1a.dat", DumpType::HELPER, true); // has address, size, count for fetching buffer from memory
+  MemoryDump *newdataDump = new MemoryDump(EDIZON_DIR "/datadump2.dat", DumpType::DATA, true);
+  MemoryDump *newstringDump = new MemoryDump(EDIZON_DIR "/stringdump.csv", DumpType::DATA, true); // to del when not needed
+  helperinfo_t helperinfo;
+  helperinfo.count = 0;
+  bool ledOn = false;
+  time_t unixTime1 = time(NULL);
+  printf("%s%lx\n", "Start Time primary search", unixTime1);
+  printf("value1=%lx value2=%lx typesize=%d\n", searchValue1._u64, searchValue2._u64, dataTypeSizes[searchType]);
+  for (MemoryInfo meminfo : memInfos)
+  {
+    if (searchRegion == SEARCH_REGION_HEAP && meminfo.type != MemType_Heap)
+      continue;
+    else if (searchRegion == SEARCH_REGION_MAIN &&
+             (((meminfo.type != MemType_CodeWritable && meminfo.type != MemType_CodeMutable && meminfo.type != MemType_CodeStatic) || !(meminfo.addr < m_mainend && meminfo.addr >= m_mainBaseAddr))))
+      continue;
+    else if (searchRegion == SEARCH_REGION_HEAP_AND_MAIN &&
+             (((meminfo.type != MemType_Heap && meminfo.type != MemType_CodeWritable && meminfo.type != MemType_CodeMutable)) || !((meminfo.addr < m_heapEnd && meminfo.addr >= m_heapBaseAddr) || (meminfo.addr < m_mainend && meminfo.addr >= m_mainBaseAddr))))
+      continue;
+    else if ( (meminfo.perm & Perm_Rw) != Perm_Rw) //searchRegion == SEARCH_REGION_RAM &&
+      continue;
+    setLedState(ledOn);
+    ledOn = !ledOn;
+    u64 offset = 0;
+    u64 bufferSize = MAX_BUFFER_SIZE; // consider to increase from 10k to 1M (not a big problem)
+    u8 *buffer = new u8[MAX_BUFFER_SIZE + m_multisearch.size];
+    while (offset < meminfo.size)
+    {
+      if (meminfo.size - offset < bufferSize)
+        bufferSize = meminfo.size - offset;
+      debugger->readMemory(buffer, bufferSize + m_multisearch.size, meminfo.addr + offset);
+      searchValue_t realValue = {0};
+      u32 inc_i;
+      if (Config::getConfig()->extra_value)
+      {
+        inc_i = M_ALIGNMENT;
+      }
+      else if (searchMode == SEARCH_MODE_POINTER)
+        inc_i = 4;
+      else
+        inc_i = dataTypeSizes[searchType];
+      for (u32 i = 0; i < bufferSize; i += inc_i)
+      {
+        if (_check_extra_not_OK(buffer, i))
+        {
+          continue; // if not match let's continue
+        }
+        u64 address = meminfo.addr + offset + m_multisearch.target_offset + i;
+        memset(&realValue, 0, 8);
+        if (searchMode == SEARCH_MODE_POINTER && m_32bitmode)
+          memcpy(&realValue, buffer + m_multisearch.target_offset + i, 4);
+        else
+          memcpy(&realValue, buffer + m_multisearch.target_offset + i, dataTypeSizes[searchType]);
+        if (Config::getConfig()->exclude_ptr_candidates && searchMode != SEARCH_MODE_POINTER)
+        {
+          searchValue_t ptr_address;
+          memcpy(&ptr_address, buffer + m_multisearch.target_offset + i - m_multisearch.target_offset % 8, 8);
+          if (((ptr_address._u64 >= m_mainBaseAddr) && (ptr_address._u64 <= (m_mainend))) || ((ptr_address._u64 >= m_heapBaseAddr) && (ptr_address._u64 <= (m_heapEnd))))
+            continue;
+        }
+        switch (searchMode)
+        {
+        case SEARCH_MODE_EQ:
+          if (realValue._s64 == searchValue1._s64)
+          {
+            (*displayDump)->addData((u8 *)&address, sizeof(u64));
+            helperinfo.count++;
+          }
+          break;
+        case SEARCH_MODE_NEQ:
+          if (realValue._s64 != searchValue1._s64)
+          {
+            (*displayDump)->addData((u8 *)&address, sizeof(u64));
+            helperinfo.count++;
+          }
+          break;
+        case SEARCH_MODE_GT:
+          if (searchType & (SEARCH_TYPE_SIGNED_8BIT | SEARCH_TYPE_SIGNED_16BIT | SEARCH_TYPE_SIGNED_32BIT | SEARCH_TYPE_SIGNED_64BIT | SEARCH_TYPE_FLOAT_32BIT | SEARCH_TYPE_FLOAT_64BIT))
+          {
+            if (realValue._s64 > searchValue1._s64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          else
+          {
+            if (realValue._u64 > searchValue1._u64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          break;
+        case SEARCH_MODE_DIFFA:
+          if (searchType & (SEARCH_TYPE_SIGNED_8BIT | SEARCH_TYPE_SIGNED_16BIT | SEARCH_TYPE_SIGNED_32BIT | SEARCH_TYPE_SIGNED_64BIT | SEARCH_TYPE_FLOAT_32BIT | SEARCH_TYPE_FLOAT_64BIT))
+          {
+            if (realValue._s64 >= searchValue1._s64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          else
+          {
+            if (realValue._u64 >= searchValue1._u64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          break;
+        case SEARCH_MODE_LT:
+          if (searchType & (SEARCH_TYPE_SIGNED_8BIT | SEARCH_TYPE_SIGNED_16BIT | SEARCH_TYPE_SIGNED_32BIT | SEARCH_TYPE_SIGNED_64BIT | SEARCH_TYPE_FLOAT_32BIT | SEARCH_TYPE_FLOAT_64BIT))
+          {
+            if (realValue._s64 < searchValue1._s64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          else
+          {
+            if (realValue._u64 < searchValue1._u64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          break;
+        case SEARCH_MODE_SAMEA:
+          if (searchType & (SEARCH_TYPE_SIGNED_8BIT | SEARCH_TYPE_SIGNED_16BIT | SEARCH_TYPE_SIGNED_32BIT | SEARCH_TYPE_SIGNED_64BIT | SEARCH_TYPE_FLOAT_32BIT | SEARCH_TYPE_FLOAT_64BIT))
+          {
+            if (realValue._s64 <= searchValue1._s64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          else
+          {
+            if (realValue._u64 <= searchValue1._u64)
+            {
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              helperinfo.count++;
+            }
+          }
+          break;
+        case SEARCH_MODE_RANGE:
+          if (realValue._s64 >= searchValue1._s64 && realValue._s64 <= searchValue2._s64)
+          {
+            (*displayDump)->addData((u8 *)&address, sizeof(u64));
+            newdataDump->addData((u8 *)&realValue, sizeof(u64));
+            helperinfo.count++;
+          }
+          break;
+        case SEARCH_MODE_POINTER: //m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize
+          if ((realValue._u64 != 0))
+            if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+            {
+              if ((m_forwarddump) && (address > realValue._u64) && (meminfo.type == MemType_Heap))
+                break;
+              (*displayDump)->addData((u8 *)&address, sizeof(u64));
+              newdataDump->addData((u8 *)&realValue, sizeof(u64));
+              helperinfo.count++;
+            }
+          break;
+        case SEARCH_MODE_NONE:
+        case SEARCH_MODE_SAME:
+        case SEARCH_MODE_DIFF:
+        case SEARCH_MODE_INC:
+        case SEARCH_MODE_DEC:
+        case SEARCH_MODE_NOT_POINTER:
+          printf("search mode non !");
+          break;
+        }
+      }
+      if (helperinfo.count != 0)
+      {
+        helperinfo.address = meminfo.addr + offset;
+        helperinfo.size = bufferSize;
+        helperDump->addData((u8 *)&helperinfo, sizeof(helperinfo));
+        helperinfo.count = 0;
+      } // must be after write
+      offset += bufferSize;
+    }
+    delete[] buffer;
+  }
+  setLedState(false);
+  time_t unixTime2 = time(NULL);
+  printf("%s%lx\n", "Stop Time ", unixTime2);
+  printf("%s%ld\n", "Stop Time ", unixTime2 - unixTime1);
+  (*displayDump)->flushBuffer();
+  newdataDump->flushBuffer();
+  helperDump->flushBuffer();
+  delete helperDump;
+  delete newdataDump;
+  newstringDump->flushBuffer(); // temp
+  delete newstringDump;         //
+}
+// end new dev
 void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
 {
 #define M_ENTRY m_multisearch.Entries[m_selectedEntry / 6]
+#define M_ENTRY_TOGGLE       \
+  if (M_ENTRY.on == OFF)     \
+    M_ENTRY.on = ON;         \
+  else if (M_ENTRY.on == ON) \
+    M_ENTRY.on = OFF;
   std::stringstream ss;
   if (kdown & KEY_B && !(kheld & KEY_ZL))
   {
@@ -1536,13 +1885,30 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_selectedEntry = m_selectedEntrySave;
     m_searchMenuLocation = SEARCH_NONE;
   }
+  else if (kdown & KEY_ZR && !(kheld & KEY_ZL))
+  {
+    m_selectedEntry = m_multisearch.target * 6 + 4;
+  }
+  else if (kdown & KEY_B && (kheld & KEY_ZL))
+  {
+    GuiCheats::save_multisearch_setup();
+  }
+  else if (kdown & KEY_PLUS && (kheld & KEY_ZL))
+  {
+    M_TARGET.on = ON;
+    m_multisearch.target = m_selectedEntry / 6;
+    M_TARGET.on = TARGET;
+  }
   else if (kdown & KEY_PLUS && !(kheld & KEY_ZL))
   {
-    m_multisearch.target = m_selectedEntry / 6;
-    m_searchType = M_ENTRY.type;
-    m_searchMode = M_ENTRY.mode;
-    m_searchValue[0] = M_ENTRY.value1;
-    m_searchValue[1] = M_ENTRY.value2; 
+    // M_TARGET.on = OFF;
+    // m_multisearch.target = m_selectedEntry / 6;
+    // M_TARGET.on = TARGET;
+    GuiCheats::save_multisearch_setup();
+    m_searchType = M_TARGET.type;
+    m_searchMode = M_TARGET.mode;
+    m_searchValue[0] = M_TARGET.value1;
+    m_searchValue[1] = M_TARGET.value2; 
     // START SEARCH
     {
       if (m_searched)
@@ -1627,9 +1993,9 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
           {
             delete m_memoryDump;
             if (Config::getConfig()->enabletargetedscan && m_targetmemInfos.size() != 0)
-              GuiCheats::searchMemoryAddressesPrimary(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_targetmemInfos);
+              GuiCheats::MTsearchMemoryAddressesPrimary(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_targetmemInfos);
             else
-              GuiCheats::searchMemoryAddressesPrimary(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_memoryInfo);
+              GuiCheats::MTsearchMemoryAddressesPrimary(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_memoryInfo);
           }
           else
           {
@@ -1653,21 +2019,25 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     for (u8 i = 0; i < 10; i++)
     {
       m_multisearch.Entries[i].offset = i * 0x8;
-      m_multisearch.Entries[i].on = false;
-      m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_32BIT;
-      m_multisearch.Entries[i].mode = SEARCH_MODE_EQ;
+      m_multisearch.Entries[i].on = OFF;
+      m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_64BIT;
+      m_multisearch.Entries[i].mode = SEARCH_MODE_POINTER;
       m_multisearch.Entries[i].value1._u64 = 0;
       m_multisearch.Entries[i].value2._u64 = 0;
       ss.str("");
-      ss << "Item " << std::dec << (u16)i + 1;
+      ss << "" << std::dec << (u16)i + 1;
       strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     }
+    m_multisearch.Entries[0].on = TARGET;
+    m_multisearch.target = 0;
   }
   else if (kdown & KEY_MINUS && (kheld & KEY_ZL))
   {
+    m_multisearch.Entries[0].on = TARGET;
+    m_multisearch.target = 0;
     u8 i = 0;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_32BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_EQ;
     m_multisearch.Entries[i].value1._u64 = 0;
@@ -1678,7 +2048,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 1;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_FLOAT_32BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
     m_multisearch.Entries[i].value1._f32 = 0.1;
@@ -1689,7 +2059,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 2;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_FLOAT_32BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
     m_multisearch.Entries[i].value1._f32 = -0.1;
@@ -1700,7 +2070,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 3;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_FLOAT_64BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_EQ;
     m_multisearch.Entries[i].value1._f64 = 0;
@@ -1711,7 +2081,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 4;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_FLOAT_64BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
     m_multisearch.Entries[i].value1._f64 = 0.1;
@@ -1722,7 +2092,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 5;
     m_multisearch.Entries[i].offset = i * 0x8;
-    m_multisearch.Entries[i].on = false;
+    m_multisearch.Entries[i].on = OFF;
     m_multisearch.Entries[i].type = SEARCH_TYPE_FLOAT_64BIT;
     m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
     m_multisearch.Entries[i].value1._f64 = -0.1;
@@ -1730,21 +2100,34 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     ss.str("");
     ss << "Range 64-";
 
-    // strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
-    // u8 i = 6;
-    // m_multisearch.Entries[i].offset = i * 0x8;
-    // m_multisearch.Entries[i].on = false;
-    // m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_32BIT;
-    // m_multisearch.Entries[i].mode = SEARCH_MODE_EQ;
-    // m_multisearch.Entries[i].value1._u64 = 0;
-    // m_multisearch.Entries[i].value2._u64 = 0;
-    // ss.str("");
-    // ss << "Item " << std::dec << (u16)i + 1;
-    // strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
+    strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
+
+    i = 6;
+    m_multisearch.Entries[i].offset = i * 0x8;
+    m_multisearch.Entries[i].on = OFF;
+    m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_64BIT;
+    m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
+    m_multisearch.Entries[i].value1._u64 = m_heapBaseAddr;
+    m_multisearch.Entries[i].value2._u64 = m_heapEnd;
+    ss.str("");
+    ss << "Heap " << std::dec << (u16)i + 1;
+    strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
+
+    i = 7;
+    m_multisearch.Entries[i].offset = i * 0x8;
+    m_multisearch.Entries[i].on = OFF;
+    m_multisearch.Entries[i].type = SEARCH_TYPE_UNSIGNED_64BIT;
+    m_multisearch.Entries[i].mode = SEARCH_MODE_RANGE;
+    m_multisearch.Entries[i].value1._u64 = m_mainBaseAddr;
+    m_multisearch.Entries[i].value2._u64 = m_mainend;
+    ss.str("");
+    ss << "Main " << std::dec << (u16)i + 1;
+    strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
   }
   else if (kdown & KEY_X && !(kheld & KEY_ZL))
   {
-    m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
+    M_ENTRY_TOGGLE
+    // m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
   }
   else if (kdown & KEY_R && !(kheld & KEY_ZL))
   {
@@ -1754,9 +2137,16 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       m_multisearch.Entries[m_selectedEntry / 6].offset++;
       break;
     case 1:
-      m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
+      M_ENTRY_TOGGLE
+      // m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
       break;
     case 2:
+      if (M_ENTRY.mode == SEARCH_MODE_EQ)
+        M_ENTRY.mode = SEARCH_MODE_NOT_POINTER;
+      else
+        M_ENTRY.mode = SEARCH_MODE_EQ;
+      break;
+    case 3:
       if (M_ENTRY.type == SEARCH_TYPE_UNSIGNED_32BIT)
       {
         M_ENTRY.type = SEARCH_TYPE_UNSIGNED_64BIT;
@@ -1771,9 +2161,6 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       }
       else
         M_ENTRY.type = SEARCH_TYPE_UNSIGNED_32BIT;
-      break;
-    case 3:
-      M_ENTRY.mode = SEARCH_MODE_EQ;
       break;
     case 4:
       switch (M_ENTRY.type)
@@ -1811,22 +2198,27 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       m_multisearch.Entries[m_selectedEntry / 6].offset--;
       break;
     case 1:
-      m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
+      M_ENTRY_TOGGLE
+      // m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
       break;
     case 2:
+      if (M_ENTRY.mode == SEARCH_MODE_POINTER)
+        M_ENTRY.mode = SEARCH_MODE_RANGE;
+      else
+      {
+        M_ENTRY.mode = SEARCH_MODE_POINTER;
+        M_ENTRY.type = SEARCH_TYPE_UNSIGNED_64BIT;
+      }
+      break;
+    case 3:
       if (m_multisearch.Entries[m_selectedEntry / 6].type == SEARCH_TYPE_FLOAT_32BIT)
       {
         m_multisearch.Entries[m_selectedEntry / 6].type = SEARCH_TYPE_FLOAT_64BIT;
       }
-      else if (M_ENTRY.type == SEARCH_TYPE_FLOAT_64BIT)
-      {
-        M_ENTRY.type = SEARCH_TYPE_POINTER;
-      }
       else
+      {
         m_multisearch.Entries[m_selectedEntry / 6].type = SEARCH_TYPE_FLOAT_32BIT;
-      break;
-    case 3:
-      M_ENTRY.mode = SEARCH_MODE_RANGE;
+      }
       break;
     case 4:
       switch (M_ENTRY.type)
@@ -1933,7 +2325,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     if (m_selectedEntry % 6 < 5)
       m_selectedEntry++;
   }
-  if (M_ENTRY.type == SEARCH_TYPE_POINTER)
+  if (M_ENTRY.mode == SEARCH_MODE_POINTER || M_ENTRY.mode == SEARCH_MODE_NOT_POINTER)
   {
     if (m_selectedEntry % 6 > 2)
     {
@@ -1948,7 +2340,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     }
   }
 }
-void GuiCheats::editor_input(u32 kdown, u32 kheld)
+void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory explorer
 {
   if (kdown & KEY_B && kheld & KEY_ZL)
   {
@@ -1956,30 +2348,161 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld)
     m_searchMenuLocation = SEARCH_NONE;
     m_addressmod = 0;
   }
+  else if (kdown & KEY_RSTICK && !(kheld & KEY_ZL))
+  {
+    u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+    searchValue_t value = {0};
+    u8 *ram_buffer = new u8[M_ENTRY_MAX * sizeof(u64)];
+    u64 startaddress = address - 0x20 - (address % 16);
+    m_debugger->readMemory(ram_buffer, M_ENTRY_MAX * sizeof(u64), startaddress);
+    for (int i = 0; i < M_ENTRY_MAX; i++)
+    {
+      if (i == (int)(4 + (address / sizeof(u64)) % 2))
+      {
+        M_ENTRYi.on = TARGET;
+        M_ENTRYi.type = m_searchType;
+        M_ENTRYi.mode = SEARCH_MODE_EQ;
+        M_ENTRYi.offset = address % 16 + 0x20;
+        memcpy(&value, ram_buffer + M_ENTRYi.offset, dataTypeSizes[m_searchType]);
+        M_ENTRYi.value1._s64 = value._s64;
+      }
+      else
+      {
+        M_ENTRYi.on = ON;
+        M_ENTRYi.type = SEARCH_TYPE_UNSIGNED_64BIT;
+        value = {0};
+        memcpy(&value, ram_buffer + i * sizeof(u64), sizeof(u64));
+        if (((value._u64 >= m_mainBaseAddr) && (value._u64 <= (m_mainend))) || ((value._u64 >= m_heapBaseAddr) && (value._u64 <= (m_heapEnd))))
+        {
+          M_ENTRYi.mode = SEARCH_MODE_POINTER;
+          M_ENTRYi.offset = i * sizeof(u64);
+        }
+        else
+        {
+          value = {0};
+          memcpy(&value, ram_buffer + i * sizeof(u64), sizeof(u32));
+          if (value._f32 > 0.001 && value._f32 < 1000000)
+          {
+            M_ENTRYi.mode = SEARCH_MODE_RANGE;
+            M_ENTRYi.type = SEARCH_TYPE_FLOAT_32BIT;
+            M_ENTRYi.offset = i * sizeof(u64);
+            M_ENTRYi.value1._f32 = 0.001;
+            M_ENTRYi.value2._f32 = 1000000;
+          }
+          else if (value._f32 < -0.001 && value._f32 > -1000000)
+          {
+            M_ENTRYi.mode = SEARCH_MODE_RANGE;
+            M_ENTRYi.type = SEARCH_TYPE_FLOAT_32BIT;
+            M_ENTRYi.offset = i * sizeof(u64);
+            M_ENTRYi.value1._f32 = -0.001;
+            M_ENTRYi.value2._f32 = -1000000;
+          }
+          else
+          {
+            value = {0};
+            memcpy(&value, ram_buffer + i * sizeof(u64) + sizeof(u32), sizeof(u32));
+            if (value._f32 > 0.001 && value._f32 < 1000000)
+            {
+              M_ENTRYi.mode = SEARCH_MODE_RANGE;
+              M_ENTRYi.type = SEARCH_TYPE_FLOAT_32BIT;
+              M_ENTRYi.offset = i * sizeof(u64) + sizeof(u32);
+              M_ENTRYi.value1._f32 = 0.001;
+              M_ENTRYi.value2._f32 = 1000000;
+            }
+            else if (value._f32 < -0.001 && value._f32 > -1000000)
+            {
+              M_ENTRYi.mode = SEARCH_MODE_RANGE;
+              M_ENTRYi.type = SEARCH_TYPE_FLOAT_32BIT;
+              M_ENTRYi.offset = i * sizeof(u64) + sizeof(u32);
+              M_ENTRYi.value1._f32 = -0.001;
+              M_ENTRYi.value2._f32 = -1000000;
+            }
+            else
+            {
+              M_ENTRYi.mode = SEARCH_MODE_NOT_POINTER;
+              M_ENTRYi.offset = i * sizeof(u64);
+            }
+          }
+        }
+      }
+    }
+    delete [] ram_buffer;
+    (new Snackbar("Multi search setup created!"))->show();
+    GuiCheats::save_multisearch_setup();
+  }
   else if (kdown & KEY_B && !(kheld & KEY_ZL))
   {
-    if (m_jump_stack_index > 0)
+    // if (m_jump_stack_index > 0)
+    // {
+    //   m_jump_stack_index--;
+    //   // m_EditorBaseAddr = m_jump_stack[m_jump_stack_index];
+    //   m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+    // }
+    // else
+    // {
+    //   (new Snackbar("Jump Stack empty!"))->show();
+    // }
     {
-      m_jump_stack_index--;
-      m_EditorBaseAddr = m_jump_stack[m_jump_stack_index];
-      m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
-    }
-    else
-    {
-      (new Snackbar("Jump Stack empty!"))->show();
+      if (m_EditorBaseAddr >= m_mainBaseAddr && m_EditorBaseAddr <= m_mainend)
+      {
+        (new Snackbar("Already at Main!"))->show();
+      }
+      else
+      {
+        u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+        GuiCheats::prep_pointersearch(m_debugger, m_memoryInfo);
+        GuiCheats::prep_backjump_stack(address);
+        m_searchMenuLocation = SEARCH_pickjump;
+      }
+      // pick key need to do this
+      // {
+      //   u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+      //   m_bookmark.pointer.offset[m_z] = m_fromto32(m_pick).to - address + m_heapBaseAddr;
+      //   m_z++;
+      //   m_jump_stack[m_z].from = m_fromto32(m_pick).from + m_heapBaseAddr;
+      //   m_jump_stack[m_z].to = m_fromto32(m_pick).to + m_heapBaseAddr;
+      //   m_EditorBaseAddr = m_jump_stack[m_z].from;
+      //   m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+      //   m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
+      //   m_addressmod = 0;
+      //   place head here;
+      // }
     }
   }
   else if (kdown & KEY_R && !(kheld & KEY_ZL))
   {
-    if (m_jump_stack_index < m_jump_stack_max - 1)
+    if (m_z > m_bookmark.pointer.depth - m_depth_count)
     {
-      m_jump_stack_index++;
-      m_EditorBaseAddr = m_jump_stack[m_jump_stack_index];
+      // if (m_jump_stack[m_z].to !=0)
+      m_EditorBaseAddr = m_jump_stack[m_z].to;
       m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+      m_addressmod = 0;
+      m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
+      m_z--;
     }
     else
     {
-      (new Snackbar("Top of Stack reached!"))->show();
+      m_EditorBaseAddr = m_jump_stack[m_z + 1].to + m_bookmark.pointer.offset[m_z];
+      m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+      m_addressmod = m_EditorBaseAddr % 4;
+      m_searchType = m_bookmark.type;
+      if (m_addressmod % 2)
+        m_searchType = SEARCH_TYPE_UNSIGNED_8BIT;
+      else if (m_addressmod == 2)
+        m_searchType = SEARCH_TYPE_UNSIGNED_16BIT;
+      else 
+        m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
+    }
+  }
+  else if (kdown & KEY_L && !(kheld & KEY_ZL))
+  {
+    if (m_z < m_bookmark.pointer.depth)
+    {
+      m_z++;
+      m_EditorBaseAddr = m_jump_stack[m_z].from;
+      m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+      m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
+      m_addressmod = 0;
     }
   }
   else if (kdown & KEY_UP)
@@ -2047,11 +2570,18 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld)
     m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
     if (m_bookmark.pointer.depth > 0)
     {
-      s64 offset = address - m_BookmarkAddr + m_bookmark.pointer.offset[0];
-      if (offset >= 0 && offset < (s64)m_max_range)
+      u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+      if (m_z == m_bookmark.pointer.depth)
+        m_bookmark.pointer.offset[m_z] = address - ((m_bookmark.heap) ? m_heapBaseAddr : m_mainBaseAddr);
+      else
+        m_bookmark.pointer.offset[m_z] = address - m_jump_stack[m_z + 1].to;
+      bookmark.pointer.depth = m_bookmark.pointer.depth - m_z;
       {
-        memcpy(&(bookmark.pointer), &(m_bookmark.pointer), (m_bookmark.pointer.depth + 2) * 8);
-        bookmark.pointer.offset[0] = (u64)offset;
+        for (int z = m_bookmark.pointer.depth; z >= m_z; z--)
+        {
+          bookmark.pointer.offset[z-m_z] = m_bookmark.pointer.offset[z];
+        }
+        // memcpy(&(bookmark.pointer), &(m_bookmark.pointer[m_bookmark.pointer.depth - m_depth_count]), (m_depth_count + 2) * 8);
         m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
         m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
       }
@@ -2072,14 +2602,6 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld)
   else if (kdown & KEY_ZR) // Page down
   {
     m_EditorBaseAddr += 0x80;
-  }
-  else if (kdown & KEY_R && !(kheld & KEY_ZL))
-  {
-
-  }
-  else if (kdown & KEY_L && !(kheld & KEY_ZL))
-  {
-
   }
   else if (kdown & KEY_R && kheld & KEY_ZL) // change type
   {
@@ -2114,24 +2636,68 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld)
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     u64 pointed_address;
     m_debugger->readMemory(&pointed_address, sizeof(u64), address);
+    if (m_z == m_bookmark.pointer.depth)
+      m_bookmark.pointer.offset[m_z] = address - ((m_bookmark.heap) ? m_heapBaseAddr : m_mainBaseAddr);
+    else
+      m_bookmark.pointer.offset[m_z] = address - m_jump_stack[m_z + 1].to;
     if ((pointed_address >= m_mainBaseAddr && pointed_address <= m_mainend) || (pointed_address >= m_heapBaseAddr && pointed_address <= m_heapEnd))
     {
-      if (m_jump_stack_index + 1 < MAX_JUMP_STACK)
+      if (m_z == 0)
       {
-        m_jump_stack[m_jump_stack_index] = address;
-        m_jump_stack_index++; 
-        m_jump_stack_max = m_jump_stack_index;
-        m_EditorBaseAddr = pointed_address;
-        m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
-        m_addressmod = m_EditorBaseAddr % 4;
-        if (m_addressmod % dataTypeSizes[m_searchType] != 0)
-          m_addressmod = 0;
+        if (m_bookmark.pointer.depth < MAX_POINTER_DEPTH) // expand pointer chain
+        {
+          // if (m_bookmark.pointer.depth == 0)
+          //   m_bookmark.heap = true;
+          m_bookmark.pointer.depth++;
+          for (int z = m_bookmark.pointer.depth; z > 0; z--)
+          {
+            m_bookmark.pointer.offset[z]=m_bookmark.pointer.offset[z-1];
+          }
+          m_bookmark.pointer.offset[0] = 0;
+          m_z = 1;
+          // m_bookmark.pointer.offset[1] = address - m_jump_stack[2].to;
+        }
+        else
+        {
+          // m_bookmark.pointer.offset[m_z] = address - m_jump_stack[m_z + 1].to;
+        }
       }
       else
       {
-        (new Snackbar("Jump Stack full!"))->show();
+        // m_bookmark.pointer.offset[m_z] = address - m_jump_stack[m_z + 1].to;
+        // m_jump_stack[m_z].from = address;
+        // m_jump_stack[m_z].to = pointed_address;
       }
     }
+    else
+    { // change target
+      if (m_z == 0)
+      {
+        // m_bookmark.pointer.offset[0] = address - m_jump_stack[1].to;
+      }
+      else
+      {
+        // m_bookmark.pointer.offset[m_z] = address - m_jump_stack[m_z + 1].to;
+      }
+    }
+
+      // if (m_jump_stack_index + 1 < MAX_JUMP_STACK)
+      // {
+      //   m_jump_stack[m_jump_stack_index] = address;
+      //   m_jump_stack_index++; 
+      //   m_jump_stack_max = m_jump_stack_index;
+      //   m_EditorBaseAddr = pointed_address;
+      //   m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+      //   m_addressmod = m_EditorBaseAddr % 4;
+      //   if (m_addressmod % dataTypeSizes[m_searchType] != 0)
+      //     m_addressmod = 0;
+      // }
+      // else
+      // {
+      //   (new Snackbar("Jump Stack full!"))->show();
+      // }
+
+    
     // std::stringstream ss;
     // ss << "0x" << std::uppercase << std::hex << address;
     // char input[16];
@@ -2170,17 +2736,17 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld)
       if ((address >= m_mainBaseAddr && address <= m_mainend) || (address >= m_heapBaseAddr && address <= m_heapEnd))
       {
         // printf("valid %lx\n", address);
-        (new Snackbar("Address valid!"))->show();
-        if (m_jump_stack_index < MAX_JUMP_STACK)
-        {
-          m_jump_stack[m_jump_stack_index] = m_EditorBaseAddr;
-          m_jump_stack_index++;
-          m_EditorBaseAddr = address;
-        }
-        else
-        {
-          (new Snackbar("Jump Stack full!"))->show();
-        }
+        // (new Snackbar("Address valid!"))->show();
+        // if (m_jump_stack_index < MAX_JUMP_STACK)
+        // {
+        //   m_jump_stack[m_jump_stack_index] = m_EditorBaseAddr;
+        //   m_jump_stack_index++;
+        //   m_EditorBaseAddr = address;
+        // }
+        // else
+        // {
+        //   (new Snackbar("Jump Stack full!"))->show();
+        // }
       }
       else
       {
@@ -2426,6 +2992,7 @@ void GuiCheats::drawSearchRAMMenu()
   case SEARCH_editRAM2:
   case SEARCH_POINTER:
   case SEARCH_editExtraSearchValues:
+  case SEARCH_pickjump:
     break;
   }
 }
@@ -2510,12 +3077,88 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
     }
   }
 }
+void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
+{
+  if (kdown & KEY_Y)
+  {
+    m_searchMenuLocation = SEARCH_editRAM2;
+    u64 m_pick = m_selectedJumpSource + m_fromto32_offset;
+      // Need to get main
+    // u64 address = (m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod);
+    if (m_z == 0)
+      m_bookmark.pointer.offset[m_z] =  (m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod) - (m_fromto32[m_pick].to + m_heapBaseAddr) ;
+    else
+    {
+      m_bookmark.pointer.offset[m_z] = m_jump_stack[m_z].from - (m_fromto32[m_pick].to + m_heapBaseAddr);
+      // printf("m_jump_stack[m_z].from %lx - (m_fromto32[m_pick].to + m_heapBaseAddr) %lx \n",m_jump_stack[m_z].from, (m_fromto32[m_pick].to + m_heapBaseAddr));
+    }
+    m_z++;
+    if (m_fromto32[m_pick].from == 0)
+    {
+      m_jump_stack[m_z].from = m_selectedJumpSource_offset + m_mainBaseAddr; //get_main_offset32(m_fromto32[m_pick].to)
+    }
+    else
+      m_jump_stack[m_z].from = m_fromto32[m_pick].from + m_heapBaseAddr;
+    m_jump_stack[m_z].to = m_fromto32[m_pick].to + m_heapBaseAddr;
+    m_EditorBaseAddr = m_jump_stack[m_z].from;
+    m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
+    m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
+    m_addressmod = 0;
+    m_bookmark.pointer.depth = m_z;
+    m_bookmark.pointer.offset[m_z] = m_jump_stack[m_z].from - ((m_bookmark.heap) ? m_heapBaseAddr : m_mainBaseAddr);
+    //   place head here;
+  }
+  else if (kdown & KEY_UP)
+  {
+    if (m_selectedJumpSource > 0)
+      m_selectedJumpSource--;
+    // if (m_selectedJumpSource + 1 == m_fromto32_offset && m_fromto32_offset > 0)
+    //   m_fromto32_offset-=15;
+  }
+  else if (kdown & KEY_DOWN) //
+  {
+    if ((m_selectedJumpSource < 14) && (m_selectedJumpSource + m_fromto32_offset + 1 < m_fromto32_size))
+      m_selectedJumpSource++;
+    // if (m_selectedJumpSource == (m_fromto32_offset + 15) && m_fromto32_offset < (m_fromto32_size - 15))
+    //   m_fromto32_offset+=15;
+  }
+  else if (kdown & KEY_R)
+  {
+    if ( m_fromto32_offset  + 15 < m_fromto32_size )
+      m_fromto32_offset += 15;
+    if (m_selectedJumpSource + m_fromto32_offset >= m_fromto32_size)
+      m_selectedJumpSource = m_fromto32_size - m_fromto32_offset -1;
+  }
+  else if (kdown & KEY_L)
+  {
+    if (m_fromto32_offset >= 15)
+      m_fromto32_offset -= 15;
+  }
+  else if (kdown & KEY_X && (kheld & KEY_ZL))  
+  {
+    m_redo_prep_pointersearch = true;
+    u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+    GuiCheats::prep_pointersearch(m_debugger, m_memoryInfo);
+    GuiCheats::prep_backjump_stack(address);
+  }
+  else if (kdown & KEY_B)
+  {
+    m_searchMenuLocation = SEARCH_editRAM2;
+  }
+}
+// WIP ***************
+
 void GuiCheats::onInput(u32 kdown)
 {
   u32 kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
   if (m_searchMenuLocation == SEARCH_editRAM2)
   {
     editor_input(kdown, kheld);
+    return;
+  };
+  if (m_searchMenuLocation == SEARCH_pickjump)
+  {
+    pickjump_input(kdown, kheld);
     return;
   };
   if (m_searchMenuLocation == SEARCH_editExtraSearchValues)
@@ -2839,6 +3482,7 @@ void GuiCheats::onInput(u32 kdown)
       m_selectedEntry = 1;
       m_searchValue[0]._u64 = 0x1000000000;
       m_searchValue[1]._u64 = 0x8000000000;
+      Config::getConfig()->exclude_ptr_candidates = false;
     }
     if ((kdown & KEY_LSTICK) && m_menuLocation == CHEATS && (kheld & KEY_ZL))
     {
@@ -2926,7 +3570,10 @@ void GuiCheats::onInput(u32 kdown)
           if (opcode == 5 && FSA == 0)
           {
             i++;
-            offset[depth] = cheat.opcodes[i];
+            if (M == 0)
+              offset[depth] = cheat.opcodes[i];
+            else
+              offset[depth] = m_heapBaseAddr - m_mainBaseAddr + cheat.opcodes[i];
             depth++;
           }
           continue;
@@ -3224,13 +3871,18 @@ void GuiCheats::onInput(u32 kdown)
         {
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
           m_BookmarkAddr = m_EditorBaseAddr;
-          m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
+          if (m_memoryDump1 != nullptr)
+            m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
+          else
+            m_bookmark.pointer.depth = 0;
           m_searchMenuLocation = SEARCH_editRAM2;
           m_selectedEntrySave = m_selectedEntry;
           m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
           m_addressmod = m_EditorBaseAddr % 4;
           if (m_addressmod % dataTypeSizes[m_searchType] != 0)
             m_addressmod = 0;
+          m_z = 0;
+          m_bookmark.heap = false;
           if (m_memoryDump1 != nullptr)
           {
             m_searchType = m_bookmark.type;
@@ -3241,25 +3893,22 @@ void GuiCheats::onInput(u32 kdown)
               for (int z = m_bookmark.pointer.depth; z > 0; z--)
               {
                 nextaddress += m_bookmark.pointer.offset[z];
-                m_jump_stack[m_jump_stack_index] = nextaddress;
-                m_jump_stack_index++;
+                m_jump_stack[z].from = nextaddress;
                 MemoryInfo meminfo = m_debugger->queryMemory(nextaddress);
                 if (meminfo.perm == Perm_Rw)
                   m_debugger->readMemory(&nextaddress, ((m_32bitmode) ? sizeof(u32) : sizeof(u64)), nextaddress);
                 else
                 {
-                   // printf("*access denied*");
+                  m_z = z ;
                   break;
                 }
-                m_jump_stack[m_jump_stack_index] = nextaddress;
-                m_jump_stack_index++;
+                m_jump_stack[z].to = nextaddress;
+                m_z = z - 1;
               }
             }
-            m_jump_stack[m_jump_stack_index] = m_EditorBaseAddr;
-            m_jump_stack_index++;
-            m_jump_stack_max = m_jump_stack_index;
-            //
+            //ME3 data init for memory explorer
           }
+          printf("bookmarkdepth =%ld m_z=%d\n", m_bookmark.pointer.depth, m_z);
         }
 
         if ((kdown & KEY_LSTICK) && (m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) && (m_memoryDump1 != nullptr))
@@ -3267,8 +3916,8 @@ void GuiCheats::onInput(u32 kdown)
           printf("\nstart scan range select ....................\n");
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
           MemoryInfo meminfo = {0};
-          u64 t_start = m_EditorBaseAddr - (Config::getConfig()->extraMB + 1) * 1024 * 1024;
-          u64 t_end = m_EditorBaseAddr + (Config::getConfig()->extraMB + 1) * 1024 * 1024;
+          u64 t_start = m_EditorBaseAddr - m_EditorBaseAddr % M_ALIGNMENT - (Config::getConfig()->extraMB + 1) * 1024 * 1024;
+          u64 t_end = m_EditorBaseAddr - m_EditorBaseAddr % M_ALIGNMENT + (Config::getConfig()->extraMB + 1) * 1024 * 1024;
           if (t_end > m_heapEnd && m_heapEnd != 0)
             t_end = m_heapEnd;
           meminfo = m_debugger->queryMemory(t_start);
@@ -3790,7 +4439,7 @@ void GuiCheats::onInput(u32 kdown)
     {
       if (m_searchMenuLocation == SEARCH_NONE)
       {
-        if (Config::getConfig()->extra_value)
+        if ((Config::getConfig()->extra_value) && (m_memoryDump->size() == 0))
         { // enter multi search
           m_searchMenuLocation = SEARCH_editExtraSearchValues;
           m_selectedEntrySave = m_selectedEntry;
@@ -3877,6 +4526,7 @@ void GuiCheats::onInput(u32 kdown)
 
           break;
         case SEARCH_editExtraSearchValues:
+        case SEARCH_pickjump:
           break;
         }
       }
@@ -3913,6 +4563,7 @@ void GuiCheats::onInput(u32 kdown)
 
           break;
         case SEARCH_editExtraSearchValues:
+        case SEARCH_pickjump:
           break;
         }
       }
@@ -3942,6 +4593,7 @@ void GuiCheats::onInput(u32 kdown)
             m_selectedEntry--;
           break;
         case SEARCH_editExtraSearchValues:
+        case SEARCH_pickjump:
           break;
         }
       }
@@ -3971,6 +4623,7 @@ void GuiCheats::onInput(u32 kdown)
             m_selectedEntry++;
           break;
         case SEARCH_editExtraSearchValues:
+        case SEARCH_pickjump:
           break;
         }
       }
@@ -4794,16 +5447,17 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
           if (((ptr_address._u64 >= m_mainBaseAddr) && (ptr_address._u64 <= (m_mainend))) || ((ptr_address._u64 >= m_heapBaseAddr) && (ptr_address._u64 <= (m_heapEnd))))
             continue;
         }
+        // if (_check_extra_not_OK(buffer, i)) continue; // if not match let's continue
         switch (searchMode)
         {
         case SEARCH_MODE_EQ:
           if (realValue._s64 == searchValue1._s64)
           {
-            if (Config::getConfig()->extra_value)
-            {
-              if (!true) // extra value match
-                break;
-            }
+            // if (Config::getConfig()->extra_value)
+            // {
+            //   if (!true) // extra value match
+            //     break;
+            // }
             (*displayDump)->addData((u8 *)&address, sizeof(u64));
             helperinfo.count++;
           }
@@ -4920,6 +5574,7 @@ void GuiCheats::searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t s
         case SEARCH_MODE_DIFF:
         case SEARCH_MODE_INC:
         case SEARCH_MODE_DEC:
+        case SEARCH_MODE_NOT_POINTER:
           printf("search mode non !");
           break;
         }
@@ -5169,6 +5824,7 @@ void GuiCheats::searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t
         }
         break;
       case SEARCH_MODE_NONE:
+      case SEARCH_MODE_NOT_POINTER:
         break;
       }
     }
@@ -5469,6 +6125,7 @@ void GuiCheats::searchMemoryAddressesSecondary2(Debugger *debugger, searchValue_
         }
         break;
       case SEARCH_MODE_NONE:
+      case SEARCH_MODE_NOT_POINTER:
         break;
       }
     }
@@ -5791,6 +6448,7 @@ void GuiCheats::searchMemoryValuesSecondary(Debugger *debugger, searchType_t sea
         case SEARCH_MODE_EQ:
         case SEARCH_MODE_GT:
         case SEARCH_MODE_LT:
+        case SEARCH_MODE_NOT_POINTER:
           printf("error 123\n");
           break;
         }
@@ -6103,6 +6761,7 @@ void GuiCheats::searchMemoryValuesTertiary(Debugger *debugger, searchValue_t sea
       case SEARCH_MODE_EQ:
       case SEARCH_MODE_GT:
       case SEARCH_MODE_LT:
+      case SEARCH_MODE_NOT_POINTER:
         break;
       }
     }
@@ -6738,33 +7397,26 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
 }
 // printf("not found \n");
 // return;
-
 // m_targetmemInfos.clear();
 // m_target = address;
 // m_max_depth = depth;
 // m_max_range = range;
 // m_numoffset = num;
-
 // std::vector<MemoryInfo> mainInfos;
 // mainInfos.clear();
 // m_low_main_heap_addr = 0x100000000000;
 // m_high_main_heap_addr = 0;
-
 // for (MemoryInfo meminfo : m_memoryInfo)
 // {
 //   // if (m_searchRegion == SEARCH_REGION_RAM)
 //   //   if ((meminfo.perm & Perm_Rw) != Perm_Rw) continue; else
 //   if (meminfo.type != MemType_Heap && meminfo.type != MemType_CodeWritable && meminfo.type != MemType_CodeMutable)
 //     continue;
-
 //   if (meminfo.addr < m_low_main_heap_addr)
 //     m_low_main_heap_addr = meminfo.addr;
-
 //   if ((meminfo.addr + meminfo.size) > m_high_main_heap_addr)
 //     m_high_main_heap_addr = (meminfo.addr + meminfo.size);
-
 //   m_targetmemInfos.push_back(meminfo);
-
 //   if (meminfo.type == MemType_CodeWritable || meminfo.type == MemType_CodeMutable)
 //   {
 //     mainInfos.push_back(meminfo);
@@ -6780,12 +7432,10 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
 //     //
 //   }
 // }
-
 // m_Time1 = time(NULL);
 // printf("searching pointer for address %lx\n Range %lx .. %lx ", m_target, m_low_main_heap_addr, m_high_main_heap_addr);
 // for (u8 i = 0; i < 20; i++)
 //   m_hitcount.offset[i] = 0;
-
 // for (MemoryInfo meminfo : mainInfos)
 // {
 //   if (meminfo.addr < m_mainBaseAddr)
@@ -6811,7 +7461,6 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
 //   printf("hit count depth");
 //   for (u8 i = 0; i < 20; i++)
 //     printf("%d= %d ", i, m_hitcount.offset[i]);
-
 // void GuiCheats::searchpointer(u64 address, u64 depth, u64 range, struct pointer_chain_t pointerchain) //assumed range don't extend beyond a segment, need to make seperate call to cover multi segment
 // {
 //   // using global to reduce overhead
@@ -6904,7 +7553,6 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
 //   }
 //   delete[] buffer;
 // }
-
 /**
  * Primary:
  *  Initial full memory dump regardless of type
@@ -7183,12 +7831,27 @@ bool GuiCheats::addcodetofile(u64 index)
     ss.str("");
     ss << "[" << bookmark.label << "]"
        << "\n";
-    ss << ((m_32bitmode) ? "540F0000 " : "580F0000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[bookmark.pointer.depth] << "\n";
+    if (bookmark.pointer.offset[bookmark.pointer.depth] > 0 && bookmark.pointer.offset[bookmark.pointer.depth] <= (s64)(m_mainend - m_mainBaseAddr))
+      ss << ((m_32bitmode) ? "540F0000 " : "580F0000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[bookmark.pointer.depth] << "\n";
+    else
+      ss << ((m_32bitmode) ? "541F0000 " : "581F0000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << m_mainBaseAddr - m_heapBaseAddr + bookmark.pointer.offset[bookmark.pointer.depth] << "\n";
+
     for (int z = bookmark.pointer.depth - 1; z > 0; z--)
     {
-      ss << ((m_32bitmode) ? "540F1000 " : "580F1000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[z] << "\n";
+      if (bookmark.pointer.offset[z] >= 0)
+        ss << ((m_32bitmode) ? "540F1000 " : "580F1000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[z] << "\n";
+      else
+      {
+        ss << ((m_32bitmode) ? "740F1000 " : "780F1000 ") << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[z]*(-1) << "\n";
+        ss << ((m_32bitmode) ? "540F1000 00000000" : "580F1000 00000000");
+      }
+      
     }
-    ss << "780F0000 " << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[0] << "\n";
+    if (bookmark.pointer.offset[0] >= 0)
+      ss << "780F0000 " << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[0] << "\n";
+    else
+      ss << "780F1000 " << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.pointer.offset[0]*(-1) << "\n";
+
     ss << "6" << dataTypeSizes[bookmark.type] + 0 << "0F0000 " << std::uppercase << std::hex << std::setfill('0') << std::setw(16) << realvalue._u64 << "\n";
     printf("index = %ld depth = %ld offset = %ld offset = %ld offset = %ld offset = %ld\n", index, bookmark.pointer.depth, bookmark.pointer.offset[3], bookmark.pointer.offset[2], bookmark.pointer.offset[1], bookmark.pointer.offset[0]);
     printf("address = %lx value = %lx \n", address, realvalue._u64);
@@ -7269,6 +7932,7 @@ bool GuiCheats::editcodefile() // not used work in progress
       }
     }
   }
+  delete [] s;
   // WIP
   pfile = fopen(filebuildIDStr.str().c_str(), "w+b");
   std::stringstream ss;
@@ -7307,7 +7971,7 @@ bool GuiCheats::reloadcheatsfromfile(u8 *buildID, u64 titleID)
     pfile = fopen(realCheatPath.str().c_str(), "r+b");
     fseek(pfile, 0, SEEK_END);
     u64 bufferSize = ftell(pfile);
-    u8 *s = new u8[bufferSize + 1];
+    u8 *s = new u8[bufferSize + 1]; // watch out for memory leak
     /* Read cheats into buffer. */
     fseek(pfile, 0, SEEK_SET);
     fread(s, sizeof(bufferSize), 1, pfile);
@@ -7879,6 +8543,7 @@ void GuiCheats::PCdump()
       }
     }
     offset += bufferSize;
+    delete[] buffer;
   }
   PCDump->flushBuffer();
   delete PCDump;
@@ -8033,6 +8698,410 @@ void GuiCheats::searchMemoryAddressesPrimary2(Debugger *debugger, searchValue_t 
   // delete newstringDump;
 }
 //
+// #define inc_prep
+void GuiCheats::prep_pointersearch(Debugger *debugger, std::vector<MemoryInfo> memInfos)
+{
+#ifdef inc_prep
+  u8 j = 1;
+  int k = -1;
+  while (access(m_PCDump_filename.str().c_str(), F_OK) == 0)
+  {
+    m_PCDump_filename.seekp(k, std::ios_base::end);
+    m_PCDump_filename << (0 + j++);
+    printf("%s\n", m_PCDump_filename.str().c_str());
+    if (j > 10)
+      k = -2;
+    if (j > 100)
+      k = -3;
+  }
+  // if (j == 1)
+  //   j++;
+  // std::stringstream m_PCAttr_filename;
+  // m_PCAttr_filename << m_PCDump_filename.str().c_str();
+  // m_PCAttr_filename.seekp(k - 3, std::ios_base::end);
+  // m_PCAttr_filename << "att" << (j - 1);
+#endif
+  if ((m_PC_Dump != nullptr) && !m_redo_prep_pointersearch)
+  {
+    // refresh_fromto();
+    return;
+  };
+  m_PCAttr_filename.str("");
+  m_PCAttr_filename << m_PCDump_filename.str().c_str() << "A";
+  m_PCDumpM_filename.str("");
+  m_PCDumpM_filename << m_PCDump_filename.str().c_str() << "M";
+
+  MemoryDump *PCDump;
+  // check if data is already for use
+  if (access(m_PCDump_filename.str().c_str(), F_OK) == 0)
+  {
+    PCDump = new MemoryDump(m_PCDump_filename.str().c_str(), DumpType::DATA, false);
+    if ((PCDump->getDumpInfo().heapBaseAddress == m_heapBaseAddr) && !m_redo_prep_pointersearch)
+    {
+      m_PC_Dump = PCDump;
+      m_PC_DumpM = new MemoryDump(m_PCDumpM_filename.str().c_str(), DumpType::DATA, false);
+      refresh_fromto();
+      return;
+    };
+    delete PCDump;
+  }
+  if (m_redo_prep_pointersearch)
+  {
+    m_redo_prep_pointersearch = false;
+    delete m_PC_Dump;
+    delete m_PC_DumpM;
+  };
+  (new MessageBox("Preparing JumpBack data.\n \nThis may take a while...", MessageBox::NONE))->show();
+  requestDraw();
+
+  PCDump = new MemoryDump(m_PCDump_filename.str().c_str(), DumpType::DATA, true);
+  PCDump->setBaseAddresses(m_addressSpaceBaseAddr, m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize);
+  MemoryDump *PCDumpM;
+  PCDumpM = new MemoryDump(m_PCDumpM_filename.str().c_str(), DumpType::DATA, true);
+  MemoryDump *PCAttr;
+  PCAttr = new MemoryDump(m_PCAttr_filename.str().c_str(), DumpType::DATA, true);
+  // PCDump->addData((u8 *)&m_mainBaseAddr, sizeof(u64));
+  // PCDump->addData((u8 *)&m_mainend, sizeof(u64));
+  // PCDump->addData((u8 *)&m_heapBaseAddr, sizeof(u64));
+  // PCDump->addData((u8 *)&m_heapEnd, sizeof(u64));
+  // PCDump->addData((u8 *)&m_EditorBaseAddr, sizeof(u64)); // first entry is the target address
+  // PCDump->flushBuffer();
+  PCDump->m_compress = false;
+  bool ledOn = false;
+  time_t unixTime1 = time(NULL);
+  printf("%s%lx\n", "Start Time primary search", unixTime1);
+  dmntchtPauseCheatProcess();
+  // printf("main %lx main end %lx heap %lx heap end %lx \n",m_mainBaseAddr, m_mainBaseAddr+m_mainSize, m_heapBaseAddr, m_heapBaseAddr+m_heapSize);
+  for (MemoryInfo meminfo : memInfos)
+  {
+    if (((meminfo.type != MemType_Heap && meminfo.type != MemType_CodeWritable && meminfo.type != MemType_CodeMutable)) || !((meminfo.addr < m_heapEnd && meminfo.addr >= m_heapBaseAddr) || (meminfo.addr < m_mainend && meminfo.addr >= m_mainBaseAddr)))
+      continue;
+    setLedState(ledOn);
+    ledOn = !ledOn;
+    printf("meminfo.addr,%lx,meminfo.size,%lx,meminfo.type,%d,", meminfo.addr, meminfo.size, meminfo.type);
+    PCAttr->addData((u8 *)&meminfo, sizeof(MemoryInfo));
+    u64 counting_pointers = 0;
+    u64 offset = 0;
+    u64 bufferSize = MAX_BUFFER_SIZE; // consider to increase from 10k to 1M (not a big problem)
+    u8 *buffer = new u8[bufferSize];
+    if (meminfo.addr < m_mainend && meminfo.addr >= m_mainBaseAddr)
+    {
+      while (offset < meminfo.size)
+      {
+        if (meminfo.size - offset < bufferSize)
+          bufferSize = meminfo.size - offset;
+        debugger->readMemory(buffer, bufferSize, meminfo.addr + offset);
+        searchValue_t realValue = {0};
+        for (u32 i = 0; i < bufferSize; i += 4)
+        {
+          u64 address = meminfo.addr + offset + i - m_mainBaseAddr;
+          memset(&realValue, 0, 8);
+          if (m_32bitmode)
+            memcpy(&realValue, buffer + i, 4); //dataTypeSizes[searchType]);
+          else
+            memcpy(&realValue, buffer + i, 8);
+          if (realValue._u64 != 0)
+            if (((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+            {
+              realValue._u64 = realValue._u64 - m_heapBaseAddr;
+              PCDumpM->addData((u8 *)&address, sizeof(u32));
+              PCDumpM->addData((u8 *)&realValue, sizeof(u32));
+              // address = 0;
+              // PCDump->addData((u8 *)&address, sizeof(u32));
+              // PCDump->addData((u8 *)&realValue, sizeof(u32));
+              counting_pointers++;
+            }
+        }
+        offset += bufferSize;
+      }
+    }
+    else
+    {
+      while (offset < meminfo.size)
+      {
+        if (meminfo.size - offset < bufferSize)
+          bufferSize = meminfo.size - offset;
+        debugger->readMemory(buffer, bufferSize, meminfo.addr + offset);
+        searchValue_t realValue = {0};
+        for (u32 i = 0; i < bufferSize; i += 4)
+        {
+          u64 address = meminfo.addr + offset + i - m_heapBaseAddr;
+          memset(&realValue, 0, 8);
+          if (m_32bitmode)
+            memcpy(&realValue, buffer + i, 4); //dataTypeSizes[searchType]);
+          else
+            memcpy(&realValue, buffer + i, 8);
+          if (realValue._u64 != 0)
+            if (((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+            {
+              realValue._u64 = realValue._u64 - m_heapBaseAddr;
+              PCDump->addData((u8 *)&address, sizeof(u32));
+              PCDump->addData((u8 *)&realValue, sizeof(u32));
+              counting_pointers++;
+            }
+        }
+        offset += bufferSize;
+      }
+    }
+    printf("count,%lx\n", counting_pointers);
+    PCAttr->addData((u8 *)&counting_pointers, sizeof(counting_pointers));
+    delete[] buffer;
+  };
+  setLedState(false);
+  time_t unixTime2 = time(NULL);
+  printf("%s%lx\n", "Stop Time ", unixTime2);
+  printf("%s%ld\n", "Stop Time ", unixTime2 - unixTime1);
+  if (PCDump->m_compress)
+    printf("mcompress = true\n");
+  PCDump->flushBuffer();
+  // delete PCDump;
+  m_PC_Dump = PCDump;
+  PCDumpM->flushBuffer();
+  // delete PCDumpM;
+  m_PC_DumpM = PCDumpM;
+  PCAttr->flushBuffer();
+  delete PCAttr;
+  dmntchtResumeCheatProcess();
+  Gui::g_currMessageBox->hide();
+}
+
+
+u32 GuiCheats::get_main_offset32(u32 address)
+{
+  static u32 last_address = 0, last_count = 0;
+  bool found_next_count = false;
+  if (address != last_address)
+  {
+    last_address = address;
+    last_count = 0;
+  }
+  u32 offset = 0, count = 0, first_offset = 0;
+  if (m_PC_DumpM == nullptr) 
+  {
+    printf("m_PC_DumpM == nullptr \n");
+    return offset;
+  }
+  u64 bufferSize = m_PC_DumpM->size();
+  // printf("m_PC_DumpM->size() %lx\n",m_PC_DumpM->size());
+  u8 *buffer = new u8[bufferSize];
+  m_PC_DumpM->getData(0, buffer, bufferSize);
+  for (u64 i = 0; i < bufferSize; i += sizeof(fromto32_t))
+  {
+    if (address == *reinterpret_cast<u32 *>(&buffer[i] + 4))
+    {
+      offset = *reinterpret_cast<u32 *>(&buffer[i]);
+      count ++;
+      if (count == 1) first_offset = offset; 
+      printf("Main offset = %x for heap offset = %x count = %x\n", offset, address, count);
+      if (count == last_count +1)
+      {
+        last_count++;
+        found_next_count = true;
+        break;
+      }
+    };
+  }
+  if (!found_next_count)
+  {
+    last_count = 1;
+    offset = first_offset;
+  }
+  delete[] buffer;
+  printf("get main count = %d\n",count);
+  return offset;
+}
+
+void GuiCheats::refresh_fromto()
+{
+  // return;
+  dmntchtPauseCheatProcess();
+  bool ledOn = true;
+  time_t unixTime1 = time(NULL);
+  MemoryDump *PCDump;
+  m_PCDumpR_filename.str("");
+  m_PCDumpR_filename << m_PCDump_filename.str().c_str() << "R";
+  PCDump = new MemoryDump(m_PCDumpR_filename.str().c_str(), DumpType::DATA, true);
+  {
+    u64 counting_pointers = 0;
+    u64 Foffset = 0;
+    size_t bufferSize = MAX_BUFFER_SIZE; 
+    u8 *buffer = new u8[bufferSize];
+    size_t FbufferSize = MAX_BUFFER_SIZE - MAX_BUFFER_SIZE % sizeof(fromto32_t);
+    fromto32_t fromto_data1, fromto_data2;
+    u8 *Fbuffer = new u8[FbufferSize];
+    
+
+    {
+      while (Foffset < m_PC_Dump->size())
+      {
+        setLedState(ledOn);
+        ledOn = !ledOn;
+        if (m_PC_Dump->size() - Foffset < FbufferSize)
+          FbufferSize = m_PC_Dump->size() - Foffset;
+        printf("FbufferSize = %lx\n", FbufferSize);
+        m_PC_Dump->getData(Foffset, Fbuffer, FbufferSize);
+        memcpy(&fromto_data1, Fbuffer, sizeof(fromto32_t));
+        memcpy(&fromto_data2, Fbuffer + (FbufferSize - sizeof(fromto32_t)*2), sizeof(fromto32_t));
+        printf("fromto_data1 form = %x ,to = %x , fromto_data2 from = %x , to = %x \n ", fromto_data1.from, fromto_data1.to, fromto_data2.from, fromto_data2.to);
+        size_t i = 0;
+        MemoryInfo meminfo;
+        u64 memsize, address, start_address, last_address, new_to;
+        bool inc = false;
+        while (i < FbufferSize) //(fromto_data1.from <= fromto_data2.from)
+        {
+
+          bufferSize = MAX_BUFFER_SIZE;
+          memsize = fromto_data2.from - fromto_data1.from;
+          address = fromto_data1.from + m_heapBaseAddr;
+          meminfo = m_debugger->queryMemory(address);
+          if (memsize < bufferSize) // don't read usless data
+            bufferSize = memsize;
+
+          start_address = address;
+          last_address = meminfo.addr + meminfo.size;
+          memsize = last_address - address;
+          // printf("start address = %lx last address = %lx memsize = %lx i= %lx\n", start_address, last_address, memsize, i);
+          if (memsize < bufferSize) // don't read past the segment
+            bufferSize = memsize;
+
+          m_debugger->readMemory(buffer, bufferSize, address);
+
+          while (address < start_address + bufferSize)
+          {
+            memcpy(&new_to, buffer + address - start_address, sizeof(u64));
+
+            if (new_to == (fromto_data1.to + m_heapBaseAddr))
+            // if (((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+            {
+              PCDump->addData((u8 *)&fromto_data1, sizeof(fromto32_t));
+              counting_pointers++;
+            }
+            i += sizeof(fromto32_t);
+            if (i < FbufferSize)
+            {
+              memcpy(&fromto_data1, Fbuffer + i, sizeof(fromto32_t));
+              address = fromto_data1.from + m_heapBaseAddr;
+              inc = true;
+            }
+            else
+              break;
+          }
+          if (!inc)
+          {
+            printf("not able to access address = %lx i= %lx\n", address, i);
+            i += sizeof(fromto32_t);
+            if  (i < FbufferSize)
+              memcpy(&fromto_data1, Fbuffer + i, sizeof(fromto32_t));
+          }
+          inc = false;
+        };
+        printf("next Fbuf\n");
+        Foffset += FbufferSize;
+      }
+    }
+    printf("count,%lx\n", counting_pointers);
+    delete[] buffer;
+    delete[] Fbuffer;
+  };
+  setLedState(false);
+  time_t unixTime2 = time(NULL);
+  printf("%s%lx\n", "Stop Time ", unixTime2);
+  printf("%s%ld\n", "Stop Time ", unixTime2 - unixTime1);
+  if (PCDump->m_compress)
+    printf("mcompress = true\n");
+
+// clean up and rename file
+
+  PCDump->flushBuffer();
+  delete m_PC_Dump;
+  m_PC_Dump = PCDump;
+  // PCDumpM->flushBuffer();
+  // PCDumpM = PCDumpM;
+  dmntchtResumeCheatProcess();
+  printf("refresh fromto done\n");
+}
+
+
+void GuiCheats::prep_backjump_stack(u64 address)
+{
+  const u16 tablesize = 0xFFFF;
+  fromto32_t *fromto = new fromto32_t[tablesize];
+  u32 file_range = 0x10000;
+  u32 targetaddress = address - m_heapBaseAddr;
+  u32 offset = 0;
+  u32 count = 0;
+  u64 bufferSize = MAX_BUFFER_SIZE;
+  u8 *buffer = new u8[bufferSize];
+  u32 distance;
+  while (offset < m_PC_Dump->size())
+  {
+    if (m_PC_Dump->size() - offset < bufferSize)
+      bufferSize = m_PC_Dump->size() - offset;
+    m_PC_Dump->getData(offset, buffer, bufferSize); // BM4
+
+    for (u64 i = 0; i < bufferSize; i += sizeof(fromto)) // for (size_t i = 0; i < (bufferSize / sizeof(u64)); i++)
+    {
+      if (m_abort)
+        return;
+      u32 pointedaddress = *reinterpret_cast<u32 *>(&buffer[i]+4);
+      if (targetaddress >= pointedaddress)
+      {
+        distance = targetaddress - pointedaddress;
+        if (distance <= file_range)
+        {
+          fromto[count].from = *reinterpret_cast<u32 *>(&buffer[i]);
+          fromto[count].to = pointedaddress;
+          // fromto[count].hits = 0;
+          count++;
+        }
+      }
+    }
+    offset += bufferSize;
+  }
+// repeat for main
+  offset = 0;
+  bufferSize = MAX_BUFFER_SIZE;
+  while (offset < m_PC_DumpM->size())
+  {
+    if (m_PC_DumpM->size() - offset < bufferSize)
+      bufferSize = m_PC_DumpM->size() - offset;
+    m_PC_DumpM->getData(offset, buffer, bufferSize); // BM4
+
+    for (u64 i = 0; i < bufferSize; i += sizeof(fromto)) // for (size_t i = 0; i < (bufferSize / sizeof(u64)); i++)
+    {
+      if (m_abort)
+        return;
+      u32 pointedaddress = *reinterpret_cast<u32 *>(&buffer[i]+4);
+      if (targetaddress >= pointedaddress)
+      {
+        distance = targetaddress - pointedaddress;
+        if (distance <= file_range)
+        {
+          fromto[count].from = 0;
+          fromto[count].to = pointedaddress;
+          // fromto[count].hits = 0;
+          count++;
+        }
+      }
+    }
+    offset += bufferSize;
+  }
+  // refresh the list
+
+
+
+
+  //
+  printf("count = %x\n",count);
+  delete buffer;
+  std::sort(fromto,fromto + count, comparefromto);
+  m_fromto32_size = count;
+  if (m_fromto32 !=nullptr) delete m_fromto32;
+  m_fromto32 = fromto;
+  m_fromto32_offset = 0;
+}
+
+//
 void GuiCheats::updatebookmark(bool clearunresolved, bool importbookmark, bool filter)
 {
   std::stringstream filebuildIDStr;
@@ -8140,6 +9209,7 @@ void GuiCheats::updatebookmark(bool clearunresolved, bool importbookmark, bool f
             tempdump->addData((u8 *)&bookmark, sizeof(bookmark_t));
           }
           printf("found %d good ones\n", goodcount);
+          delete [] buffer;
           (new Snackbar("Bookmark file imported"))->show();
         }
         else
@@ -8236,17 +9306,110 @@ void GuiCheats::load_meminfos()
   }
   delete scaninfo;
 }
+
+static bool compareentry(MultiSearchEntry_t e1, MultiSearchEntry_t e2)
+{
+  if (e1.on != OFF && e2.on == OFF)
+    return true;
+  return (e1.offset < e2.offset);
+};
+static bool comparefromto(fromto32_t e1, fromto32_t e2)
+{
+  return (e1.to > e2.to);
+};
 void GuiCheats::save_multisearch_setup()
 {
+  std::sort(m_multisearch.Entries, m_multisearch.Entries + sizeof(m_multisearch.Entries) / sizeof(m_multisearch.Entries[0]), compareentry);
+  m_multisearch.count = 0;
+  m_multisearch.target = 0;
+  for (int i = 0; i < M_ENTRY_MAX; i++)
+  {
+    if (M_ENTRYi.on)
+    {
+      if (m_multisearch.count == 0) m_multisearch.first = i;
+      m_multisearch.count++;
+      if (M_ENTRYi.on == TARGET) m_multisearch.target = i;
+      m_multisearch.last = i;
+    }
+  }
+  m_multisearch.size = (m_multisearch.Entries[m_multisearch.last].offset / M_ALIGNMENT - m_multisearch.Entries[m_multisearch.first].offset / M_ALIGNMENT) * M_ALIGNMENT;
+  m_multisearch.adjustment = (m_multisearch.Entries[m_multisearch.first].offset / M_ALIGNMENT) * M_ALIGNMENT;
+  m_multisearch.target_offset = m_multisearch.Entries[m_multisearch.target].offset - (m_multisearch.Entries[m_multisearch.first].offset / M_ALIGNMENT) * M_ALIGNMENT;
+
   MemoryDump *multisearch = new MemoryDump((m_edizon_dir + "/multisearch.dat").c_str(), DumpType::UNDEFINED, true);
   multisearch->addData((u8 *)&m_multisearch, sizeof(m_multisearch));
   multisearch->flushBuffer();
   delete multisearch;
+  printf("MT count = %d",m_multisearch.count);
 }
 void GuiCheats::load_multisearch_setup()
 {
   MemoryDump *multisearch = new MemoryDump((m_edizon_dir + "/multisearch.dat").c_str(), DumpType::UNDEFINED, false);
-  if (multisearch->size()>0)
+  if ((multisearch->size() > 0) && (multisearch->size() % sizeof(m_multisearch) == 0))
     multisearch->getData(0, (u8 *)&m_multisearch, sizeof(m_multisearch));
+  else
+    m_multisearch.Entries[0].on = TARGET;
   delete multisearch;
+}
+bool GuiCheats::_check_extra_not_OK(u8 *buffer, u32 index)
+{
+  searchValue_t realValue;
+  for (int i = 0; i < M_ENTRY_MAX; i++)
+  {
+    if (M_ENTRYi.on == ON)
+    {
+      // printf("i=%d\n",i);
+      memset(&realValue, 0, 8);
+      memcpy(&realValue, buffer + index + M_ENTRYi.offset - m_multisearch.adjustment, dataTypeSizes[M_ENTRYi.type]);
+      switch (M_ENTRYi.mode)
+      {
+      case SEARCH_MODE_EQ:
+        if (realValue._s64 == M_ENTRYi.value1._s64)
+        {
+          if (Config::getConfig()->exclude_ptr_candidates)
+          {
+            memset(&realValue, 0, 8);
+            memcpy(&realValue, buffer + index + (M_ENTRYi.offset - M_ENTRYi.offset % 8) - m_multisearch.adjustment, 8);
+            if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+              return true;
+          }
+          // printf("match EQ\n");
+        }
+        else
+          return true;
+        break;
+      case SEARCH_MODE_RANGE:
+        if (realValue._s64 >= M_ENTRYi.value1._s64 && realValue._s64 <= M_ENTRYi.value2._s64)
+        {
+          if (Config::getConfig()->exclude_ptr_candidates)
+          {
+            memset(&realValue, 0, 8);
+            memcpy(&realValue, buffer + index + (M_ENTRYi.offset - M_ENTRYi.offset % 8) - m_multisearch.adjustment, 8);
+            if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+              return true;
+          }
+        }
+        else
+          return true;
+        break;
+      case SEARCH_MODE_POINTER: //m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize
+        if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+        {
+          // printf("value is %lx, datatype size %d \n",realValue._u64,dataTypeSizes[M_ENTRYi.type] );
+        }
+        else
+          return true;
+        break;
+      case SEARCH_MODE_NOT_POINTER: //m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize
+        if (((realValue._u64 >= m_mainBaseAddr) && (realValue._u64 <= (m_mainend))) || ((realValue._u64 >= m_heapBaseAddr) && (realValue._u64 <= (m_heapEnd))))
+        {
+          return true;
+        }
+        break;
+      default:
+        break;
+      }
+    };
+  }
+  return false;
 }

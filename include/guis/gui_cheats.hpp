@@ -12,7 +12,26 @@
 #include "helpers/memory_dump.hpp"
 
 #include "helpers/dmntcht.h"
-
+enum on_off_target_t
+{
+  OFF,
+  ON,
+  TARGET
+};
+struct MultiSearchEntry_t
+{
+  char label[20] = {0};
+  u16 offset = 0;
+  on_off_target_t on = OFF;
+  searchType_t type = SEARCH_TYPE_UNSIGNED_32BIT;
+  searchMode_t mode = SEARCH_MODE_EQ;
+  searchValue_t value1 = {0}, value2 = {0};
+};
+struct fromto32_t
+{
+  u32 from;
+  u32 to;
+};
 enum
 {
   FORMAT_DEC,
@@ -64,6 +83,7 @@ private:
     SEARCH_VALUE,
     SEARCH_editRAM,
     SEARCH_editRAM2,
+    SEARCH_pickjump,
     SEARCH_editExtraSearchValues,
     SEARCH_POINTER
   } m_searchMenuLocation = SEARCH_NONE;
@@ -81,20 +101,18 @@ private:
   MemoryDump *m_AttributeDumpBookmark;
   MemoryDump *m_pointeroffsetDump;
   MemoryDump *m_dataDump;
-  struct MultiSearchEntry_t
-  {
-    char label[20] = {0};
-    s16 offset = 0;
-    bool on = false;
-    searchType_t type = SEARCH_TYPE_UNSIGNED_32BIT;
-    searchMode_t mode = SEARCH_MODE_EQ;
-    searchValue_t value1 = {0}, value2 = {0};
-  };
+  MemoryDump *m_PC_Dump = nullptr;
+  MemoryDump *m_PC_DumpM = nullptr;
+
+  #define M_ENTRY_MAX 10
+  #define M_TARGET m_multisearch.Entries[m_multisearch.target]
+  #define M_ALIGNMENT 16
   struct MultiSearch_t
   {
     char laber[40] = {0};
     u32 target = 0;
-    MultiSearchEntry_t Entries[10];
+    u32 count = 0, first = 0, last = 0, size = 0, adjustment = 0, target_offset = 0;
+    MultiSearchEntry_t Entries[M_ENTRY_MAX];
   };
   MultiSearch_t m_multisearch;
 
@@ -138,11 +156,6 @@ private:
   u64 m_EditorBaseAddr = 0x00;
   u64 m_BookmarkAddr = 0;
   u8 m_addressmod = 0;
-  #define MAX_JUMP_STACK 50
-  u64 m_jump_stack [MAX_JUMP_STACK];
-  u16 m_jump_stack_index = 0;
-  u16 m_jump_stack_max = 0;
-  bool m_show_ptr = true;
   time_t m_Time1;
   struct helperinfo_t
   {
@@ -165,6 +178,32 @@ private:
 #define MAX_POINTER_RANGE 0x2000
 #define MAX_NUM_POINTER_OFFSET 30
 #define HAVESAVE (Title::g_titles[m_debugger->getRunningApplicationTID()] != nullptr) //m_havesave
+  // #define MAX_JUMP_STACK 50
+  struct fromto_t
+  {
+    u64 from;
+    u64 to;
+  };
+
+  struct jump_table_entry_t
+  {
+    u32 start_address;
+    u32 table_index;
+    u32 table_entrysize;
+  };
+  jump_table_entry_t *m_jumptable;
+  fromto32_t *m_fromto32 = nullptr;
+  u64 m_fromto32_offset = 0;
+  u32 m_fromto32_size = 0;
+  u64 m_selectedJumpSource = 0;
+  u32 m_selectedJumpSource_offset = 0;
+
+  fromto_t m_jump_stack[MAX_POINTER_DEPTH + 1];
+  s16 m_depth_count = 0;
+  u16 m_jump_stack_index = 0;
+  u16 m_jump_stack_max = 0;
+  u16 m_z = 0;
+  bool m_show_ptr = true;
   bool m_havesave = true;
   void iconloadcheck();
   void removef(std::string filePath);
@@ -214,7 +253,7 @@ private:
   struct pointer_chain_t
   {
     u64 depth = 0;
-    u64 offset[MAX_POINTER_DEPTH + 1] = {0}; // offset to address pointed by pointer
+    s64 offset[MAX_POINTER_DEPTH + 1] = {0}; // offset to address pointed by pointer
     // below is for debugging can consider removing;
     // u64 fileoffset[MAX_POINTER_DEPTH + 1] = {0}; // offset to the file that has the address where the pointer was stored in this instance for debugging
   };
@@ -232,6 +271,11 @@ private:
   pointer_chain_t m_hitcount; // maybe not used
 
   std::stringstream m_PCDump_filename;
+  std::stringstream m_PCAttr_filename;
+  std::stringstream m_PCDumpM_filename;
+  std::stringstream m_PCDumpR_filename;
+  bool m_redo_prep_pointersearch = false;
+
   void PCdump();
   enum MemoryType
   {
@@ -264,6 +308,7 @@ private:
   void load_meminfos();
   void save_multisearch_setup();
   void load_multisearch_setup();
+  bool _check_extra_not_OK(u8 *buffer, u32 i);
   void _moveLonelyCheats(u8 *buildID, u64 titleID);
   void _writegameid();
   u64 m_heapSize = 0;
@@ -286,13 +331,20 @@ private:
   std::string buttonStr(u32 buttoncode);
   void drawEditRAMMenu2();
   void drawEditExtraSearchValues();
+  void drawSEARCH_pickjump();
   bool m_editCheat = false;
   bool m_32bitmode = false;
   void editor_input(u32 kdown, u32 kheld);
   void EditExtraSearchValues_input(u32 kdown, u32 kheld);
   void easymode_input(u32 kdown, u32 kheld);
+  void pickjump_input(u32 kdown, u32 kheld);
   void drawSearchPointerMenu();
   void searchMemoryAddressesPrimary(Debugger *debugger, searchValue_t searchValue1,
+                                    searchValue_t searchValue2, searchType_t searchType,
+                                    searchMode_t searchMode, searchRegion_t searchRegion,
+                                    MemoryDump **displayDump, std::vector<MemoryInfo> memInfos);
+
+  void MTsearchMemoryAddressesPrimary(Debugger *debugger, searchValue_t searchValue1,
                                     searchValue_t searchValue2, searchType_t searchType,
                                     searchMode_t searchMode, searchRegion_t searchRegion,
                                     MemoryDump **displayDump, std::vector<MemoryInfo> memInfos);
@@ -301,6 +353,14 @@ private:
                                      searchValue_t searchValue2, searchType_t searchType,
                                      searchMode_t searchMode, searchRegion_t searchRegion,
                                      MemoryDump **displayDump, std::vector<MemoryInfo> memInfos);
+
+  void prep_pointersearch(Debugger *debugger, std::vector<MemoryInfo> memInfos);
+
+  u32 get_main_offset32(u32 address);
+  
+  void refresh_fromto();
+
+  void prep_backjump_stack(u64 address);
 
   void searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t searchValue1,
                                       searchValue_t searchValue2, searchType_t searchType,

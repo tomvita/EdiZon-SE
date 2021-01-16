@@ -31,10 +31,15 @@ void getCurrBatteryPercentage(char *buffer) {
   psmGetBatteryChargePercentage(&percents);
   sprintf(buffer, "%d%%", percents);
 }
-
+s32 total_entries;
+HidsysUniquePadId unique_pad_ids[2] = {0};
 void ledInit() {
-  hidsysGetUniquePadsFromNpad(hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1, g_uniquePadIds, 2, &g_uniquePadCnt);
-
+  // hidsysGetUniquePadsFromNpad(hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1, g_uniquePadIds, 2, &g_uniquePadCnt);
+  // hidsysGetUniquePadsFromNpad(hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1, g_uniquePadIds, 2, &g_uniquePadCnt);
+    // PadState pad;
+    // padInitializeDefault(&pad);
+  hidsysGetUniquePadsFromNpad(HidNpadIdType_Handheld, g_uniquePadIds, 2, &g_uniquePadCnt);
+  hidsysGetUniquePadsFromNpad(HidNpadIdType_No1, unique_pad_ids, 2, &total_entries);
   memset(&g_patternOn, 0x00, sizeof(HidsysNotificationLedPattern));
   memset(&g_patternOff, 0x00, sizeof(HidsysNotificationLedPattern));
 
@@ -48,6 +53,8 @@ void ledInit() {
 void setLedState(bool state) {
   for(u8 i = 0; i < g_uniquePadCnt; i++)
     hidsysSetNotificationLedPattern(state ? &g_patternOn : &g_patternOff, g_uniquePadIds[i]);
+  for (u8 i = 0; i < total_entries; i++)
+    hidsysSetNotificationLedPattern(state ? &g_patternOn : &g_patternOff, unique_pad_ids[i]);
 }
 
 void overclockSystem(bool enable) {

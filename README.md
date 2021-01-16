@@ -16,6 +16,8 @@ Here are the added features:
 11. Create dmnt cheat code from pointer chain found.
 12. Ability to detach dmnt from game process.
 13. Adding/Removing conditional button to cheat code.
+14. Multi target search for faster convergencence when the data structure is known. 
+15. Memory explorer to look at the memory data structure, follow pointer chain and edit pointer chain. 
 
 PS: Please refer to https://github.com/tomvita/EdiZon-SE/wiki for instructions on how to use the app. 
 
