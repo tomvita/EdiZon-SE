@@ -32,6 +32,11 @@ struct fromto32_t
   u32 from;
   u32 to;
 };
+struct fromto_t
+{
+  u64 from;
+  u64 to;
+};
 enum
 {
   FORMAT_DEC,
@@ -156,6 +161,7 @@ private:
   u64 m_EditorBaseAddr = 0x00;
   u64 m_BookmarkAddr = 0;
   u8 m_addressmod = 0;
+  bool m_64bit_offset = false;
   time_t m_Time1;
   struct helperinfo_t
   {
@@ -179,11 +185,7 @@ private:
 #define MAX_NUM_POINTER_OFFSET 30
 #define HAVESAVE (Title::g_titles[m_debugger->getRunningApplicationTID()] != nullptr) //m_havesave
   // #define MAX_JUMP_STACK 50
-  struct fromto_t
-  {
-    u64 from;
-    u64 to;
-  };
+
 
   struct jump_table_entry_t
   {
@@ -192,7 +194,7 @@ private:
     u32 table_entrysize;
   };
   jump_table_entry_t *m_jumptable;
-  fromto32_t *m_fromto32 = nullptr;
+  fromto_t *m_fromto32 = nullptr;
   u64 m_fromto32_offset = 0;
   u32 m_fromto32_size = 0;
   u64 m_selectedJumpSource = 0;
@@ -356,7 +358,7 @@ private:
 
   void prep_pointersearch(Debugger *debugger, std::vector<MemoryInfo> memInfos);
 
-  u32 get_main_offset32(u32 address);
+  u64 get_main_offset32(u64 address);
   
   void refresh_fromto();
 
