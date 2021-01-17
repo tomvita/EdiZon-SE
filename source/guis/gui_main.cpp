@@ -191,7 +191,7 @@ void GuiMain::draw() {
 
     std::string buttonHintStr = "";
 
-    buttonHintStr  = !tmpEditableOnly ? "\uE0E6 可编辑的所有title     " : "\uE0E6 所有title     ";
+    buttonHintStr  = !tmpEditableOnly ? "\uE0E6 可编辑的所有游戏     " : "\uE0E6 所有游戏     ";
     buttonHintStr += m_backupAll ? "（\uE0E7） + \uE0E2 备份所有     " : "（\uE0E7） + \uE0E2 备份     ";
     buttonHintStr += "\uE0E1 返回     \uE0E0 确认";
 
