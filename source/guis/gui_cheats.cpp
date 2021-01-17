@@ -496,7 +496,7 @@ if (!(m_debugger->m_dmnt)){
     ss.str("");
   }
   else
-    titleNameStr = "Unknown title name!";
+    titleNameStr = "游戏名称未知！";
   printf("%s\n", "after part");
   ss << "TID: " << std::uppercase << std::hex << std::setfill('0') << std::setw(sizeof(u64) * 2) << m_debugger->getRunningApplicationTID();
   tidStr = ss.str();
@@ -582,14 +582,14 @@ void GuiCheats::draw_easymode()
   if (m_debugger->getRunningApplicationPID() == 0)
   {
     Gui::drawTextAligned(fontHuge, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 - 100, currTheme.textColor, "\uE12C", ALIGNED_CENTER);
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2, currTheme.textColor, "A title needs to be running in the background to use the RAM editor. \n Please launch an application and try again.", ALIGNED_CENTER);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2, currTheme.textColor, "使用RAM编辑器前，游戏需要在后台运行。\n 请启动应用程序，然后重试。", ALIGNED_CENTER);
     Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 Back", ALIGNED_RIGHT);
     Gui::endDraw();
     return;
   }
   m_menuLocation = CHEATS;
   {
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0F0 Check for update  \uE0E6 Page Up  \uE0E7 Page Down  \uE0E0 Cheat on/off  \uE0E1 Quit", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 51, currTheme.textColor, "\uE0F0 检查更新  \uE0E6 上一页  \uE0E7 下一页  \uE0E0 金手指开|关  \uE0E1 退出", ALIGNED_RIGHT);
   }
   Gui::drawRectangle(256, 50, Gui::g_framebuffer_width - 256, 206, currTheme.separatorColor);
   // Don't draw icon
@@ -604,11 +604,11 @@ void GuiCheats::draw_easymode()
   Gui::drawRectangle(660, 125, 20, 20, Gui::makeColor(0xFF, 0xFF, 0x00, 0xFF)); // Stack
   Gui::drawRectangle(660, 145, 20, 20, Gui::makeColor(0x80, 0x80, 0x80, 0xFF)); // Others
 
-  Gui::drawTextAligned(font14, 700, 62, currTheme.textColor, "Code", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 82, currTheme.textColor, "Shared Memory", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 102, currTheme.textColor, "Heap", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 122, currTheme.textColor, "Stack", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 142, currTheme.textColor, "Others", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 62, currTheme.textColor, "代码", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 82, currTheme.textColor, "共享内存", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 102, currTheme.textColor, "堆", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 122, currTheme.textColor, "栈", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 142, currTheme.textColor, "其他", ALIGNED_LEFT);
 
   ss.str("");
   if (m_debugger->m_dmnt)
@@ -616,19 +616,19 @@ void GuiCheats::draw_easymode()
   else
   {
     ss << "EdiZon SE " VERSION_STRING;
-    ss << " (dmnt not attached)"; //"dmnt not attached to game process";
+    ss << "（dmnt没有附加）"; //"dmnt not attached to game process";
   }
   if (m_32bitmode)
-    ss << "(32bit)";
+    ss << "（32位）";
   Gui::drawTextAligned(font14, 900, 62, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
   Gui::drawTextAligned(font14, 900, 92, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
-  ss << "HEAP  :  0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_heapBaseAddr;
+  ss << "堆：0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_heapBaseAddr;
   ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_heapEnd;
   Gui::drawTextAligned(font14, 900, 122, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
-  ss << "MAIN  :  0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainBaseAddr;
+  ss << "主存储：0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainBaseAddr;
   ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainend;
   Gui::drawTextAligned(font14, 900, 152, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   if (m_memoryDump1 != nullptr)
@@ -642,7 +642,7 @@ void GuiCheats::draw_easymode()
     if (m_cheatCnt > 0)
     {
       Gui::drawRectangle(50, 256, 650, 46 + std::min(static_cast<u32>(m_cheatCnt), 8U) * 40, currTheme.textColor);
-      Gui::drawTextAligned(font14, 375, 262, currTheme.backgroundColor, "Cheats", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, 375, 262, currTheme.backgroundColor, "金手指", ALIGNED_CENTER);
       Gui::drawShadow(50, 256, 650, 46 + std::min(static_cast<u32>(m_cheatCnt), 8U) * 40);
 
       for (u8 line = cheatListOffset; line < 8 + cheatListOffset; line++)
@@ -651,7 +651,7 @@ void GuiCheats::draw_easymode()
           break;
         // WIP
         ss.str("");
-        ss << "\uE070  " << buttonStr(m_cheats[line].definition.opcodes[0]) << ((m_editCheat && line == m_selectedEntry) ? "Press button for conditional execute" : (m_cheatDelete[line] ? " Press \uE104 to delete" : (m_cheats[line].definition.readable_name)));
+        ss << "\uE070  " << buttonStr(m_cheats[line].definition.opcodes[0]) << ((m_editCheat && line == m_selectedEntry) ? "按下按钮以继续执行" : (m_cheatDelete[line] ? " 按下 \uE104 删除" : (m_cheats[line].definition.readable_name)));
 
         Gui::drawRectangle(52, 300 + (line - cheatListOffset) * 40, 646, 40, (m_selectedEntry == line && m_menuLocation == CHEATS) ? currTheme.highlightColor : line % 2 == 0 ? currTheme.backgroundColor : currTheme.separatorColor);
         Gui::drawTextAligned(font14, 70, 305 + (line - cheatListOffset) * 40, (m_selectedEntry == line && m_menuLocation == CHEATS) ? COLOR_BLACK : currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
@@ -666,11 +666,11 @@ void GuiCheats::draw_easymode()
       }
     }
     else if (m_mainBaseAddr == 0)
-      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Dmnt detached from game process, press ZL+B to attach,\n \n relaunch EdiZon SE to access this game", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Dmnt已与游戏进程解除附加，请按 ZL + B 进行附加，\n \n 重新启动EdiZon SE访问此游戏", ALIGNED_CENTER);
     else if (m_cheatsPresent && m_memoryDump->size() == 0)
-      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Cheats for this game present but title version or region doesn't match!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "该游戏存在金手指，但游戏版本或地区不匹配！", ALIGNED_CENTER);
     else
-      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "No cheats available for this game", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "此游戏没有金手指", ALIGNED_CENTER);
 
     Gui::drawShadow(0, 0, Gui::g_framebuffer_width, 256);
     Gui::drawShadow(256, 50, Gui::g_framebuffer_width, 136);
@@ -715,8 +715,8 @@ void GuiCheats::draw()
   if (m_debugger->getRunningApplicationPID() == 0)
   {
     Gui::drawTextAligned(fontHuge, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 - 100, currTheme.textColor, "\uE12C", ALIGNED_CENTER);
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2, currTheme.textColor, "A title needs to be running in the background to use the RAM editor. \n Please launch an application and try again.", ALIGNED_CENTER);
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 Back", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2, currTheme.textColor, "使用RAM编辑器前，游戏需要在后台运行。\n 请启动应用程序，然后重试。", ALIGNED_CENTER);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 返回", ALIGNED_RIGHT);
     Gui::endDraw();
     return;
   }
@@ -733,13 +733,13 @@ void GuiCheats::draw()
   {
     if (m_memoryDump1 == nullptr)
     {
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE105 Modify  \uE0F2 Delete  \uE0E6+\uE104 Write to File  \uE0E6+\uE0E1 Detach  \uE0E4 BM toggle   \uE0E3 Search RAM   \uE0E0 Cheat on/off   \uE0E1 Quit", ALIGNED_RIGHT);
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E5+\uE0E1 Show Option on next Launch \uE0E6+\uE105 Remove condition key  \uE0E6+\uE0E2 Preparation for pointer Search", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE105 修改  \uE0F2 删除  \uE0E6+\uE104 写入文件  \uE0E6+\uE0E1 解附加  \uE0E4 BM切换   \uE0E3 内存搜索   \uE0E0 金手指开|关   \uE0E1 退出", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E5+\uE0E1 在下次启动时显示选项 \uE0E6+\uE105 删除条件键  \uE0E6+\uE0E2 准备指针搜索", ALIGNED_RIGHT);
     }
     else
     {
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0EF BM add   \uE105 Modify  \uE0F2 Delete  \uE0E6+\uE104 Write to File  \uE0E6+\uE0E1 Detach  \uE0E4 BM toggle   \uE0E3 Search RAM   \uE0E0 Cheat on/off   \uE0E1 Quit", ALIGNED_RIGHT);
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E5+\uE0E1 Show Option on next Launch \uE0E6+\uE105 Remove condition key  \uE0E6+\uE0E2 Preparation for pointer Search", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0EF BM添加   \uE105 修改  \uE0F2 删除  \uE0E6+\uE104 写入文件  \uE0E6+\uE0E1 解附加  \uE0E4 BM切换   \uE0E3 内存搜索   \uE0E0 金手指开|关   \uE0E1 退出", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E5+\uE0E1 在下次启动时显示选项 \uE0E6+\uE105 删除条件键  \uE0E6+\uE0E2 准备指针搜索", ALIGNED_RIGHT);
     }
   }
   else if (m_memoryDump1 == nullptr)
@@ -747,9 +747,9 @@ void GuiCheats::draw()
     if (m_memoryDump->size() == 0)
     {
       if (m_frozenAddresses.size() != 0)
-        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0F0 Frozen es     \uE0E3 Search RAM     \uE0E1 Quit", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0F0 锁定es     \uE0E3 内存搜索     \uE0E1 退出", ALIGNED_RIGHT);
       else
-        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 BM toggle      \uE0E3 Search RAM     \uE0E1 Quit", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 BM切换      \uE0E3 内存搜索     \uE0E1 退出", ALIGNED_RIGHT);
       // Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 E4 \uE0E5 E5 \uE0E6 E6 \uE0E7 E7 \uE0E8 E8 \uE0E9 E9 \uE0EA EA \uE0EF EF \uE0F0 F0 \uE0F1 F1 \uE0F2 F2 \uE0F3 F3 \uE0F4 F4 \uE0F5 F5 ", ALIGNED_RIGHT);
       // Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 E1 \uE0E0 E0 \uE0E1 E1 \uE0E2 E2 \uE0E3 E3 \uE0D9 D9 \uE0DA DA \uE0DF DF \uE0F0 F0 \uE0F6 F6 \uE0F7 F7 \uE0F8 F8 \uE0F9 F9 \uE0FA FA ", ALIGNED_RIGHT);
     }
@@ -757,23 +757,23 @@ void GuiCheats::draw()
     {
       if (m_memoryDump->size() > 0)
       {
-        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0E6+\uE0E1 Detach debugger  \uE0E4 BM toggle \uE0E5 Hex Mode  \uE0EF BM add \uE0F0 Reset search \uE0E3 Search again \uE0E2 Freeze value  \uE0E0 Edit value   \uE0E1 Quit", ALIGNED_RIGHT);
-        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 Type  \uE0E5+\uE0E1 Show Option on next Launch \uE0E6+\uE0E2 Preparation for pointer Search  \uE0E6+\uE0E7 Page Up  \uE0E7 Page Down  \uE105 Memory Editor", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0E6+\uE0E1 调试器解附加  \uE0E4 BM切换 \uE0E5 十六进制模式  \uE0EF BM添加 \uE0F0 重置搜索 \uE0E3 重新搜索 \uE0E2 锁定值  \uE0E0 编辑值   \uE0E1 退出", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 类型  \uE0E5+\uE0E1 在下次启动时显示选项 \uE0E6+\uE0E2 准备指针搜索  \uE0E6+\uE0E7 上一页  \uE0E7 下一页  \uE105 内存编辑器", ALIGNED_RIGHT);
       }
       else
-        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0F0 Reset search     \uE0E1 Quit", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0F0 重置搜索     \uE0E1 退出", ALIGNED_RIGHT);
     }
   }
   else
   {
     if (m_memoryDumpBookmark->size() > 0)
     {
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0E6+\uE0E1 Detach  \uE0E4 BM toggle   \uE0E5 Hex Mode  \uE0EF BM label  \uE0E6+\uE0E0 Add Cheat  \uE0F0 Delete BM   \uE0E2 Freeze value  \uE0E7 Page Down  \uE0E0 Edit value  \uE0E1 Quit", ALIGNED_RIGHT);
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 Change Type  \uE0E6+\uE0F0 Refresh Bookmark  \uE0E6+\uE0EF Import Bookmark  \uE0E6+\uE0E3 Pointer Search  \uE0E6+\uE0E7 Page Up  \uE105 Memory Editor", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "\uE0E6+\uE0E1 解附加  \uE0E4 BM切换   \uE0E5 十六进制模式  \uE0EF BM标签  \uE0E6+\uE0E0 添加金手指  \uE0F0 删除BM   \uE0E2 锁定值  \uE0E7 下一页  \uE0E0 编辑值  \uE0E1 退出", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 更改类型  \uE0E6+\uE0F0 刷新书签  \uE0E6+\uE0EF 导入书签  \uE0E6+\uE0E3 指针搜索  \uE0E6+\uE0E7 上一页  \uE105 内存编辑器", ALIGNED_RIGHT);
       //
     }
     else
-      Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 BM toggle \uE0E1 Quit", ALIGNED_RIGHT);
+      Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 BM切换 \uE0E1 退出", ALIGNED_RIGHT);
   }
 
   Gui::drawRectangle(256, 50, Gui::g_framebuffer_width - 256, 206, currTheme.separatorColor);
@@ -790,11 +790,11 @@ void GuiCheats::draw()
   Gui::drawRectangle(660, 125, 20, 20, Gui::makeColor(0xFF, 0xFF, 0x00, 0xFF)); // Stack
   Gui::drawRectangle(660, 145, 20, 20, Gui::makeColor(0x80, 0x80, 0x80, 0xFF)); // Others
 
-  Gui::drawTextAligned(font14, 700, 62, currTheme.textColor, "Code", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 82, currTheme.textColor, "Shared Memory", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 102, currTheme.textColor, "Heap", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 122, currTheme.textColor, "Stack", ALIGNED_LEFT);
-  Gui::drawTextAligned(font14, 700, 142, currTheme.textColor, "Others", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 62, currTheme.textColor, "代码", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 82, currTheme.textColor, "共享内存", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 102, currTheme.textColor, "堆", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 122, currTheme.textColor, "栈", ALIGNED_LEFT);
+  Gui::drawTextAligned(font14, 700, 142, currTheme.textColor, "其他", ALIGNED_LEFT);
 
   ss.str("");
   if (m_debugger->m_dmnt)
@@ -802,34 +802,34 @@ void GuiCheats::draw()
   else
   {
     ss << "EdiZon SE " VERSION_STRING;
-    ss << " (dmnt not attached)"; //"dmnt not attached to game process";
+    ss << "（dmnt没有附加）"; //"dmnt not attached to game process";
   }
   if (m_32bitmode)
-    ss << "(32bit)";
+    ss << "（32位）";
   Gui::drawTextAligned(font14, 900, 62, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
     if (Config::getConfig()->enabletargetedscan && m_targetmemInfos.size() != 0)
     {
-      ss << "Target  :  0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_targetmemInfos[0].addr; //metadata.address_space_extents.size
+      ss << "目标地址：0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_targetmemInfos[0].addr; //metadata.address_space_extents.size
       ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << (m_targetmemInfos[m_targetmemInfos.size()-1].addr + m_targetmemInfos[m_targetmemInfos.size()-1].size);
     }
     else if (m_debugger->m_dmnt)
     {
 
-      ss << "BASE  :  0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_addressSpaceBaseAddr; //metadata.address_space_extents.size
+      ss << "基地址：0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_addressSpaceBaseAddr; //metadata.address_space_extents.size
       ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_addressSpaceBaseAddr + m_addressSpaceSize;
     }
   Gui::drawTextAligned(font14, 900, 92, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
   if (m_64bit_offset)
-    ss << "HEAP64:  0x";
+    ss << "64位堆：0x";
   else
-    ss << "HEAP  :  0x";
+    ss << "32位堆：0x";
   ss << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_heapBaseAddr;
   ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_heapEnd;
   Gui::drawTextAligned(font14, 900, 122, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   ss.str("");
-  ss << "MAIN  :  0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainBaseAddr;
+  ss << "主存储：0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainBaseAddr;
   ss << " - 0x" << std::uppercase << std::setfill('0') << std::setw(10) << std::hex << m_mainend;
   Gui::drawTextAligned(font14, 900, 152, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
 
@@ -860,7 +860,7 @@ void GuiCheats::draw()
     {
       ss.str("");
       int i = 0;
-      ss << "z=" << bookmark.pointer.depth << " main"; //[0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_mainBaseAddr << "]";
+      ss << "z=" << bookmark.pointer.depth << " 主存储"; //[0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_mainBaseAddr << "]";
       u64 nextaddress = m_mainBaseAddr;
       for (int z = bookmark.pointer.depth; z >= 0; z--)
       {
@@ -875,11 +875,11 @@ void GuiCheats::draw()
           m_debugger->readMemory(&nextaddress, ((m_32bitmode) ? sizeof(u32) : sizeof(u64)), nextaddress);
         else
         {
-          ss << "(*access denied*)";
+          ss << "（*拒绝访问*）";
           // printf("*access denied*");
           break;
         }
-        ss << "(" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << nextaddress << ")";
+        ss << "（" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << nextaddress << "）";
         i++;
         if ((i == 4) || (i == 8))
           ss << "\n";
@@ -893,11 +893,11 @@ void GuiCheats::draw()
       ss.str("");
       if (bookmark.heap == true)
       {
-        ss << "Heap + ";
+        ss << "堆 + ";
       }
       else
       {
-        ss << "Main + ";
+        ss << "主内存 + ";
       }
       ss << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << bookmark.offset;
       ss << " " << dataTypes[bookmark.type];
@@ -906,12 +906,12 @@ void GuiCheats::draw()
   }
   else 
   {
-      static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM", "  "};
-      static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR", "  "};
+      static const char *const regionNames[] = {"堆", "主存储", "堆 + 主存储", "内存", "  "};
+      static const char *const modeNames[] = {"==", "!=", ">", "状态B", "<", "状态A", "A..B", "相同", "不同", "++", "--", "指针", "  "};
       ss.str("");
-      ss << "Search Type [ " << dataTypes[m_searchType] << " ]";
-      ss << "   Search Mode [ " << modeNames[m_searchMode] << " ]";
-      ss << "   Search Region [ " << regionNames[m_searchRegion] << " ]";
+      ss << "搜索类型 [ " << dataTypes[m_searchType] << " ]";
+      ss << "   搜索模式 [ " << modeNames[m_searchMode] << " ]";
+      ss << "   搜索区域 [ " << regionNames[m_searchRegion] << " ]";
       if (m_use_range) 
       ss << "   [ " << _getValueDisplayString(m_searchValue[0], m_searchType) << " .. " << _getValueDisplayString(m_searchValue[1], m_searchType) << " ]";
       Gui::drawTextAligned(font14, 768, 205, currTheme.textColor, ss.str().c_str(), ALIGNED_CENTER);
@@ -919,7 +919,7 @@ void GuiCheats::draw()
     if (m_cheatCnt > 0)
     {
       Gui::drawRectangle(50, 256, 650, 46 + std::min(static_cast<u32>(m_cheatCnt), 8U) * 40, currTheme.textColor);
-      Gui::drawTextAligned(font14, 375, 262, currTheme.backgroundColor, "Cheats", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, 375, 262, currTheme.backgroundColor, "金手指", ALIGNED_CENTER);
       Gui::drawShadow(50, 256, 650, 46 + std::min(static_cast<u32>(m_cheatCnt), 8U) * 40);
 
       for (u8 line = cheatListOffset; line < 8 + cheatListOffset; line++)
@@ -928,7 +928,7 @@ void GuiCheats::draw()
           break;
         // WIP
         ss.str("");
-        ss << "\uE070  " << buttonStr(m_cheats[line].definition.opcodes[0]) << ((m_editCheat && line == m_selectedEntry) ? "Press button for conditional execute" : (m_cheatDelete[line] ? " Press \uE104 to delete" : (m_cheats[line].definition.readable_name)));
+        ss << "\uE070  " << buttonStr(m_cheats[line].definition.opcodes[0]) << ((m_editCheat && line == m_selectedEntry) ? "按下按钮以条件执行" : (m_cheatDelete[line] ? " 按下 \uE104 删除" : (m_cheats[line].definition.readable_name)));
 
         Gui::drawRectangle(52, 300 + (line - cheatListOffset) * 40, 646, 40, (m_selectedEntry == line && m_menuLocation == CHEATS) ? currTheme.highlightColor : line % 2 == 0 ? currTheme.backgroundColor : currTheme.separatorColor);
         Gui::drawTextAligned(font14, 70, 305 + (line - cheatListOffset) * 40, (m_selectedEntry == line && m_menuLocation == CHEATS) ? COLOR_BLACK : currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
@@ -943,21 +943,21 @@ void GuiCheats::draw()
       }
     }
     else if (m_mainBaseAddr == 0)
-      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Dmnt detached from game process, press ZL+B to attach,\n \n relaunch EdiZon SE to access this game", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Dmnt已与游戏流程解除附加，请按 ZL + B 进行附加，\n \n 重新启动EdiZon SE访问此游戏", ALIGNED_CENTER);
     else if (m_cheatsPresent && m_memoryDump->size() == 0)
-      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "Cheats for this game present but title version or region doesn't match!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font24, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 + 50, currTheme.textColor, "游戏存在金手指，但游戏版本或地区不匹配！", ALIGNED_CENTER);
 
     if (m_memoryDump->getDumpInfo().dumpType == DumpType::DATA)
     {
       if (m_memoryDump->size() > 0)
       {
         Gui::drawRectangle(Gui::g_framebuffer_width - 552, 256, 500, 366, currTheme.textColor);
-        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 302, 262, currTheme.backgroundColor, "Found candidates", ALIGNED_CENTER);
+        Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 302, 262, currTheme.backgroundColor, "找到候选", ALIGNED_CENTER);
         Gui::drawShadow(Gui::g_framebuffer_width - 552, 256, 500, 366 * 40);
         Gui::drawRectangle(Gui::g_framebuffer_width - 550, 300, 496, 320, currTheme.separatorColor);
 
         ss.str("");
-        ss << (static_cast<double>(m_memoryDump->size()) / (0x100000)) << "MB dumped";
+        ss << (static_cast<double>(m_memoryDump->size()) / (0x100000)) << "MB已转储";
         Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 302, 450, currTheme.textColor, ss.str().c_str(), ALIGNED_CENTER);
       }
     }
@@ -969,7 +969,7 @@ void GuiCheats::draw()
         {
           Gui::drawRectangle(Gui::g_framebuffer_width - 552, 256, 500, 46 + std::min(static_cast<u32>(m_memoryDump->size() / sizeof(u64)), 8U) * 40, currTheme.textColor);
           ss.str("");
-          ss << "Found candidates   " << std::dec << (((m_menuLocation == CANDIDATES) ? m_selectedEntry : 0) + m_addresslist_offset + 1) << " / " << std::dec << ((m_memoryDump->size() / sizeof(u64)));
+          ss << "找到候选   " << std::dec << (((m_menuLocation == CANDIDATES) ? m_selectedEntry : 0) + m_addresslist_offset + 1) << " / " << std::dec << ((m_memoryDump->size() / sizeof(u64)));
           Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 302, 262, currTheme.backgroundColor, ss.str().c_str(), ALIGNED_CENTER);
           Gui::drawShadow(Gui::g_framebuffer_width - 552, 256, 500, 46 + std::min(static_cast<u32>(m_memoryDump->size() / sizeof(u64)), 8U) * 40);
         }
@@ -977,7 +977,7 @@ void GuiCheats::draw()
         {
           Gui::drawRectangle(Gui::g_framebuffer_width - 557, 256, 549, 46 + std::min(static_cast<u32>(m_memoryDump->size() / sizeof(u64)), 8U) * 40, currTheme.textColor);
           ss.str("");
-          ss << "   Bookmarks   " << std::dec << (((m_menuLocation == CANDIDATES) ? m_selectedEntry : 0) + m_addresslist_offset + 1) << " / " << std::dec << ((m_memoryDump->size() / sizeof(u64)));
+          ss << "   书签   " << std::dec << (((m_menuLocation == CANDIDATES) ? m_selectedEntry : 0) + m_addresslist_offset + 1) << " / " << std::dec << ((m_memoryDump->size() / sizeof(u64)));
           Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 302, 262, currTheme.backgroundColor, ss.str().c_str(), ALIGNED_CENTER);
           // Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 302, 262, currTheme.backgroundColor, "Book Marks", ALIGNED_CENTER);
           Gui::drawShadow(Gui::g_framebuffer_width - 557, 256, 549, 46 + std::min(static_cast<u32>(m_memoryDump->size() / sizeof(u64)), 8U) * 40);
@@ -1001,11 +1001,11 @@ void GuiCheats::draw()
             if (Config::getConfig()->use_absolute_address)
               ss << "[ 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address) << " ]";
             else if (address >= m_heapBaseAddr && address < m_heapEnd)
-              ss << "[ HEAP + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_heapBaseAddr) << " ]";
+              ss << "[ 堆存储 + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_heapBaseAddr) << " ]";
             else if (address >= m_mainBaseAddr && address < m_mainend)
-              ss << "[ MAIN + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_mainBaseAddr) << " ]";
+              ss << "[ 主存储 + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_mainBaseAddr) << " ]";
             else
-              ss << "[ BASE + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_memoryDump->getDumpInfo().addrSpaceBaseAddress) << " ]";
+              ss << "[ 基地址 + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (address - m_memoryDump->getDumpInfo().addrSpaceBaseAddress) << " ]";
 
             ss << "  ( " << _getAddressDisplayString(address, m_debugger, (searchType_t)m_searchType) << " )";
 
@@ -1013,7 +1013,7 @@ void GuiCheats::draw()
               ss << "   \uE130";
           }
           else
-            ss << "And " << std::dec << ((m_memoryDump->size() / sizeof(u64)) - 8) << " others...";
+            ss << "与 " << std::dec << ((m_memoryDump->size() / sizeof(u64)) - 8) << " 其他候选...";
 
           Gui::drawRectangle(Gui::g_framebuffer_width - 550, 300 + line * 40, 496, 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? currTheme.highlightColor : line % 2 == 0 ? currTheme.backgroundColor : currTheme.separatorColor);
           Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 530, 305 + line * 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? COLOR_BLACK : currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
@@ -1076,10 +1076,10 @@ void GuiCheats::draw()
               ss << " *";
           }
           else
-            ss << "And " << std::dec << ((m_memoryDump->size() / sizeof(u64)) - 8) << " others...";
+            ss << "与 " << std::dec << ((m_memoryDump->size() / sizeof(u64)) - 8) << " 其他候选...";
 
           Gui::drawRectangle(Gui::g_framebuffer_width - 555, 300 + line * 40, 545, 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? currTheme.highlightColor : line % 2 == 0 ? currTheme.backgroundColor : currTheme.separatorColor);
-          Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 545, 305 + line * 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? COLOR_BLACK : currTheme.textColor, bookmark.deleted ? "To be deleted" : bookmark.label, ALIGNED_LEFT);
+          Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 545, 305 + line * 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? COLOR_BLACK : currTheme.textColor, bookmark.deleted ? "待删除" : bookmark.label, ALIGNED_LEFT);
           Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 340, 305 + line * 40, (m_selectedEntry == line && m_menuLocation == CANDIDATES) ? COLOR_BLACK : currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
         }
     }
@@ -1112,11 +1112,11 @@ void GuiCheats::drawSearchPointerMenu()
 
   Gui::drawRectangle(50, 50, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.backgroundColor);
   Gui::drawRectangle(100, 135, Gui::g_framebuffer_width - 200, 1, currTheme.textColor);
-  Gui::drawText(font24, 120, 70, currTheme.textColor, "\uE132   Search Pointer");
+  Gui::drawText(font24, 120, 70, currTheme.textColor, "\uE132   搜索指针");
   Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor,
-                       "Set the parameters of your pointer search. You can keep the time require within reasonable range by trading off between \n"
-                       "max depth, max range and max source. The impact of these setting to the time taken to complete the search will largely \n"
-                       "depends on the game itself too. Dump forward only assume pointer pointing to larger address is forward which may not be.",
+                       "设置指针搜索的参数。您可以通过在最大深度，最大范围和最大源之间进行权衡来将时间要求保持在合理范围内。\n"
+                       "这些设置对完成搜索所用时间的影响在很大程度上也取决于游戏本身。\n"
+                       "转储转发仅假定指向较大地址的指针是转发的，但有可能不是在较大的地址。",
                        ALIGNED_CENTER);
 
   //Gui::drawRectangle(300, 250, Gui::g_framebuffer_width - 600, 80, currTheme.separatorColor);
@@ -1129,7 +1129,7 @@ void GuiCheats::drawSearchPointerMenu()
   //   ss << _getValueDisplayString(m_searchValue[0], m_searchType);
   // else if (m_searchValueFormat == FORMAT_HEX)
 
-  Gui::drawText(font20, 310, 160, currTheme.textColor, "Max Depth");
+  Gui::drawText(font20, 310, 160, currTheme.textColor, "最大深度");
   ss.str("");
   ss << std::uppercase << std::dec << m_max_depth;
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
@@ -1137,7 +1137,7 @@ void GuiCheats::drawSearchPointerMenu()
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 0)
     Gui::drawRectangled(622 + strWidth, 160, 3, 35, currTheme.highlightColor);
 
-  Gui::drawText(font20, 310, 200, currTheme.textColor, "Max Range");
+  Gui::drawText(font20, 310, 200, currTheme.textColor, "最大范围");
   ss.str("");
   ss << "0x" << std::uppercase << std::hex << m_max_range;
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
@@ -1145,7 +1145,7 @@ void GuiCheats::drawSearchPointerMenu()
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 1)
     Gui::drawRectangled(622 + strWidth, 200, 3, 35, currTheme.highlightColor);
 
-  Gui::drawText(font20, 310, 240, currTheme.textColor, "Max Source");
+  Gui::drawText(font20, 310, 240, currTheme.textColor, "最大源");
   ss.str("");
   ss << std::uppercase << std::dec << m_max_source;
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
@@ -1153,28 +1153,28 @@ void GuiCheats::drawSearchPointerMenu()
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 2)
     Gui::drawRectangled(622 + strWidth, 240, 3, 35, currTheme.highlightColor);
 
-  Gui::drawText(font20, 310, 280, currTheme.textColor, "Target Address");
+  Gui::drawText(font20, 310, 280, currTheme.textColor, "目标地址");
   ss.str("");
   ss << "0x" << std::uppercase << std::hex << m_EditorBaseAddr;
   if (m_pointersearch_canresume)
-    ss << " Resumable";
+    ss << " 可恢复";
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
   Gui::drawTextAligned(font20, 620, 280, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 3)
     Gui::drawRectangled(622 + strWidth, 280, 3, 35, currTheme.highlightColor);
 
-  Gui::drawText(font20, 310, 320, currTheme.textColor, "Dump Forward only");
+  Gui::drawText(font20, 310, 320, currTheme.textColor, "仅存储转发");
   ss.str("");
   if (m_forwarddump)
-    ss << "YES";
+    ss << "是";
   else
-    ss << "NO";
+    ss << "否";
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
   Gui::drawTextAligned(font20, 620, 320, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 4)
     Gui::drawRectangled(622 + strWidth, 320, 3, 35, currTheme.highlightColor);
 
-  Gui::drawText(font20, 310, 360, currTheme.textColor, "Max num of Offsets");
+  Gui::drawText(font20, 310, 360, currTheme.textColor, "最大偏移量");
   ss.str("");
   ss << "0x" << std::uppercase << std::hex << m_numoffset;
   Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
@@ -1182,7 +1182,7 @@ void GuiCheats::drawSearchPointerMenu()
   if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 5)
     Gui::drawRectangled(622 + strWidth, 360, 3, 35, currTheme.highlightColor);
 
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E6+\uE0E3 Make Dump for pointersearcher SE    \uE0EF Start Search   \uE0E1 Abort     \uE0E4 \uE0E5 Edit Value", ALIGNED_RIGHT);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E6+\uE0E3 生成指针搜索器SE的转储    \uE0EF 开始搜索   \uE0E1 中断     \uE0E4 \uE0E5 编辑值", ALIGNED_RIGHT);
 
   // if (m_selectedEntry == 3)
   //   Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 155, 345, 310, 90, currTheme.highlightColor);
@@ -1216,7 +1216,7 @@ void GuiCheats::drawEditRAMMenu()
 
   Gui::drawRectangle(50, 50, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.backgroundColor);
   Gui::drawRectangle(100, 135, Gui::g_framebuffer_width - 200, 1, currTheme.textColor);
-  Gui::drawText(font24, 120, 70, currTheme.textColor, "\uE132   Edit Memory");
+  Gui::drawText(font24, 120, 70, currTheme.textColor, "\uE132   编辑内存");
   Gui::drawTextAligned(font20, 100, 160, currTheme.textColor, "\uE149 \uE0A4", ALIGNED_LEFT);
   Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, 160, currTheme.textColor, "\uE0A5 \uE14A", ALIGNED_RIGHT);
   Gui::drawTextAligned(font20, 260, 160, m_searchMenuLocation == SEARCH_TYPE ? currTheme.selectedColor : currTheme.textColor, "U8", ALIGNED_CENTER);
@@ -1292,7 +1292,7 @@ void GuiCheats::drawEditRAMMenu2()
     Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, Gui::makeColor(0xFF, 0xFF, 0xC0, 0x40));
   else
     Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, currTheme.backgroundColor); //background
-  Gui::drawText(font24, 30, 10 , currTheme.textColor, "\uE132   Memory Explorer");
+  Gui::drawText(font24, 30, 10 , currTheme.textColor, "\uE132   内存浏览器");
   Gui::drawRectangle(10, 70 , Gui::g_framebuffer_width - 10, 1, currTheme.textColor);//the line
 
   // Gui::drawTextAligned(font20, 100, line2, currTheme.textColor, "\uE149 \uE0A4", ALIGNED_LEFT); // the start bracket
@@ -1354,9 +1354,9 @@ void GuiCheats::drawEditRAMMenu2()
     m_debugger->readMemory(&pointed_address, sizeof(u64), address);
     ss.str("");
     if (pointed_address >= m_mainBaseAddr && pointed_address <= m_mainend)
-      ss << "Main + " << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << pointed_address - m_mainBaseAddr;
+      ss << "主存储 + " << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << pointed_address - m_mainBaseAddr;
     else if (pointed_address >= m_heapBaseAddr && pointed_address <= m_heapEnd)
-      ss << "Heap + " << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << pointed_address - m_heapBaseAddr;
+      ss << "存存储 + " << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << pointed_address - m_heapBaseAddr;
     if (ss.str().size() != 0)
     {
       Gui::drawTextAligned(font20, 30, line3, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
@@ -1379,7 +1379,7 @@ void GuiCheats::drawEditRAMMenu2()
     {
       ss.str("");
       int i = 0;
-      ss << "z=" << std::dec << std::setfill('0') << std::setw(2) << m_depth_count << ((m_bookmark.heap)? " heap":" main"); //[0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_mainBaseAddr << "]";
+      ss << "z=" << std::dec << std::setfill('0') << std::setw(2) << m_depth_count << ((m_bookmark.heap)? " 堆存储":" 主存储"); //[0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_mainBaseAddr << "]";
       m_depth_count = -1;
       u64 nextaddress;
       if (m_bookmark.heap)
@@ -1404,7 +1404,7 @@ void GuiCheats::drawEditRAMMenu2()
         else
         {
           m_jump_stack[z].to = 0;
-          ss << "(*access denied*)";
+          ss << "（*拒绝访问*）";
           break;
         }
         m_depth_count++;
@@ -1499,8 +1499,8 @@ void GuiCheats::drawEditRAMMenu2()
   }
 
   // key hints
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 70, currTheme.textColor, "\uE105 MarkSearch \uE0E3 Change offset \uE0EF BM add \uE0E0 Edit value \uE0E4 Backward \uE0E5 Forward \uE0E1 JumpBack", ALIGNED_RIGHT); //\uE0E4 Change Mode  
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 Change Type  \uE0E6+\uE0E3 Goto any address  \uE0E7 PageDown  \uE0E6+\uE0E7 PageUp  \uE0E6+\uE0E1 Quit", ALIGNED_RIGHT);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 70, currTheme.textColor, "\uE105 搜索标记 \uE0E3 更改偏移 \uE0EF 添加BM \uE0E0 编辑值 \uE0E4 向后 \uE0E5 向前 \uE0E1 回跳", ALIGNED_RIGHT); //\uE0E4 Change Mode
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "\uE0E6+\uE0E4 \uE0E6+\uE0E5 更改类型  \uE0E6+\uE0E3 转到任意地址  \uE0E7 下一页  \uE0E6+\uE0E7 上一页  \uE0E6+\uE0E1 退出", ALIGNED_RIGHT);
 }
 void GuiCheats::drawEditExtraSearchValues()
 {
@@ -1512,9 +1512,9 @@ void GuiCheats::drawEditExtraSearchValues()
   Gui::drawRectangle(0, 50, Gui::g_framebuffer_width, Gui::g_framebuffer_height - 100, currTheme.backgroundColor);
   Gui::drawRectangle(100, 135, Gui::g_framebuffer_width - 200, 1, currTheme.textColor);
   {
-      static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM", "  "};
+      static const char *const regionNames[] = {"堆", "主存储", "堆 + 主存储", "内存", "  "};
       ss.str("");
-      ss << "\uE132   Multi Target Memory Search";
+      ss << "\uE132   多目标内存搜索";
       ss << "   [ " << regionNames[m_searchRegion] << " ]";
       // ss << " line = " << m_selectedEntry / 6;
   }
@@ -1534,13 +1534,13 @@ void GuiCheats::drawEditExtraSearchValues()
 #define M_ENTRYi m_multisearch.Entries[i]
 #define labelline 145
   color_t cellColor;
-  Gui::drawTextAligned(font20, c0, labelline, currTheme.textColor, "LABEL", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "OFFSET", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c2, labelline, currTheme.textColor, "On/OFF", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "MODE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "TYPE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "VALUE 1", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c6, labelline, currTheme.textColor, "VALUE 2", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c0, labelline, currTheme.textColor, "标签", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "偏移", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c2, labelline, currTheme.textColor, "开|关", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "模式", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "类型", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "值 1", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c6, labelline, currTheme.textColor, "值 2", ALIGNED_CENTER);
 
   for (u8 i = 0; i < 60; i++) // 10 Row X 6 column
   {
@@ -1561,13 +1561,13 @@ void GuiCheats::drawEditExtraSearchValues()
     else if ((i % 6) == 1)
     {
       if (M_ENTRY.on == TARGET) //(i / 6 == m_multisearch.target)
-        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, "Target", ALIGNED_CENTER);
+        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, "目标地址", ALIGNED_CENTER);
       else
-        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, (m_multisearch.Entries[i / 6].on == ON) ? "On" : "OFF", ALIGNED_CENTER);
+        Gui::drawTextAligned(font20, c2, 160 + linegape * (1 + i / 6), cellColor, (m_multisearch.Entries[i / 6].on == ON) ? "开" : "关", ALIGNED_CENTER);
     }
     else if ((i % 6) == 2)
     {
-      static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR", "  ","~PTR"};
+      static const char *const modeNames[] = {"==", "!=", ">", "状态B", "<", "状态A", "A..B", "相同", "不同", "++", "--", "指针", "  ","~指针"};
       // if (M_ENTRY.type != SEARCH_TYPE_POINTER)
       Gui::drawTextAligned(font20, c3, 160 + linegape * (1 + i / 6), cellColor, modeNames[m_multisearch.Entries[i / 6].mode], ALIGNED_CENTER);
     }
@@ -1600,12 +1600,12 @@ void GuiCheats::drawEditExtraSearchValues()
   //   Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 150, 350, 300, 80, currTheme.selectedButtonColor);
   //   Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.separatorColor, "Search Now!", ALIGNED_CENTER);
   // }
-  Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 520, currTheme.textColor, "Set the value(s) you want to search for. Put the cursor on the target and press \uE0A6 + \uE0B3 to mark it as target. Press \uE0B3 to start the search\n"
-                                                                                       "Each line you enable will be used to narrow down the target. Pointer is 64bit values that falls in the range of either main or heap.\n"
-                                                                                       "Move the cursor to the field you want to modify. Press \uE0A4 \uE0A5 to modify. Press \uE0A0 to edit numeric Values.\n"
-                                                                                       "Use \uE0A6 + \uE0A0 to edit label. Use \uE0A2 to toggle on/off. Use \uE0A6 + \uE0A2 to toggle Hex mode. Use \uE0A3 to jump cursor to value1.\n"
-                                                                                       "Press \uE0A7 to jump to target value1. Press \uE0A1 to exit this screen.",
-                       ALIGNED_CENTER);
+  Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 520, currTheme.textColor, "设置您要搜索的值。将光标放在目标上，然后按 \uE0A6 + \uE0B3 将其标记为目标。按 \uE0B3 开始搜索，您启用的每一行将用于缩小目标范围。"
+                                                                                       "指针是落在主存储或堆范围内的64位值。\n"
+                                                                                       "将光标移动到要修改的字段。按 \uE0A4 \uE0A5 进行修改。按 \uE0A0 编辑数字值。\n"
+                                                                                       "使用 \uE0A6 + \uE0A0 编辑标签。使用 \uE0A2 切换开、关。使用 \uE0A6 + \uE0A2 切换十六进制模式。使用 \uE0A3 将光标跳转到值1。\n"
+                                                                                       "按 \uE0A7 跳至目标值1。按 \uE0A1 退出此屏幕。"
+                                                                                       , ALIGNED_CENTER);
   //  "Press quick set keys to change the search mode \uE0AD SAME \uE0AC DIFF \uE0AB ++ \uE0AE -- \uE0B3 A..B \uE0B4 ==/!=\n"
   //  "If you search type is floating point \uE0A5 negate the number. \uE0C4 cycle float type \uE0C5 presets \uE0A3 cycle integer type",
 }
@@ -1622,7 +1622,7 @@ void GuiCheats::drawSEARCH_pickjump()
   {
       // static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM", "  "};
       ss.str("");
-      ss << "\uE132   Pick Source for JumpBack";
+      ss << "\uE132   选择回跳的来源";
       // ss << "   [ " << regionNames[m_searchRegion] << " ]";
       ss << " line = " << m_selectedJumpSource + m_fromto32_offset + 1 << " / " << m_fromto32_size;
   }
@@ -1630,13 +1630,13 @@ void GuiCheats::drawSEARCH_pickjump()
   ss.str("");
   color_t cellColor;
   // Gui::drawTextAligned(font20, c0, labelline, currTheme.textColor, "LABEL", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "OFFSET", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c1, labelline, currTheme.textColor, "偏移", ALIGNED_CENTER);
   // Gui::drawTextAligned(font20, c2, labelline, currTheme.textColor, "On/OFF", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "Source", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c3, labelline, currTheme.textColor, "源", ALIGNED_CENTER);
   // Gui::drawTextAligned(font20, c4, labelline, currTheme.textColor, "TYPE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "Target", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, c5, labelline, currTheme.textColor, "目标", ALIGNED_CENTER);
   // Gui::drawTextAligned(font20, c6, labelline, currTheme.textColor, "VALUE 2", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 Page UP   \uE0E5 Page Down   \uE0E6+\uE0E2 Rescan pointers      \uE0E3 Pick Source     \uE0E1 Exit", ALIGNED_RIGHT);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E4 上一页   \uE0E5 下一页   \uE0E6+\uE0E2 重新搜索指针      \uE0E3 选择源     \uE0E1 退出", ALIGNED_RIGHT);
   u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
   for (u8 i = 0; i < 15; i++) // 15 Row 
   {
@@ -1656,7 +1656,7 @@ void GuiCheats::drawSEARCH_pickjump()
     {
       u32 temp_offset = get_main_offset32(m_fromto32[i + m_fromto32_offset].to);
       if (m_selectedJumpSource == i) m_selectedJumpSource_offset = temp_offset;
-      ss << "Main+" << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << temp_offset;
+      ss << "主存储+" << std::uppercase << std::hex << std::setfill('0') << std::setw(8) << temp_offset;
     }
     else
       ss << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << m_heapBaseAddr + m_fromto32[i + m_fromto32_offset].from;
@@ -1922,12 +1922,12 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
           m_memoryDump->setSearchParams(m_searchType, m_searchMode, m_searchRegion, m_searchValue[0], m_searchValue[1], m_use_range);
         else
           m_memoryDump1->setSearchParams(m_searchType, m_searchMode, m_searchRegion, m_searchValue[0], m_searchValue[1], m_use_range);
-        (new Snackbar("Already did one search for this session, relaunch to do another"))->show();
+        (new Snackbar("已经为该会话进行了一次搜索，然后重新启动以进行另一次搜索"))->show();
       }
       else
       {
         m_searched = true;
-        (new MessageBox("Traversing title memory.\n \nThis may take a while...", MessageBox::NONE))->show();
+        (new MessageBox("正在遍历游戏内存。\n \n这需要花费一点时间...", MessageBox::NONE))->show();
         requestDraw();
         overclockSystem(true);
         if (m_searchMode == SEARCH_MODE_POINTER)
@@ -2048,7 +2048,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._u64 = 0;
     m_multisearch.Entries[i].value2._u64 = 0;
     ss.str("");
-    ss << "Item " << std::dec << (u16)i + 1;
+    ss << "条目 " << std::dec << (u16)i + 1;
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 1;
@@ -2059,7 +2059,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._f32 = 0.1;
     m_multisearch.Entries[i].value2._f32 = 1000;
     ss.str("");
-    ss << "Range 32+";
+    ss << "范围 32+";
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 2;
@@ -2070,7 +2070,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._f32 = -0.1;
     m_multisearch.Entries[i].value2._f32 = -1000;
     ss.str("");
-    ss << "Range 32-";
+    ss << "范围 32-";
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 3;
@@ -2081,7 +2081,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._f64 = 0;
     m_multisearch.Entries[i].value2._f64 = 0;
     ss.str("");
-    ss << "Double";
+    ss << "双倍";
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 4;
@@ -2092,7 +2092,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._f64 = 0.1;
     m_multisearch.Entries[i].value2._f64 = 1000;
     ss.str("");
-    ss << "Range 64+";
+    ss << "范围 64+";
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
     i = 5;
@@ -2103,7 +2103,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._f64 = -0.1;
     m_multisearch.Entries[i].value2._f64 = -1000;
     ss.str("");
-    ss << "Range 64-";
+    ss << "范围 64-";
 
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
 
@@ -2115,7 +2115,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._u64 = m_heapBaseAddr;
     m_multisearch.Entries[i].value2._u64 = m_heapEnd;
     ss.str("");
-    ss << "Heap " << std::dec << (u16)i + 1;
+    ss << "堆 " << std::dec << (u16)i + 1;
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
 
     i = 7;
@@ -2126,7 +2126,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[i].value1._u64 = m_mainBaseAddr;
     m_multisearch.Entries[i].value2._u64 = m_mainend;
     ss.str("");
-    ss << "Main " << std::dec << (u16)i + 1;
+    ss << "主存储 " << std::dec << (u16)i + 1;
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
   }
   else if (kdown & KEY_X && !(kheld & KEY_ZL))
@@ -2303,7 +2303,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
   {
     ss.str("");
     ss << M_ENTRY.label;
-    if (!Gui::requestKeyboardInput("Enter Label", "Enter Label to this item .", ss.str().c_str(), SwkbdType_QWERTY, M_ENTRY.label, 14))
+    if (!Gui::requestKeyboardInput("输入标签名", "输入此条目的标签名", ss.str().c_str(), SwkbdType_QWERTY, M_ENTRY.label, 14))
     {
       ss.str("");
       ss << "Item " << std::dec << (m_selectedEntry / 6) + 1;
@@ -2432,7 +2432,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       }
     }
     delete [] ram_buffer;
-    (new Snackbar("Multi search setup created!"))->show();
+    (new Snackbar("多搜索设置已创建！"))->show();
     GuiCheats::save_multisearch_setup();
   }
   else if (kdown & KEY_B && !(kheld & KEY_ZL))
@@ -2450,7 +2450,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     {
       if (m_EditorBaseAddr >= m_mainBaseAddr && m_EditorBaseAddr <= m_mainend)
       {
-        (new Snackbar("Already at Main!"))->show();
+        (new Snackbar("已经在主存储！"))->show();
       }
       else
       {
@@ -2570,7 +2570,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       bookmark.heap = false;
     }
     bookmark.type = m_searchType;
-    Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", "", SwkbdType_QWERTY, bookmark.label, 18);
+    Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", "", SwkbdType_QWERTY, bookmark.label, 18);
     m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
     m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
     if (m_bookmark.pointer.depth > 0)
@@ -2597,8 +2597,8 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     delete BMDump;
     m_AttributeDumpBookmark->flushBuffer();
     m_memoryDumpBookmark->flushBuffer();
-    (new Snackbar("Address added to bookmark!"))->show();
-    printf("%s\n", "PLUS key pressed1");
+    (new Snackbar("地址已添加到书签！"))->show();
+    printf("%s\n", "PLUS key pressed!");
   }
   else if (kdown & KEY_ZR && kheld & KEY_ZL) // Page Up
   {
@@ -2726,16 +2726,16 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     std::stringstream ss;
     ss << "0x" << std::uppercase << std::hex << address;
     char input[19];
-    if (Gui::requestKeyboardInput("Enter Address", "Enter Address to Jump to .", ss.str(), SwkbdType_QWERTY, input, 18))
+    if (Gui::requestKeyboardInput("输入地址值", "输入要跳转的地址值", ss.str(), SwkbdType_QWERTY, input, 18))
     {
       address = static_cast<u64>(std::stoul(input, nullptr, 16)); // this line has problem?
       bookmark_t bookmark;
       bookmark.type = m_searchType;
-      if (!Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", "", SwkbdType_QWERTY, bookmark.label, 18))
-        strcpy(bookmark.label, "jump address");
+      if (!Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", "", SwkbdType_QWERTY, bookmark.label, 18))
+        strcpy(bookmark.label, "跳转地址");
       m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
       m_AttributeDumpBookmark->flushBuffer();
-      (new Snackbar("Address added to bookmark!"))->show();
+      (new Snackbar("地址已添加到书签！"))->show();
       m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
       m_memoryDumpBookmark->flushBuffer();
       if ((address >= m_mainBaseAddr && address <= m_mainend) || (address >= m_heapBaseAddr && address <= m_heapEnd))
@@ -2756,7 +2756,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       else
       {
         // printf("not valid %lx\n", address);
-        (new Snackbar("Address not valid!"))->show();
+        (new Snackbar("地址无效！"))->show();
       }
     }
   }
@@ -2766,7 +2766,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     char input[19];
     char initialString[21];
     strcpy(initialString, _getAddressDisplayString(address, m_debugger, m_searchType).c_str());
-    if (Gui::requestKeyboardInput("Enter value", "Enter a value that should get written at this .", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
+    if (Gui::requestKeyboardInput("输入值", "输入一个应该在此写入的值。", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
     {
       if (m_searchValueFormat == FORMAT_HEX)
       {
@@ -2807,18 +2807,18 @@ void GuiCheats::drawSearchRAMMenu()
   Gui::drawRectangle(50, 50, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.backgroundColor);
   Gui::drawRectangle(100, 135, Gui::g_framebuffer_width - 200, 1, currTheme.textColor);
   {
-      static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM", "  "};
-      static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR", "  "};
+      static const char *const regionNames[] = {"堆", "主存储", "堆 + 主存储", "内存", "  "};
+      static const char *const modeNames[] = {"==", "!=", ">", "状态B", "<", "状态A", "A..B", "相同", "不同", "++", "--", "指针", "  "};
       ss.str("");
       if (m_memoryDump1 != nullptr)
-        ss << "\uE132   Search Bookmark";
+        ss << "\uE132   搜索书签";
       else
-        ss << "\uE132   Search Memory";
+        ss << "\uE132   搜素内存";
       ss << "   [ " << dataTypes[m_searchType] << " ]";
       ss << "   [ " << modeNames[m_searchMode] << " ]";
       ss << "   [ " << regionNames[m_searchRegion] << " ]";
       if (m_use_range)
-      ss << "   [ using range ]";
+      ss << "   [ 使用范围 ]";
   }
   Gui::drawText(font24, 120, 70, currTheme.textColor, ss.str().c_str());
   ss.str("");
@@ -2826,15 +2826,15 @@ void GuiCheats::drawSearchRAMMenu()
   Gui::drawTextAligned(font20, 100, 160, currTheme.textColor, "\uE149 \uE0A4", ALIGNED_LEFT);
   Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, 160, currTheme.textColor, "\uE0A5 \uE14A", ALIGNED_RIGHT);
 
-  Gui::drawTextAligned(font20, 260, 160, m_searchMenuLocation == SEARCH_TYPE ? currTheme.selectedColor : currTheme.textColor, "TYPE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, 510, 160, m_searchMenuLocation == SEARCH_MODE ? currTheme.selectedColor : currTheme.textColor, "MODE", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, 760, 160, m_searchMenuLocation == SEARCH_REGION ? currTheme.selectedColor : currTheme.textColor, "REGION", ALIGNED_CENTER);
-  Gui::drawTextAligned(font20, 1010, 160, m_searchMenuLocation == SEARCH_VALUE ? currTheme.selectedColor : currTheme.textColor, "VALUE", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, 260, 160, m_searchMenuLocation == SEARCH_TYPE ? currTheme.selectedColor : currTheme.textColor, "类型", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, 510, 160, m_searchMenuLocation == SEARCH_MODE ? currTheme.selectedColor : currTheme.textColor, "模式", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, 760, 160, m_searchMenuLocation == SEARCH_REGION ? currTheme.selectedColor : currTheme.textColor, "范围", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, 1010, 160, m_searchMenuLocation == SEARCH_VALUE ? currTheme.selectedColor : currTheme.textColor, "值", ALIGNED_CENTER);
 
   static const char *const typeNames[] = {"u8", "s8", "u16", "s16", "u32", "s32", "u64", "s64", "flt", "dbl", "void*"};
-  static const char *const modeNames[] = {"==", "!=", ">", "StateB", "<", "StateA", "A..B", "SAME", "DIFF", "+ +", "- -", "PTR"};
-  static const char *const modeNames1[] = {"==", "!=", ">", "StateA", "<", "", "A..B", "", "Unknown", "? +", "? -", "PTR"};
-  static const char *const regionNames[] = {"HEAP", "MAIN", "HEAP + MAIN", "RAM"};
+  static const char *const modeNames[] = {"==", "!=", ">", "状态B", "<", "状态A", "A..B", "相同", "不同", "++", "--", "指针"};
+  static const char *const modeNames1[] = {"==", "!=", ">", "状态A", "<", "", "A..B", "", "未知", "?+", "?-", "指针"};
+  static const char *const regionNames[] = {"堆", "主存储", "堆 + 主存储", "内存"};
 
   switch (m_searchMenuLocation) // search menu
   {
@@ -2848,14 +2848,14 @@ void GuiCheats::drawSearchRAMMenu()
       Gui::drawTextAligned(font20, 400 + (i / 2) * 100, 250 + (i % 2) * 100, currTheme.textColor, typeNames[i], ALIGNED_CENTER);
     }
 
-    Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Set the data type of the value you’re searching here. The prefix [u] means unsigned (positive integers), [s] means \n"
-                                                                                         "signed (positive and negative integers), [flt] is for floating point numbers (rational numbers), [dbl] is for double (bigger \n"
-                                                                                         "rational numbers) and [void*] stands for pointer (link to another memory ) which is useful for creating cheats. The \n"
-                                                                                         "number that follows is the number of bits used in memory which determines the maximum value. Choose the data type that \n"
-                                                                                         "best fits for the type of data you’re looking for.",
-                         ALIGNED_CENTER);
+    Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "在此处设置您要搜索的值的数据类型。\n"
+                                                                                         "前缀[u]表示无符号（正整数），[s]表示带符号（正整数和负整数），"
+                                                                                         "[flt]表示浮点数（有理数），[dbl]表示双精度（更大的有理数），\n"
+                                                                                         "[void *]代表指针（链接到另一个内存），对创建金手指很有用。\n"
+                                                                                         "接下来的数字是确定最大值的内存中使用的位数。选择最适合您要查找的数据类型的数据类型。"
+                                                                                         , ALIGNED_CENTER);
 
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 Back     \uE0E0 OK", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 返回     \uE0E0 确认", ALIGNED_RIGHT);
 
     break;
   case SEARCH_MODE:
@@ -2869,21 +2869,22 @@ void GuiCheats::drawSearchRAMMenu()
     }
 
     if (m_memoryDump->size() == 0)
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Set the mode you want to use for finding values. With these modes EdiZon will search for known values that are equal to [==], \n"
-                                                                                           "not equal to [!=], greater than [>] or less than [<] that you input. \n"
-                                                                                           "For unknown value [A : B] allows you to set a (min : max) range of values, Choose [Unknown] if to search find values that \n"
-                                                                                           "will be different, [? +] and [? -] for value that will increased or decreased \n"
-                                                                                           "[StateA] let you capture state A to be compared with state B in next search. ",
-                           ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "设置用于查找值的模式。\n"
+                                                                                           "在这些模式下，EdiZon将搜索等于[==]、不等于[!=]、大于[>]或小于[<]您输入的已知值。\n"
+                                                                                           "对于未知值[A:B]，您可以设置一个（最小:最大）值范围，\n"
+                                                                                           "如果要搜索不同的值，则选择[未知]，如果要搜索的值是[?+]和[?-]，则选择[未知]。\n"
+                                                                                           "通过增大或减小[状态A]，您可以捕获状态A，以便在下一次搜索中将其与状态B进行比较。\n"
+                                                                                           , ALIGNED_CENTER);
     else
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Set the mode you want to use for finding values. With these modes EdiZon will search for known values that are equal to [==], \n"
-                                                                                           "not equal to [!=], greater than [>] or less than [<] that you input. \n"
-                                                                                           "For unknown value [A : B] allows you to set a (min : max) range of values, SAME and DIFF search allows you to find values that \n"
-                                                                                           "stayed the same or changed since the previous search, [+ +] and [- -] checks for values that increased or decreased since the \n"
-                                                                                           "previous search. [StateA] and [StateB] let you search for value that are mutually exclusive between two states. ",
-                           ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "设置用于查找值的模式。\n"
+                                                                                           "在这些模式下，EdiZon将搜索等于[==]、不等于[!=]、大于[>]或小于[<]您输入的已知值。\n"
+                                                                                           "对于未知值[A:B]允许您设置（最小:最大）值范围，"
+                                                                                           "[相同]和[不同]搜索允许您查找自上一次搜索以来保持不变或更改的值，\n"
+                                                                                           "即[++]和[--]检查自上次搜索以来增加或减少的值。\n"
+                                                                                           "[状态A]和[状态B]可让您搜索两个状态之间互斥的值。\n"
+                                                                                           , ALIGNED_CENTER);
 
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 Back     \uE0E0 OK", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 返回     \uE0E0 确定", ALIGNED_RIGHT);
     break;
   case SEARCH_REGION:
     for (u8 i = 0; i < 4; i++)
@@ -2895,23 +2896,25 @@ void GuiCheats::drawSearchRAMMenu()
       Gui::drawTextAligned(font20, (Gui::g_framebuffer_width / 2), 235 + i * 70, currTheme.textColor, regionNames[i], ALIGNED_CENTER);
     }
 
-    Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Set the memory region you want to search in. HEAP contains dynamically allocated values and will be where the majority of \n"
-                                                                                         "values worth changing will be found. MAIN contains global variables and instructions for game operation. You may find some \n"
-                                                                                         "values here but it’s mainly for finding pointers to HEAP values or changing game code. RAM will search the entirety of the Games \n"
-                                                                                         "used memory including memory shared memory and resources. Should only be used as a final resort as this will be extremely slow. \n",
-                         ALIGNED_CENTER);
+    Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "设置要搜索的内存区域。\n"
+                                                                                         "堆包含动态分配的值，并将在其中找到大多数值得更改的值。\n"
+                                                                                         "主存储包含全局变量和游戏操作指令。您可能会在这里找到一些值，"
+                                                                                         "但这主要是为了找到指向堆的值的指针或更改游戏代码。\n"
+                                                                                         "内存将搜索整个游戏使用的内存，包括共享内存和资源。只能作为最后的手段，因为这将非常慢。\n"
+                                                                                         , ALIGNED_CENTER);
 
-    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 Back     \uE0E0 OK", ALIGNED_RIGHT);
+    Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0E1 返回     \uE0E0 确认", ALIGNED_RIGHT);
     break;
   case SEARCH_VALUE:
     if (m_memoryDump1 != nullptr)
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Bookmark search let you narrow down your bookmark list by searching. Only search of type == or A..B supported.", ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "书签搜索使您可以通过搜索缩小书签列表的范围。仅支持==或A..B类型的搜索。", ALIGNED_CENTER);
     else
-      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "Set the value you want to search for. The value(s) you enter here will depend on what options you've chosen in the \n"
-                                                                                           "first three sections. Either it's the exact integer you want to search for, a floating point number or even two values that \n"
-                                                                                           "will be used as range. Use quick set keys to change the search mode \uE0AD SAME \uE0AC DIFF \uE0AB ++ \uE0AE -- \uE0B3 A..B \uE0B4 ==/!=\n"
-                                                                                           "If you search type is floating point \uE0A5 negate the number. \uE0C4 cycle float type \uE0C5 presets \uE0A3 cycle integer type",
-                           ALIGNED_CENTER);
+      Gui::drawTextAligned(font14, Gui::g_framebuffer_width / 2, 500, currTheme.textColor, "设置要搜索的值。\n"
+                                                                                           "您在此处输入的值将取决于您在前三个部分中选择了哪些选项。"
+                                                                                           "它是您要搜索的确切整数、浮点数甚至两个用作范围的值。\n"
+                                                                                           "使用快速设置键更改搜索模式：\uE0AD 相同  \uE0AC 不同  \uE0AB ++  \uE0AE --  \uE0B3 A..B  \uE0B4 ==或!=\n"
+                                                                                           "如果搜索类型为浮点： \uE0A5 取反该数字  \uE0C4 循环浮点型  \uE0C5 预设  \uE0A3 循环整数型\n"
+                                                                                           , ALIGNED_CENTER);
 
     //Gui::drawRectangle(300, 250, Gui::g_framebuffer_width - 600, 80, currTheme.separatorColor);
     if (m_searchMode == SEARCH_MODE_SAME || m_searchMode == SEARCH_MODE_DIFF || m_searchMode == SEARCH_MODE_INC || m_searchMode == SEARCH_MODE_DEC || m_searchMode == SEARCH_MODE_DIFFA || m_searchMode == SEARCH_MODE_SAMEA) {m_selectedEntry = 1;};
@@ -2963,9 +2966,9 @@ void GuiCheats::drawSearchRAMMenu()
       //	End Mod
 
       if (m_searchValueFormat == FORMAT_DEC)
-        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0EA \uE0EF \uE0F0 Quick Set Search Mode    \uE0E6 -   \uE0E7 +   \uE0E2 Hexadecimal view  \uE0E1 Back  \uE0E0 OK", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0EA \uE0EF \uE0F0 快速设置搜索模式    \uE0E6 -   \uE0E7 +   \uE0E2 十六进制视图  \uE0E1 返回  \uE0E0 确定", ALIGNED_RIGHT);
       else if (m_searchValueFormat == FORMAT_HEX)
-        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0AD SAME \uE0AC DIFF \uE0AB ++ \uE0AE -- \uE0EF A..B \uE0F0 == \uE0E6 - \uE0E7 + \uE0E2 Decimal view     \uE0E1 Back     \uE0E0 OK", ALIGNED_RIGHT);
+        Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 100, Gui::g_framebuffer_height - 100, currTheme.textColor, "\uE0AD 相同 \uE0AC 不同 \uE0AB ++ \uE0AE -- \uE0EF A..B \uE0F0 == \uE0E6 - \uE0E7 + \uE0E2 十进制视图     \uE0E1 返回     \uE0E0 确定", ALIGNED_RIGHT);
     };
     if (m_selectedEntry == 1)
       Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 155, 345, 310, 90, currTheme.highlightColor);
@@ -2973,12 +2976,12 @@ void GuiCheats::drawSearchRAMMenu()
     if (m_searchType != SEARCH_TYPE_NONE && m_searchMode != SEARCH_MODE_NONE && m_searchRegion != SEARCH_REGION_NONE)
     {
       Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 150, 350, 300, 80, currTheme.selectedColor);
-      Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.backgroundColor, "Search Now!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.backgroundColor, "开始搜索！", ALIGNED_CENTER);
     }
     else
     {
       Gui::drawRectangled(Gui::g_framebuffer_width / 2 - 150, 350, 300, 80, currTheme.selectedButtonColor);
-      Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.separatorColor, "Search Now!", ALIGNED_CENTER);
+      Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 2, 375, currTheme.separatorColor, "开始搜索！", ALIGNED_CENTER);
     }
 
     {
@@ -3068,7 +3071,7 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
     }
     if (opcodecount > 0x400)
     {
-      (new Snackbar("Total opcode count would exceed 1024!"))->show();
+      (new Snackbar("操作码总数将超过1024！"))->show();
       return;
     }
     dmntchtToggleCheat(m_cheats[m_selectedEntry].cheat_id);
@@ -3309,10 +3312,10 @@ void GuiCheats::onInput(u32 kdown)
       m_searchRegion = SEARCH_REGION_HEAP_AND_MAIN;
       Gui::beginDraw();
       Gui::drawRectangle(70, 420, 1150, 65, currTheme.backgroundColor);
-      Gui::drawTextAligned(font20, 70, 420, currTheme.textColor, "Making Dump for pointersearcher SE", ALIGNED_LEFT);
+      Gui::drawTextAligned(font20, 70, 420, currTheme.textColor, "生成指针搜索器的转储", ALIGNED_LEFT);
       Gui::endDraw();
       GuiCheats::searchMemoryAddressesPrimary2(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_memoryInfo);
-      (new Snackbar("Dump for pointersearcher SE completed"))->show();
+      (new Snackbar("指针搜索器SE的转储已完成"))->show();
       // PCdump();
     }
 
@@ -3330,7 +3333,7 @@ void GuiCheats::onInput(u32 kdown)
       else
         startpointersearch2(m_EditorBaseAddr);
       char st[100];
-      snprintf(st, 100, "Done pointer search found %ld pointer in %ld seconds", m_pointer_found, time(NULL) - m_Time1);
+      snprintf(st, 100, "在 %ld 秒内完成指针搜索， 找到 %ld 个指针", time(NULL) - m_Time1, m_pointer_found);
       printf("done pointer search \n");
       printf("Time taken =%ld\n", time(NULL) - m_Time1);
       (new Snackbar(st))->show();
@@ -3492,7 +3495,7 @@ void GuiCheats::onInput(u32 kdown)
     if ((kdown & KEY_LSTICK) && m_menuLocation == CHEATS && (kheld & KEY_ZL))
     {
       dumpcodetofile();
-      (new Snackbar("Writing change to file"))->show();
+      (new Snackbar("将更改写入文件"))->show();
     }
 
     if ((kdown & KEY_PLUS) && m_menuLocation == CHEATS && (m_cheatCnt > 0) && (m_memoryDump1 != nullptr) && !(kheld & KEY_ZL))
@@ -3522,7 +3525,7 @@ void GuiCheats::onInput(u32 kdown)
 
         if (depth > MAX_POINTER_DEPTH)
         {
-          (new Snackbar("this code is bigger than space catered on the bookmark !!"))->show();
+          (new Snackbar("此代码大于书签上提供的空间！"))->show();
           printf("!!!!!!!!!!!!!!!!!!!!!!!this code is bigger than space catered on the bookmark !! \n");
           break;
         }
@@ -3670,18 +3673,18 @@ void GuiCheats::onInput(u32 kdown)
       {
         m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
         m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
-        (new Snackbar("Adding pointer chain from cheat to bookmark"))->show();
+        (new Snackbar("将金手指中的指针链添加到书签"))->show();
       }
       else
       {
         if (bookmark.pointer.depth > 2) // depth of 2 means only one pointer hit high chance of wrong positive
         {
-          (new MessageBox("Extracted pointer chain is broken on current memory state\n \n If the game is in correct state\n \n would you like to try to rebase the chain?", MessageBox::YES_NO))
+          (new MessageBox("提取的指针链在当前内存状态下无效\n \n 如果游戏处于正确状态\n \n 您想尝试重新建立指针链吗？", MessageBox::YES_NO))
               ->setSelectionAction([&](u8 selection) {
                 if (selection)
                 {
                   searchValue_t value;
-                  while (!getinput("Enter the value at this memory", "You must know what type is the value and set it correctly in the search memory type setting", "", &value))
+                  while (!getinput("输入此存储器中的值", "您必须知道值的类型，然后在搜索存储类型设置中正确设置它", "", &value))
                   {
                   }
                   printf("value = %ld\n", value._u64);
@@ -3692,7 +3695,7 @@ void GuiCheats::onInput(u32 kdown)
               ->show();
         }
         else
-          (new Snackbar("Not able to extract pointer chain from cheat"))->show();
+          (new Snackbar("无法从金手指中提取指针链"))->show();
       }
 
       // pointercheck(); //disable for now;
@@ -3762,11 +3765,11 @@ void GuiCheats::onInput(u32 kdown)
             {
               if (R_SUCCEEDED(dmntchtEnableFrozenAddress(address, dataTypeSizes[m_searchType], &outValue)))
               {
-                (new Snackbar("Froze variable!"))->show();
+                (new Snackbar("变量锁定！"))->show();
                 m_frozenAddresses.insert({address, outValue});
               }
               else
-                (new Snackbar("Failed to freeze variable!"))->show();
+                (new Snackbar("变量锁定失败！"))->show();
             }
             else
             {
@@ -3774,22 +3777,22 @@ void GuiCheats::onInput(u32 kdown)
               m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &bookmark, sizeof(bookmark_t));
               if (R_SUCCEEDED(dmntchtEnableFrozenAddress(address, dataTypeSizes[bookmark.type], &outValue)))
               {
-                (new Snackbar("Froze variable!"))->show();
+                (new Snackbar("变量锁定！"))->show();
                 m_frozenAddresses.insert({address, outValue});
               }
               else
-                (new Snackbar("Failed to freeze variable!"))->show();
+                (new Snackbar("变量锁定失败！"))->show();
             }
           }
           else
           {
             if (R_SUCCEEDED(dmntchtDisableFrozenAddress(address)))
             {
-              (new Snackbar("Unfroze variable!"))->show();
+              (new Snackbar("变量解除锁定！"))->show();
               m_frozenAddresses.erase(address);
             }
             else
-              (new Snackbar("Failed to unfreeze variable!"))->show();
+              (new Snackbar("变量解除锁定失败！"))->show();
           }
         }
         // add bookmark
@@ -3824,7 +3827,7 @@ void GuiCheats::onInput(u32 kdown)
           { //Bookmark case
             bookmark_t bookmark;
             m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &bookmark, sizeof(bookmark_t));
-            if (Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", bookmark.label, SwkbdType_QWERTY, bookmark.label, 18))
+            if (Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", bookmark.label, SwkbdType_QWERTY, bookmark.label, 18))
               m_AttributeDumpBookmark->putData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &bookmark, sizeof(bookmark_t));
           }
           else
@@ -3834,7 +3837,7 @@ void GuiCheats::onInput(u32 kdown)
 
             bookmark_t bookmark;
             bookmark.type = m_searchType;
-            Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", "", SwkbdType_QWERTY, bookmark.label, 18);
+            Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", "", SwkbdType_QWERTY, bookmark.label, 18);
 
             if (address >= m_heapBaseAddr && address < m_heapEnd)
             {
@@ -3856,7 +3859,7 @@ void GuiCheats::onInput(u32 kdown)
             BMDump->addData((u8 *)&bookmark.label, 18);
             BMDump->addData((u8 *)&address, sizeof(u64));
             delete BMDump;
-            (new Snackbar("Address added to bookmark!"))->show(); // prompt for label
+            (new Snackbar("地址已添加到书签！"))->show(); // prompt for label
             printf("%s\n", "PLUS key pressed2");
           }
         }
@@ -3993,7 +3996,7 @@ void GuiCheats::onInput(u32 kdown)
                 addstaticcodetofile(m_selectedEntry + m_addresslist_offset);
               }
               m_searchMenuLocation = SEARCH_NONE;
-              (new Snackbar("Coded added to cheat file, reload to take effect"))->show();
+              (new Snackbar("代码已添加到金手指文件，重新加载才能生效"))->show();
             }
             // pointercheck();
             // (new Snackbar("Searching pointer "))->show();
@@ -4020,7 +4023,7 @@ void GuiCheats::onInput(u32 kdown)
 
             //
             strcpy(initialString, _getAddressDisplayString(address, m_debugger, m_searchType).c_str());
-            if (Gui::requestKeyboardInput("Enter value", "Enter a value that should get written at this .", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
+            if (Gui::requestKeyboardInput("输入值", "输入一个应该在此写入的值。", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
             {
               if (m_searchValueFormat == FORMAT_HEX)
               {
@@ -4062,7 +4065,7 @@ void GuiCheats::onInput(u32 kdown)
               printf("%s\n", ss.str().c_str());
             }
 
-            (new ListSelector("Edit value at ", "\uE0E0 Edit value     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
+            (new ListSelector("编辑的值位于 ", "\uE0E0 编辑值     \uE0E1 返回", options))->setInputAction([&](u32 k, u16 selectedItem) {
                                                                                                 if (k & KEY_A)
                                                                                                 {
                                                                                                   char input[16];
@@ -4073,12 +4076,12 @@ void GuiCheats::onInput(u32 kdown)
 
                                                                                                   strcpy(initialString, _getAddressDisplayString(selectedAddress, m_debugger, m_searchType).c_str());
 
-                                                                                                  if (Gui::requestKeyboardInput("Enter value", "Enter a value for which the game's memory should be searched.", initialString, SwkbdType::SwkbdType_NumPad, input, 15))
+                                                                                                  if (Gui::requestKeyboardInput("输入值", "输入一个值，该值应用于搜索游戏的内存。", initialString, SwkbdType::SwkbdType_NumPad, input, 15))
                                                                                                   {
                                                                                                     u64 value = atol(input);
                                                                                                     if (value > dataTypeMaxValues[m_searchType] || value < dataTypeMinValues[m_searchType])
                                                                                                     {
-                                                                                                      (new Snackbar("Entered value isn't inside the range of this data type. Please enter a different value."))->show();
+                                                                                                      (new Snackbar("输入的值不在此数据类型的范围内。请输入其他值。"))->show();
                                                                                                       return;
                                                                                                     }
 
@@ -4090,7 +4093,7 @@ void GuiCheats::onInput(u32 kdown)
                 ->show();
           }
           else
-            (new Snackbar("Too many addresses! Narrow down the selection before editing."))->show();
+            (new Snackbar("地址太多！请在编辑之前缩小选择范围。"))->show();
 
           m_searchType = savetype; // restore value
         }
@@ -4112,7 +4115,7 @@ void GuiCheats::onInput(u32 kdown)
         }
         if (opcodecount > 0x400)
         {
-          (new Snackbar("Total opcode count would exceed 1024!"))->show();
+          (new Snackbar("操作码总数将超过1024！"))->show();
           return;
         }
 
@@ -4191,13 +4194,13 @@ void GuiCheats::onInput(u32 kdown)
             std::stringstream ss;
             for (auto [addr, value] : m_frozenAddresses)
             {
-              ss << "[ BASE + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (addr - m_addressSpaceBaseAddr) << " ]  ";
+              ss << "[ 基地址 + 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(10) << (addr - m_addressSpaceBaseAddr) << " ]  ";
               ss << "( " << std::dec << value << " )";
               options.push_back(ss.str());
               ss.str("");
             }
 
-            (new ListSelector("Frozen Addresses", "\uE0E0 Unfreeze     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
+            (new ListSelector("锁定地址", "\uE0E0 解除锁定     \uE0E1 返回", options))->setInputAction([&](u32 k, u16 selectedItem) {
                                                                                                 if (k & KEY_A)
                                                                                                 {
                                                                                                   auto itr = m_frozenAddresses.begin();
@@ -4652,7 +4655,7 @@ void GuiCheats::onInput(u32 kdown)
           }
 
           bookmark.type = m_searchType;
-          Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", "", SwkbdType_QWERTY, bookmark.label, 18);
+          Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", "", SwkbdType_QWERTY, bookmark.label, 18);
           m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
           m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
           if (m_bookmark.pointer.depth > 0)
@@ -4673,7 +4676,7 @@ void GuiCheats::onInput(u32 kdown)
           BMDump->addData((u8 *)&bookmark.label, 18);
           BMDump->addData((u8 *)&address, sizeof(u64));
           delete BMDump;
-          (new Snackbar("Address added to bookmark!"))->show();
+          (new Snackbar("地址已添加到书签！"))->show();
           printf("%s\n", "PLUS key pressed3");
         }
         if (kdown & KEY_ZR)
@@ -4707,17 +4710,17 @@ void GuiCheats::onInput(u32 kdown)
           std::stringstream ss;
           ss << "0x" << std::uppercase << std::hex << address;
           char input[19];
-          if (Gui::requestKeyboardInput("Enter Address", "Enter Address to add to bookmark .", ss.str(), SwkbdType_QWERTY, input, 18))
+          if (Gui::requestKeyboardInput("输入地址值", "输入地址值以添加到书签。", ss.str(), SwkbdType_QWERTY, input, 18))
           {
             address = static_cast<u64>(std::stoul(input, nullptr, 16));
 
             bookmark_t bookmark;
             bookmark.type = m_searchType;
-            Gui::requestKeyboardInput("Enter Label", "Enter Label to add to bookmark .", "", SwkbdType_QWERTY, bookmark.label, 18);
+            Gui::requestKeyboardInput("输入标签名", "输入标签名以添加到书签。", "", SwkbdType_QWERTY, bookmark.label, 18);
             m_AttributeDumpBookmark->addData((u8 *)&bookmark, sizeof(bookmark_t));
             m_AttributeDumpBookmark->flushBuffer();
 
-            (new Snackbar("Address added to bookmark!"))->show();
+            (new Snackbar("地址已添加到书签！"))->show();
             m_memoryDumpBookmark->addData((u8 *)&address, sizeof(u64));
             m_memoryDumpBookmark->flushBuffer();
           }
@@ -4875,7 +4878,7 @@ void GuiCheats::onInput(u32 kdown)
           char input[19];
           char initialString[21];
           strcpy(initialString, _getAddressDisplayString(address, m_debugger, m_searchType).c_str());
-          if (Gui::requestKeyboardInput("Enter value", "Enter a value that should get written at this .", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
+          if (Gui::requestKeyboardInput("输入值", "输入一个应该在此写入的值。", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
           {
             if (m_searchValueFormat == FORMAT_HEX)
             {
@@ -4915,11 +4918,11 @@ void GuiCheats::onInput(u32 kdown)
             // End Mod
             if ((m_searchValue[m_searchValueIndex]._u32 > 10) || (m_searchValueFormat == FORMAT_HEX))
             {
-              Gui::requestKeyboardInput("Enter the value you want to search for", "Based on your previously chosen options, EdiZon will expect different input here.", _getValueDisplayString(m_searchValue[m_searchValueIndex], m_searchType), m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, str, 0x20);
+              Gui::requestKeyboardInput("输入您要搜索的值", "根据您先前选择的选项，EdiZon将在此处期望不同的输入。", _getValueDisplayString(m_searchValue[m_searchValueIndex], m_searchType), m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, str, 0x20);
             }
             else
             {
-              Gui::requestKeyboardInput("Enter the value you want to search for", "Based on your previously chosen options, EdiZon will expect different input here.", "", m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, str, 0x20);
+              Gui::requestKeyboardInput("输入您要搜索的值", "根据您先前选择的选项，EdiZon将在此处期望不同的输入。", "", m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, str, 0x20);
             }
             if (std::string(str) == "")
               return;
@@ -4977,12 +4980,12 @@ void GuiCheats::onInput(u32 kdown)
               m_memoryDump->setSearchParams(m_searchType, m_searchMode, m_searchRegion, m_searchValue[0], m_searchValue[1], m_use_range);
             else
               m_memoryDump1->setSearchParams(m_searchType, m_searchMode, m_searchRegion, m_searchValue[0], m_searchValue[1], m_use_range);
-            (new Snackbar("Already did one search for this session, relaunch to do another"))->show();
+            (new Snackbar("已经为该会话进行了一次搜索，然后重新启动以进行另一次搜索"))->show();
           }
           else
           {
             m_searched = true;
-            (new MessageBox("Traversing title memory.\n \nThis may take a while...", MessageBox::NONE))->show();
+            (new MessageBox("正在遍历游戏内存。\n \n这需要花费一点时间...", MessageBox::NONE))->show();
             requestDraw();
 
             overclockSystem(true);
@@ -5274,7 +5277,7 @@ static searchValue_t _get_entry(searchValue_t value, searchType_t type)
   char input[19];
   char initialString[21];
   strcpy(initialString, _getValueDisplayString(value, type).c_str());
-  if (Gui::requestKeyboardInput("Enter value", "Enter a value that should get written at this .", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
+  if (Gui::requestKeyboardInput("输入值", "输入一个应该在此写入的值。", initialString, m_searchValueFormat == FORMAT_DEC ? SwkbdType_NumPad : SwkbdType_QWERTY, input, 18))
   {
     if (m_searchValueFormat == FORMAT_HEX)
     {
@@ -5658,14 +5661,14 @@ void GuiCheats::searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t
     if (helpercount != (*displayDump)->size() / sizeof(u64))
     {
       printf("Integrity problem with helper file helpercount = %d  memdumpsize = %ld \n", helpercount, (*displayDump)->size() / sizeof(u64));
-      (new Snackbar("Helper integrity check failed !"))->show();
+      (new Snackbar("帮助文件完整性检查失败！"))->show();
       return;
     }
     printf("end helper integrity check address secondary \n");
     // end helper integrity check
 
     std::stringstream Message;
-    Message << "Traversing title memory.\n \nThis may take a while... secondary search\nTime " << (unixTime1 - time(NULL)) << "    total " << (*displayDump)->size();
+    Message << "正在遍历游戏内存。\n \n这需要花费一点时间... 二次搜索\n时间 " << (unixTime1 - time(NULL)) << "    总计 " << (*displayDump)->size();
     (new MessageBox(Message.str(), MessageBox::NONE))->show();
     requestDraw();
   }
@@ -5879,7 +5882,7 @@ void GuiCheats::searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t
   }
   else
   {
-    (new Snackbar("None of values changed to the entered one!"))->show();
+    (new Snackbar("没有值更改为输入的值！"))->show();
     m_nothingchanged = true;
   }
 
@@ -5934,7 +5937,7 @@ void GuiCheats::searchMemoryAddressesSecondary2(Debugger *debugger, searchValue_
   // MemoryDump *debugdump1 = new MemoryDump(EDIZON_DIR "/debugdump1.dat", DumpType::HELPER, true);
   if (helperDump->size() == 0)
   {
-    (new Snackbar("Helper file not found !"))->show();
+    (new Snackbar("帮助文件没有找到！"))->show();
     return;
   }
   else
@@ -5951,14 +5954,14 @@ void GuiCheats::searchMemoryAddressesSecondary2(Debugger *debugger, searchValue_
     if (helpercount != (*displayDump)->size() / sizeof(u64))
     {
       printf("Integrity problem with helper file helpercount = %d  memdumpsize = %ld \n", helpercount, (*displayDump)->size() / sizeof(u64));
-      (new Snackbar("Helper integrity check failed !"))->show();
+      (new Snackbar("帮助文件完整性检查失败！"))->show();
       return;
     }
     printf("end helper integrity check address secondary \n");
     // end helper integrity check
 
     std::stringstream Message;
-    Message << "Traversing title memory.\n \nThis may take a while... secondary search\nTime " << (unixTime1 - time(NULL)) << "    total " << (*displayDump)->size();
+    Message << "正在遍历游戏内存。\n \n这需要花费一点时间... 二次搜索\n时间 " << (unixTime1 - time(NULL)) << "    总计 " << (*displayDump)->size();
     (new MessageBox(Message.str(), MessageBox::NONE))->show();
     requestDraw();
   }
@@ -6180,7 +6183,7 @@ void GuiCheats::searchMemoryAddressesSecondary2(Debugger *debugger, searchValue_
   }
   else
   {
-    (new Snackbar("None of values changed to the entered one!"))->show();
+    (new Snackbar("没有值更改为输入的值！"))->show();
     m_nothingchanged = true;
   }
 
@@ -6220,7 +6223,7 @@ void GuiCheats::searchMemoryValuesPrimary(Debugger *debugger, searchType_t searc
   // printf("%s%X1\n", "searchType ", searchType);
   // printf("%s%X1\n", "searchMode ", searchMode);
   // printf("%s%X1\n", "searchRegion ", searchRegion);
-  (new Snackbar("Dumping memory"))->show();
+  (new Snackbar("正在转储内存"))->show();
   (*displayDump) = new MemoryDump(EDIZON_DIR "/memdump1.dat", DumpType::DATA, true);
   (*displayDump)->setBaseAddresses(m_addressSpaceBaseAddr, m_heapBaseAddr, m_mainBaseAddr, m_heapSize, m_mainSize);
   (*displayDump)->setSearchParams(searchType, searchMode, searchRegion, {0}, {0}, false);
@@ -6563,7 +6566,7 @@ void GuiCheats::searchMemoryValuesTertiary(Debugger *debugger, searchValue_t sea
   MemoryDump *newhelperDump = new MemoryDump(EDIZON_DIR "/memdump3a.dat", DumpType::ADDR, true); // has address, size, count for fetching buffer from memory
   if (helperDump->size() == 0)
   {
-    (new Snackbar("Helper file not found !"))->show();
+    (new Snackbar("找不到帮助文件！"))->show();
     return;
   }
 
@@ -6581,7 +6584,7 @@ void GuiCheats::searchMemoryValuesTertiary(Debugger *debugger, searchValue_t sea
     if (helpercount != (*displayDump)->size() / sizeof(u64))
     {
       printf("Integrity problem with helper file helpercount = %d  memdumpsize = %ld \n", helpercount, (*displayDump)->size() / sizeof(u64));
-      (new Snackbar("Helper integrity check failed !"))->show();
+      (new Snackbar("帮助文件完整性检查失败！"))->show();
       return;
     }
     printf("end helper integrity check value tertiary \n");
@@ -6608,7 +6611,7 @@ void GuiCheats::searchMemoryValuesTertiary(Debugger *debugger, searchValue_t sea
   }
   else
   {
-    (new Snackbar("previous value file not found !"))->show();
+    (new Snackbar("找不到先前的值！"))->show();
     return; /* code */
   }
 
@@ -6794,7 +6797,7 @@ void GuiCheats::searchMemoryValuesTertiary(Debugger *debugger, searchValue_t sea
   }
   else
   {
-    (new Snackbar("None of values changed to the entered one!"))->show();
+    (new Snackbar("没有值更改为输入的值！"))->show();
   }
 
   setLedState(false);
@@ -7623,7 +7626,7 @@ void GuiCheats::_moveLonelyCheats(u8 *buildID, u64 titleID)
       printf("force open called\n");
     }
     else
-      (new MessageBox("A new cheat has been added for this title. \n Please restart the game to start using it.", MessageBox::OKAY))->show();
+      (new MessageBox("此游戏已添加了新的金手指。 \n 请重新启动游戏以开始使用它。", MessageBox::OKAY))->show();
   }
   // Move cheat from code database if exist
   std::stringstream zipPath;
@@ -7696,7 +7699,7 @@ void GuiCheats::_moveLonelyCheats(u8 *buildID, u64 titleID)
             delete content2;
           };
           if (different)
-            (new MessageBox("A new cheat has been added for this title from database. \n Please reload dmnt or restart the game.", MessageBox::OKAY))->show();
+            (new MessageBox("数据库中为此游戏添加了新的金手指。\n 请重新加载dmnt或重新启动游戏。", MessageBox::OKAY))->show();
         }
       }
     }
@@ -8756,7 +8759,7 @@ void GuiCheats::prep_pointersearch(Debugger *debugger, std::vector<MemoryInfo> m
     delete m_PC_Dump;
     delete m_PC_DumpM;
   };
-  (new MessageBox("Preparing JumpBack data.\n \nThis may take a while...", MessageBox::NONE))->show();
+  (new MessageBox("准备跳回数据。\n \n这需要一点时间...", MessageBox::NONE))->show();
   requestDraw();
 
   PCDump = new MemoryDump(m_PCDump_filename.str().c_str(), DumpType::DATA, true);
@@ -9278,14 +9281,14 @@ void GuiCheats::updatebookmark(bool clearunresolved, bool importbookmark, bool f
             m_memoryDumpBookmark->addData((u8 *)&m_heapBaseAddr, sizeof(u64));
             tempdump->addData((u8 *)&bookmark, sizeof(bookmark_t));
           }
-          printf("found %d good ones\n", goodcount);
+          printf("已找到 %d 有效的\n", goodcount);
           delete [] buffer;
-          (new Snackbar("Bookmark file imported"))->show();
+          (new Snackbar("书签文件已导入"))->show();
         }
         else
         {
           printf("bookmark file %s missing \n", filebuildIDStr.str().c_str());
-          (new Snackbar("Bookmark file to import from is missing"))->show();
+          (new Snackbar("缺少要导入的书签文件"))->show();
         }
         delete bmkdump;
         remove(filebuildIDStr.str().c_str());
