@@ -37,6 +37,12 @@ struct fromto_t
   u64 from;
   u64 to;
 };
+struct fromtoP_t
+{
+  u64 from;
+  u64 to;
+  u8 P;
+};
 enum
 {
   FORMAT_DEC,
@@ -90,7 +96,8 @@ private:
     SEARCH_editRAM2,
     SEARCH_pickjump,
     SEARCH_editExtraSearchValues,
-    SEARCH_POINTER
+    SEARCH_POINTER,
+    SEARCH_POINTER2
   } m_searchMenuLocation = SEARCH_NONE;
 
   searchType_t m_searchType = SEARCH_TYPE_NONE;
@@ -108,10 +115,25 @@ private:
   MemoryDump *m_dataDump;
   MemoryDump *m_PC_Dump = nullptr;
   MemoryDump *m_PC_DumpM = nullptr;
+  MemoryDump *m_PC_DumpP = nullptr; // Pointer distance to main file ptr_distance_t
+  MemoryDump *m_PC_DumpTo = nullptr; // File to hold list of "To" to be process next
 
   #define M_ENTRY_MAX 10
   #define M_TARGET m_multisearch.Entries[m_multisearch.target]
   #define M_ALIGNMENT 16
+  #define FORWARD_DEPTH 2
+  struct forward_chain_t
+  {
+    u32 length [FORWARD_DEPTH];
+    u32 offset [FORWARD_DEPTH];
+    u32 target [FORWARD_DEPTH];
+  };
+  // #define SET_BIT(i) 0x1 << i
+  // #define GET_BIT(i) & (SET_BIT(i)) >> i
+  struct ptr_distance_t
+  {
+    bool main:1,l1:1,l2:1,l3:1,l4:1,l5:1,l6:1,l7:1;
+  };
   struct MultiSearch_t
   {
     char laber[40] = {0};
@@ -138,8 +160,9 @@ private:
   u64 m_target = 0;
   u64 m_numoffset = 3;
   u64 m_max_source = 200;
-  u64 m_max_depth = 2;
+  u64 m_max_depth = 5;
   u64 m_max_range = 0x800;
+  u64 m_max_P_range = 0x800;
   u64 m_low_main_heap_addr = 0x100000000;
   u64 m_high_main_heap_addr = 0x10000000000;
   u64 m_pointer_found = 0;
@@ -194,7 +217,7 @@ private:
     u32 table_entrysize;
   };
   jump_table_entry_t *m_jumptable;
-  fromto_t *m_fromto32 = nullptr;
+  fromtoP_t *m_fromto32 = nullptr;
   u64 m_fromto32_offset = 0;
   u32 m_fromto32_size = 0;
   u64 m_selectedJumpSource = 0;
@@ -272,10 +295,12 @@ private:
   bookmark_t bookmark;        //used in add book mark
   pointer_chain_t m_hitcount; // maybe not used
 
-  std::stringstream m_PCDump_filename;
-  std::stringstream m_PCAttr_filename;
-  std::stringstream m_PCDumpM_filename;
-  std::stringstream m_PCDumpR_filename;
+  std::stringstream m_PCDump_filename; // Pointer base file
+  std::stringstream m_PCAttr_filename; // For information only
+  std::stringstream m_PCDumpM_filename; // main pointer data
+  std::stringstream m_PCDumpP_filename; // Pointer distance to main file ptr_distance_t
+  std::stringstream m_PCDumpT_filename; // list of "To" for processing
+  std::stringstream m_PCDumpR_filename; // Pointer refresh file
   bool m_redo_prep_pointersearch = false;
 
   void PCdump();
@@ -363,6 +388,8 @@ private:
   void refresh_fromto();
 
   void prep_backjump_stack(u64 address);
+
+  void prep_forward_stack();
 
   void searchMemoryAddressesSecondary(Debugger *debugger, searchValue_t searchValue1,
                                       searchValue_t searchValue2, searchType_t searchType,

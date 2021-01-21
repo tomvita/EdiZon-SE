@@ -1230,7 +1230,7 @@ void GuiCheats::drawSearchPointerMenu()
     ss.str("");
     ss << "0x" << std::uppercase << std::hex << m_EditorBaseAddr;
     if (m_pointersearch_canresume)
-      ss << " Resumable";
+      ss << " 可恢复";
     Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
     Gui::drawTextAligned(font20, 620, 280, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
     if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 3)
@@ -1239,9 +1239,9 @@ void GuiCheats::drawSearchPointerMenu()
     Gui::drawText(font20, 310, 320, currTheme.textColor, "仅存储转发");
     ss.str("");
     if (m_forwarddump)
-      ss << "YES";
+      ss << "是";
     else
-      ss << "NO";
+      ss << "否";
     Gui::getTextDimensions(font20, ss.str().c_str(), &strWidth, nullptr);
     Gui::drawTextAligned(font20, 620, 320, currTheme.textColor, ss.str().c_str(), ALIGNED_LEFT);
     if (cursorBlinkCnt++ % 60 > 10 && m_selectedEntry == 4)
@@ -1700,7 +1700,7 @@ void GuiCheats::drawSEARCH_pickjump()
       ss << "\uE132   选择回跳的来源";
       // ss << "   [ " << regionNames[m_searchRegion] << " ]";
       ss << "     " << m_selectedJumpSource + m_fromto32_offset + 1 << " / " << m_fromto32_size;
-      ss << " Max P Range = " << std::hex << m_max_P_range;
+      ss << " 最大P的范围 = " << std::hex << m_max_P_range;
   }
   Gui::drawText(font24, 120, 70, currTheme.textColor, ss.str().c_str());
   ss.str("");
@@ -3589,6 +3589,102 @@ void GuiCheats::onInput(u32 kdown)
       };
     }
   }
+  if (m_searchMenuLocation == SEARCH_POINTER2)
+  {
+    if (kdown & KEY_Y)
+    {
+      printf("starting PC dump\n");
+      m_searchType = SEARCH_TYPE_UNSIGNED_64BIT;
+      m_searchRegion = SEARCH_REGION_HEAP_AND_MAIN;
+      Gui::beginDraw();
+      Gui::drawRectangle(70, 420, 1150, 65, currTheme.backgroundColor);
+      Gui::drawTextAligned(font20, 70, 420, currTheme.textColor, "Making Dump for pointersearcher SE", ALIGNED_LEFT);
+      Gui::endDraw();
+      GuiCheats::searchMemoryAddressesPrimary2(m_debugger, m_searchValue[0], m_searchValue[1], m_searchType, m_searchMode, m_searchRegion, &m_memoryDump, m_memoryInfo);
+      (new Snackbar("Dump for pointersearcher SE completed"))->show();
+      // PCdump();
+    }
+
+    if ((kdown & KEY_PLUS) && !(kheld & KEY_ZL))
+    {
+      m_abort = false;
+      // (new Snackbar("Starting pointer search"))->show();
+      // m_searchMenuLocation = SEARCH_NONE;
+      printf("starting pointer search from plus %lx \n", m_EditorBaseAddr);
+      // m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
+      m_abort = false;
+      m_Time1 = time(NULL);
+      if (m_pointersearch_canresume)
+        resumepointersearch2();
+      else
+        startpointersearch2(m_EditorBaseAddr);
+      char st[100];
+      snprintf(st, 100, "Done pointer search found %ld pointer in %ld seconds", m_pointer_found, time(NULL) - m_Time1);
+      printf("done pointer search \n");
+      printf("Time taken =%ld\n", time(NULL) - m_Time1);
+      (new Snackbar(st))->show();
+    }
+    if ((kdown & KEY_PLUS) && (kheld & KEY_ZL))
+    {
+      m_pointersearch_canresume = false;
+      delete m_PointerSearch;
+      printf("set resume to false\n");
+    }
+
+    if (kdown & KEY_UP)
+    {
+      if (m_selectedEntry > 0)
+        m_selectedEntry--;
+    }
+    if (kdown & KEY_DOWN)
+    {
+      if (m_selectedEntry < 5)
+        m_selectedEntry++;
+    }
+    if (kdown & KEY_R)
+    {
+      if (m_selectedEntry == 0 && m_max_depth < MAX_POINTER_DEPTH)
+      {
+        m_max_depth++;
+      }
+      else if (m_selectedEntry == 1 && m_max_range < MAX_POINTER_RANGE)
+      {
+        m_max_range += 0x100;
+      }
+      else if (m_selectedEntry == 2 && m_max_source < MAX_NUM_SOURCE_POINTER)
+      {
+        m_max_source += 10;
+      }
+      else if (m_selectedEntry == 4)
+      {
+        m_forwarddump = !m_forwarddump;
+      }
+      else if (m_selectedEntry == 5 && m_numoffset < MAX_NUM_POINTER_OFFSET)
+      {
+        m_numoffset++;
+      };
+    }
+    if (kdown & KEY_L)
+    {
+      if (m_selectedEntry == 0 && m_max_depth > 2)
+      {
+        m_max_depth--;
+      }
+      else if (m_selectedEntry == 1 && m_max_range > 0x100)
+      {
+        m_max_range -= 0x100;
+      }
+      else if (m_selectedEntry == 2 && m_max_source > 10)
+      {
+        m_max_source -= 10;
+      }
+      else if (m_selectedEntry == 5 && m_numoffset > 1)
+      {
+        m_numoffset--;
+      };
+    }
+  }
+
 
 
   if (m_searchMenuLocation == SEARCH_NONE)
