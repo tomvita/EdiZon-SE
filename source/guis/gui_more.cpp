@@ -1,4 +1,4 @@
-#include "guis/gui_More.hpp"
+#include "guis/gui_more.hpp"
 #include "helpers/config.hpp"
 GuiMore::GuiMore() : Gui() {
   Config::getConfig()->option_once = false;
