@@ -58,7 +58,7 @@ void GuiMain::draw() {
   s64 x = 0, y = 32, currItem = 0;
   s64 selectedX = 0, selectedY = 0;
   bool tmpEditableOnly = m_editableOnly;
-  static u32 splashCnt = 0;
+  //static u32 splashCnt = 0;
 
   Gui::beginDraw();
 

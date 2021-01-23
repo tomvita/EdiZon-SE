@@ -136,7 +136,7 @@ bool Gui::setFontType(u32 font) {
 }
 
 inline bool Gui::fontLoadGlyph(glyph_t* glyph, u32 font, u32 codepoint) {
-  FT_Face face;
+  FT_Face face{};
   FT_Error ret = 0;
   FT_GlyphSlot slot;
   FT_UInt glyphIndex;

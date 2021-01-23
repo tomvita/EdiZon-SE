@@ -39,8 +39,8 @@ void Interpreter::setSaveFileBuffer(u8 *buffer, size_t bufferSize, std::string e
     case UTF_16LE:
       utf8 = Encoding::uft16leToUtf8(buffer, bufferSize);
       break;
-    case ASCII: [[fallthrough]]
-    case UTF_8: [[fallthrough]]
+    case ASCII: //fallthrough
+    case UTF_8: //fallthrough
     default:
       utf8 = std::vector<u8>(buffer, buffer + bufferSize);
       break;

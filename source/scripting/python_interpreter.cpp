@@ -290,8 +290,8 @@ void PythonInterpreter::getModifiedSaveFile(std::vector<u8> &buffer) {
     case UTF_16LE:
       buffer = Encoding::utf8ToUtf16le(&encoded[0], encoded.size());
       break;
-    case ASCII: [[fallthrough]]
-    case UTF_8: [[fallthrough]]
+    case ASCII: //fallthrough
+    case UTF_8: //fallthrough
     default:
       buffer = encoded;
       break;

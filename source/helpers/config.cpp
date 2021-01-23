@@ -3,7 +3,7 @@
 static Config::config_data_t configData;
 
 void Config::readConfig() {
-memset(&configData, 0x00, sizeof(config_data_t));
+memset(static_cast<void*>(&configData), 0x00, sizeof(config_data_t));
 
 if (access(CONFIG_PATH, F_OK) == 0) {
     FILE *configFile = fopen(CONFIG_PATH, "r+");
@@ -11,7 +11,7 @@ if (access(CONFIG_PATH, F_OK) == 0) {
     fclose(configFile);
 
     if (strcmp(configData.magic, "EDZNCFG") != 0) {
-    memset(&configData, 0x00, sizeof(config_data_t));
+    memset(static_cast<void*>(&configData), 0x00, sizeof(config_data_t));
     Config::writeConfig();
     }
 } else
