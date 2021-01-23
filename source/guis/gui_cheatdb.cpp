@@ -125,7 +125,7 @@ void Guicheatdb::onInput(u32 kdown) {
       curl_easy_cleanup(curl);
       printf("remove(APP_OUTPUT) = %d\n", remove(APP_OUTPUT));
       (new MessageBox("金手指代码数据库已更新\n\n 请享受！", MessageBox::OKAY))->show();
-      printf("remove(TEMP_FILE，APP_OUTPUT) = %d\n", rename(TEMP_FILE, APP_OUTPUT));
+      printf("rename(TEMP_FILE，APP_OUTPUT) = %d\n", rename(TEMP_FILE, APP_OUTPUT));
       updateAvailable = false;
       for (int i=0;i<6;i++)
         Config::getConfig()->dbversion[i] = remoteVersion[i];
