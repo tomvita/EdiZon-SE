@@ -119,6 +119,10 @@ void Guifirstrun::onInput(u32 kdown) {
   else if (kdown & KEY_X)
   {
     Config::getConfig()->easymode = !Config::getConfig()->easymode;
+    if (!Config::getConfig()->easymode)
+    {
+      Config::getConfig()->options[0] = false;
+    }
   }
     else if (kdown & KEY_PLUS)
   {
