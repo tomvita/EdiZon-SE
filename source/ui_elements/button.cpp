@@ -30,7 +30,7 @@ void Button::onInput(u32 kdown) {
 
 }
 
-void Button::onTouch(touchPosition &touch) {
+void Button::onTouch(HidTouchState &touch) {
 
 }
 

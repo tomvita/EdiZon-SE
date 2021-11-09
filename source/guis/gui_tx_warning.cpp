@@ -31,20 +31,20 @@ void GuiTXWarning::draw() {
 }
 
 void GuiTXWarning::onInput(u32 kdown) {
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
     Gui::g_requestExit = true;
 
-  if (kdown & KEY_A)
+  if (kdown & HidNpadButton_A)
     Gui::g_nextGui = GUI_MAIN;
 }
 
-void GuiTXWarning::onTouch(touchPosition &touch) {
-  if (touch.px > 400 && touch.px < 900 && touch.py > 600 && touch.py < 660) {
+void GuiTXWarning::onTouch(HidTouchState &touch) {
+  if (touch.x > 400 && touch.x < 900 && touch.y > 600 && touch.y < 660) {
     Config::getConfig()->hideSX = !Config::getConfig()->hideSX;
     Config::writeConfig();
   }
 }
 
-void GuiTXWarning::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void GuiTXWarning::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 
 }

@@ -21,7 +21,7 @@ void WidgetString::draw(Gui *gui, u16 x, u16 y) {
 }
 
 void WidgetString::onInput(u32 kdown) {
-  if (kdown & KEY_A) {
+  if (kdown & HidNpadButton_A) {
     char out_string[m_maxLength + 1];
     Gui::requestKeyboardInput("Input string value", "Enter a string for this value to be set to.", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
 
@@ -31,7 +31,7 @@ void WidgetString::onInput(u32 kdown) {
   }
 }
 
-void WidgetString::onTouch(touchPosition &touch) {
+void WidgetString::onTouch(HidTouchState &touch) {
   char out_string[m_maxLength + 1];
   Gui::requestKeyboardInput("Input string value", "Enter a string for this value to be set to.", Widget::getStringValue(), SwkbdType_Normal, out_string, m_maxLength);
 
