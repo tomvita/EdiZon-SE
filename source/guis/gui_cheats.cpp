@@ -76,6 +76,26 @@ static bool compareentry(MultiSearchEntry_t e1, MultiSearchEntry_t e2);
 static bool comparefromto(fromto_t e1, fromto_t e2);
 static bool comparefromtoP(fromtoP_t e1, fromtoP_t e2);
 u32 kheld;
+bool dmntpresent() {
+    /* Get all process ids */
+    u64 process_ids[0x50];
+    s32 num_process_ids;
+    svcGetProcessList(&num_process_ids, process_ids, sizeof process_ids);  // need to double check
+
+    /* Look for dmnt or dmntgen2 titleID */
+    u64 titeID;
+    for (s32 i = 0; i < num_process_ids; ++i) {
+        if (R_SUCCEEDED(pminfoGetProgramId(&titeID, process_ids[i]))) {
+            if (titeID == 0x010000000000000D) {
+                return true;
+            } 
+            // else if (titeID == 0x010000000000D609) {
+            //     return false;
+            // }
+        };
+    }
+    return false;
+};
 GuiCheats::GuiCheats() : Gui()
 {
   if (Config::getConfig()->deletebookmark)
@@ -92,9 +112,12 @@ GuiCheats::GuiCheats() : Gui()
   m_sysmodulePresent = true;
   m_debugger = new Debugger();
   // if (m_sysmodulePresent)
-  dmntchtInitialize();
-  if (!autoattachcheck())
-    m_debugger->attachToProcess();
+  if (dmntpresent()) {
+      dmntchtInitialize();
+      if (!autoattachcheck())
+          m_debugger->attachToProcess();
+  } else
+      m_debugger->attachToProcess();
   if (!m_debugger->m_dmnt) { m_sysmodulePresent = true;  }
   // printf(" envIsSyscallHinted(0x60) = %d \n",envIsSyscallHinted(0x60));
   // printf("init debugger success m_rc = %x m_debugHandle = %x m_dmnt = %x\n",(u32) m_debugger->m_rc, m_debugger->m_debugHandle, m_debugger->m_dmnt);
@@ -2764,6 +2787,10 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
   else if (kdown & HidNpadButton_Plus) // Add bookmark
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
+    {
+        auto info = m_debugger->queryMemory(address);
+        printf("offset=0x%08lX seg_addr=0x%10lX size=0x%08lX type=0x%X", address - info.addr, info.addr, info.size, info.type);
+    }
     bookmark_t bookmark;
     if (address >= m_heapBaseAddr && address < m_heapEnd)
     {
@@ -2804,7 +2831,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     m_AttributeDumpBookmark->flushBuffer();
     m_memoryDumpBookmark->flushBuffer();
     (new Snackbar("Address added to bookmark!"))->show();
-    printf("%s\n", "PLUS key pressed1");
+    printf("%s %s\n", "PLUS key pressed1 ", bookmark.label);
   }
   else if (kdown & HidNpadButton_ZR && kheld & HidNpadButton_ZL) // Page Up
   {
