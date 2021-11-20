@@ -20,9 +20,10 @@ void GuiMore::draw() {
     draw2();
     return;
   }
-  std::stringstream extra_seg_str, two_value_range_str;
+  std::stringstream extra_seg_str, two_value_range_str, bit_mask_str;
   extra_seg_str << "\uE0B2 +  \uE0B1 -  Extra MB " << Config::getConfig()->extraMB;
   two_value_range_str << "\uE0A5 +  \uE0A4 - 2 value search range " << Config::getConfig()->two_value_range;
+  bit_mask_str << "\uE0A6 BM=" << std::uppercase << std::hex << std::setfill('0') << std::setw(16) << Config::getConfig()->bitmask;
   Gui::beginDraw();
   Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, Gui::makeColor(0x30, 0x39, 0x29, 0xFF));
   Gui::drawTextAligned(fontHuge, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 - 100, COLOR_WHITE, "More options", ALIGNED_CENTER);
@@ -46,6 +47,7 @@ void GuiMore::draw() {
   Gui::drawTextAligned(font20, Gui::g_framebuffer_width * 4 / 5, Gui::g_framebuffer_height / 2 + 300, Config::getConfig()->exclude_ptr_candidates ? COLOR_WHITE : COLOR_BLACK, "\uE0B4 exclue pointer candidates", ALIGNED_CENTER);
 
   Gui::drawTextAligned(font20, Gui::g_framebuffer_width * 4 / 5, Gui::g_framebuffer_height / 2 + 150, COLOR_WHITE, "About \uE0B3", ALIGNED_CENTER);
+  Gui::drawTextAligned(font20, Gui::g_framebuffer_width / 5, Gui::g_framebuffer_height / 2 + 150, Config::getConfig()->use_bitmask ? COLOR_WHITE : COLOR_BLACK, Config::getConfig()->use_bitmask ? bit_mask_str.str().c_str() : "\uE0A6 use bit mask", ALIGNED_CENTER);
   Gui::endDraw();
 }
 // u32 kheld = hidKeysHeld(HidNpadIdType_No1) | hidKeysHeld(HidNpadIdType_Handheld);
@@ -71,9 +73,22 @@ void GuiMore::onInput(u32 kdown)
     // m_edizon_dir = "/switch/EdiZon/2";
     Config::getConfig()->two_value_range = Config::getConfig()->two_value_range + 1;
   }
-    if (kdown & HidNpadButton_ZL)
+
+  if (kdown & HidNpadButton_ZL)
   {
     // m_edizon_dir = "/switch/EdiZon/3";
+    Config::getConfig()->use_bitmask = !Config::getConfig()->use_bitmask;
+    if (Config::getConfig()->use_bitmask) {
+        if (Config::getConfig()->bitmask == 0) {
+            Config::getConfig()->bitmask = 0xFFFFFFFFFFFFFFFF;
+        };
+        char input[19];
+        char initialString[21];
+        snprintf(initialString, sizeof(initialString), "0x%016lX", Config::getConfig()->bitmask);
+        if (Gui::requestKeyboardInput("Enter value", "Enter the bit mask to apply to search value.", initialString, SwkbdType_QWERTY, input, 18)) {
+            Config::getConfig()->bitmask = static_cast<u64>(std::stoul(input, nullptr, 16));
+        }
+    }
   }
   else if (kdown & HidNpadButton_ZR)
   {

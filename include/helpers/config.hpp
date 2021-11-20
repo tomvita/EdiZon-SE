@@ -34,6 +34,8 @@ namespace Config {
     bool show_previous_values;
     char store_extension[10];
     bool extra_value;
+    bool use_bitmask;
+    u64 bitmask;
   } config_data_t;
 
   void readConfig();
