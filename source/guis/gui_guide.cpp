@@ -104,12 +104,12 @@ void GuiGuide::draw() {
 }
 
 void GuiGuide::onInput(u32 kdown) {
-  if (kdown & KEY_B) {
+  if (kdown & HidNpadButton_B) {
     GuiGuide::g_selectedPage = 1;
     Gui::g_nextGui = GUI_MAIN;
     return;
   }
-  if (kdown & KEY_R) {
+  if (kdown & HidNpadButton_R) {
 
     if (GuiGuide::g_selectedPage < GUIDE_PAGE_CNT)
     GuiGuide::g_selectedPage++;
@@ -117,7 +117,7 @@ void GuiGuide::onInput(u32 kdown) {
     return;
   }
 
-  if (kdown & KEY_L) {
+  if (kdown & HidNpadButton_L) {
     if (GuiGuide::g_selectedPage > 1)
       GuiGuide::g_selectedPage--;
     Gui::g_nextGui = GUI_GUIDE;
@@ -125,10 +125,10 @@ void GuiGuide::onInput(u32 kdown) {
   }
 }
 
-void GuiGuide::onTouch(touchPosition &touch) {
+void GuiGuide::onTouch(HidTouchState &touch) {
 
 }
 
-void GuiGuide::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void GuiGuide::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 
 }

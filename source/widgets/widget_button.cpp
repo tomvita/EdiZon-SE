@@ -25,13 +25,13 @@ void WidgetButton::draw(Gui *gui, u16 x, u16 y) {
 }
 
 void WidgetButton::onInput(u32 kdown) {
-  if (kdown & KEY_A) {
+  if (kdown & HidNpadButton_A) {
     m_interpreter->setArgs(m_intArgs, m_strArgs);
     m_displayText = m_interpreter->callFunction(m_funcName);
   }
 }
 
-void WidgetButton::onTouch(touchPosition &touch) {
+void WidgetButton::onTouch(HidTouchState &touch) {
     m_interpreter->setArgs(m_intArgs, m_strArgs);
     m_displayText = m_interpreter->callFunction(m_funcName);
 }

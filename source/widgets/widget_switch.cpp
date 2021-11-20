@@ -27,7 +27,7 @@ void WidgetSwitch::draw(Gui *gui, u16 x, u16 y) {
 }
 
 void WidgetSwitch::onInput(u32 kdown) {
-  if (kdown & KEY_A) {
+  if (kdown & HidNpadButton_A) {
     if (m_widgetDataType == INT) {
       if (Widget::getIntegerValue() == m_intOnValue)
         Widget::setIntegerValue(m_intOffValue);
@@ -42,7 +42,7 @@ void WidgetSwitch::onInput(u32 kdown) {
   }
 }
 
-void WidgetSwitch::onTouch(touchPosition &touch) {
+void WidgetSwitch::onTouch(HidTouchState &touch) {
   if (m_widgetDataType == INT) {
     if (Widget::getIntegerValue() == m_intOnValue)
       Widget::setIntegerValue(m_intOffValue);

@@ -108,7 +108,7 @@ void Guifirstrun::draw() {
 
 }
 void Guifirstrun::onInput(u32 kdown) {
-  if (kdown & KEY_B) {
+  if (kdown & HidNpadButton_B) {
     if (threadRunning) {
       threadWaitForExit(&networkThread);
       threadClose(&networkThread);
@@ -117,7 +117,7 @@ void Guifirstrun::onInput(u32 kdown) {
       Gui::g_nextGui = GUI_CHEATS;
       Config::writeConfig();
   }
-  else if (kdown & KEY_X)
+  else if (kdown & HidNpadButton_X)
   {
     Config::getConfig()->easymode = !Config::getConfig()->easymode;
     if (!Config::getConfig()->easymode)
@@ -125,19 +125,19 @@ void Guifirstrun::onInput(u32 kdown) {
       Config::getConfig()->options[0] = false;
     }
   }
-    else if (kdown & KEY_PLUS)
+    else if (kdown & HidNpadButton_Plus)
   {
     Gui::g_nextGui = GUI_ABOUT;
   }
-  else if (kdown & KEY_MINUS && updateAvailable)
+  else if (kdown & HidNpadButton_Minus && updateAvailable)
   {
     getdb();
     // Gui::g_nextGui = GUI_CHEATS;
   }
 }
-void Guifirstrun::onTouch(touchPosition &touch) {
+void Guifirstrun::onTouch(HidTouchState &touch) {
 }
-void Guifirstrun::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void Guifirstrun::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 }
 static size_t writeToStr(const char * contents, size_t size, size_t nmemb, std::string * userp){
     auto totalBytes = (size * nmemb);

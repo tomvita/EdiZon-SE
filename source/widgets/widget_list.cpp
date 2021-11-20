@@ -40,9 +40,9 @@ void WidgetList::draw(Gui *gui, u16 x, u16 y) {
 }
 
 void WidgetList::onInput(u32 kdown) {
-  if (kdown & KEY_A && Gui::g_currListSelector == nullptr) {
+  if (kdown & HidNpadButton_A && Gui::g_currListSelector == nullptr) {
     (new ListSelector("Choose item", "\uE0E0 - Select      \uE0E1 - Back", m_listItemNames))->setInputAction([&](u32 k, u16 selectedItem){
-      if(k & KEY_A) {
+      if(k & HidNpadButton_A) {
         if (m_widgetDataType == INT)
           Widget::setIntegerValue(m_intListItemValues[selectedItem]);
         else if (m_widgetDataType == STRING)
@@ -53,9 +53,9 @@ void WidgetList::onInput(u32 kdown) {
   }
 }
 
-void WidgetList::onTouch(touchPosition &touch) {
+void WidgetList::onTouch(HidTouchState &touch) {
   (new ListSelector("Choose item", "\uE0E0 - Select      \uE0E1 - Back", m_listItemNames))->setInputAction([&](u32 k, u16 selectedItem){
-    if(k & KEY_A) {
+    if(k & HidNpadButton_A) {
       if (m_widgetDataType == INT)
         Widget::setIntegerValue(m_intListItemValues[selectedItem]);
       else if (m_widgetDataType == STRING)

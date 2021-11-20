@@ -124,7 +124,7 @@ GuiSysmodule::GuiSysmodule() : Gui() {
       gui->drawTextAligned(font20, x + 37, y + 23, currTheme.textColor, sysmodule.second.name.c_str(), ALIGNED_LEFT);
       gui->drawTextAligned(font20, x + 420, y + 23, this->m_runningSysmodules.find(sysmodule.first) != this->m_runningSysmodules.end() ? currTheme.selectedColor : Gui::makeColor(0xB8, 0xBB, 0xC2, 0xFF), this->m_runningSysmodules.find(sysmodule.first) != this->m_runningSysmodules.end() ? "On" : "Off", ALIGNED_LEFT);
     }, [&](u32 kdown, bool *isActivated){
-      if (kdown & KEY_A) {
+      if (kdown & HidNpadButton_A) {
         u64 pid;
         u64 tid = std::stol(sysmodule.first.c_str(), nullptr, 16);
 
@@ -249,7 +249,7 @@ void GuiSysmodule::onInput(u32 kdown) {
       if (btn->onInput(kdown)) break;
   }
   
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
   {
     Config::readConfig();
     if (Config::getConfig()->easymode)
@@ -257,7 +257,7 @@ void GuiSysmodule::onInput(u32 kdown) {
     else
       Gui::g_nextGui = GUI_CHOOSE_MISSION;
   }
-  else if ((kdown & KEY_X) && (access("sdmc:/switch/edizon/profile.zip", F_OK) == 0))
+  else if ((kdown & HidNpadButton_X) && (access("sdmc:/switch/edizon/profile.zip", F_OK) == 0))
   {
     // try
     // {
@@ -270,7 +270,7 @@ void GuiSysmodule::onInput(u32 kdown) {
     inst::zip::extractFile("sdmc:/switch/edizon/profile.zip", "sdmc:/");
     (new Snackbar("Profile set to launch EdiZon SE"))->show();
   }
-  else if ((kdown & KEY_Y) && (access(CONTENTS_PATH "0100000000001013/exefs.nsp", F_OK) == 0))
+  else if ((kdown & HidNpadButton_Y) && (access(CONTENTS_PATH "0100000000001013/exefs.nsp", F_OK) == 0))
   {
     try
     {
@@ -281,12 +281,12 @@ void GuiSysmodule::onInput(u32 kdown) {
     }
     (new Snackbar("Profile set to launch Profile"))->show();
   }
-  else if ((kdown & KEY_L) && (access("sdmc:/switch/breeze/profile.zip", F_OK) == 0))
+  else if ((kdown & HidNpadButton_L) && (access("sdmc:/switch/breeze/profile.zip", F_OK) == 0))
   {
     inst::zip::extractFile("sdmc:/switch/breeze/profile.zip", "sdmc:/");
     (new Snackbar("Profile set to launch Breeze"))->show();
   }
-  else if ((kdown & KEY_MINUS) && (!(access("/atmosphere/config/system_settings.ini", F_OK) == 0)))
+  else if ((kdown & HidNpadButton_Minus) && (!(access("/atmosphere/config/system_settings.ini", F_OK) == 0)))
   {
     const char inst1[] = "[atmosphere]\n";
     const char inst2[] = "dmnt_cheats_enabled_by_default = u8!0x0\n";
@@ -300,17 +300,17 @@ void GuiSysmodule::onInput(u32 kdown) {
     // Gui::g_requestExit = true;
   }
 
-  // if (hidMitmInstalled() && kdown & KEY_X)
+  // if (hidMitmInstalled() && kdown & HidNpadButton_X)
   //   Gui::g_nextGui = GUI_HID_MITM;
 
 }
 
-void GuiSysmodule::onTouch(touchPosition &touch) {
+void GuiSysmodule::onTouch(HidTouchState &touch) {
   for(Button2 *btn : Button2::g_buttons) {
     btn->onTouch(touch);
   }
 }
 
-void GuiSysmodule::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void GuiSysmodule::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 
 }

@@ -19,7 +19,7 @@ public:
 
   void draw(Gui *gui);
   void onInput(u32 kdown);
-  void onTouch(touchPosition &touch);
+  void onTouch(HidTouchState &touch);
 
   Button* setInputAction(std::function<void(u32 kdown)> inputActions);
 

@@ -837,7 +837,7 @@ void GuiCheats::draw()
     {
       if (m_memoryDump->size() > 0)
       {
-        if (kheld & KEY_R) {
+        if (kheld & HidNpadButton_R) {
         Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "Rstick \uE143 Inc 1000  \uE145 Freeze 100 from cursor \uE146 UnFreeze 100 from cursor  \uE144 Jump to memoryexplorer", ALIGNED_RIGHT);
         Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "Lstick \uE090 Set Value 1000", ALIGNED_RIGHT);
       } else {
@@ -1698,7 +1698,7 @@ void GuiCheats::drawEditRAMMenu2()
   }
 
   // key hints
-  if (kheld & KEY_ZL && false) {
+  if (kheld & HidNpadButton_ZL && false) {
       Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 65, currTheme.textColor, "Rstick \uE143 Inc 1000 \uE145 Freeze 100 \uE146 UnFreeze 100 \uE144 Jump to memoryexplorer", ALIGNED_RIGHT);
       Gui::drawTextAligned(font14, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 35, currTheme.textColor, "Lstick \uE090 Set Value 1000", ALIGNED_RIGHT);
   } else {
@@ -2116,27 +2116,27 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
   else if (M_ENTRY.on == ON) \
     M_ENTRY.on = OFF;
   std::stringstream ss;
-  if (kdown & KEY_B && !(kheld & KEY_ZL))
+  if (kdown & HidNpadButton_B && !(kheld & HidNpadButton_ZL))
   {
     GuiCheats::save_multisearch_setup();
     m_selectedEntry = m_selectedEntrySave;
     m_searchMenuLocation = SEARCH_NONE;
   }
-  else if (kdown & KEY_ZR && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_ZR && !(kheld & HidNpadButton_ZL))
   {
     m_selectedEntry = m_multisearch.target * 6 + 4;
   }
-  else if (kdown & KEY_B && (kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_B && (kheld & HidNpadButton_ZL))
   {
     GuiCheats::save_multisearch_setup();
   }
-  else if (kdown & KEY_PLUS && (kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_Plus && (kheld & HidNpadButton_ZL))
   {
     M_TARGET.on = ON;
     m_multisearch.target = m_selectedEntry / 6;
     M_TARGET.on = TARGET;
   }
-  else if (kdown & KEY_PLUS && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_Plus && !(kheld & HidNpadButton_ZL))
   {
     // M_TARGET.on = OFF;
     // m_multisearch.target = m_selectedEntry / 6;
@@ -2251,7 +2251,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       }
     }
   }
-  else if (kdown & KEY_MINUS && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_Minus && !(kheld & HidNpadButton_ZL))
   {
     for (u8 i = 0; i < 10; i++)
     {
@@ -2268,7 +2268,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     m_multisearch.Entries[0].on = TARGET;
     m_multisearch.target = 0;
   }
-  else if (kdown & KEY_MINUS && (kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_Minus && (kheld & HidNpadButton_ZL))
   {
     m_multisearch.Entries[0].on = TARGET;
     m_multisearch.target = 0;
@@ -2361,12 +2361,12 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
     ss << "Main " << std::dec << (u16)i + 1;
     strcpy(m_multisearch.Entries[i].label, ss.str().c_str());
   }
-  else if (kdown & KEY_X && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_X && !(kheld & HidNpadButton_ZL))
   {
     M_ENTRY_TOGGLE
     // m_multisearch.Entries[m_selectedEntry / 6].on = !m_multisearch.Entries[m_selectedEntry / 6].on;
   }
-  else if (kdown & KEY_R && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_R && !(kheld & HidNpadButton_ZL))
   {
     switch (m_selectedEntry % 6)
     {
@@ -2427,7 +2427,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       break;
     }
   }
-  else if (kdown & KEY_L && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_L && !(kheld & HidNpadButton_ZL))
   {
     switch (m_selectedEntry % 6)
     {
@@ -2485,22 +2485,22 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       break;
     }
   }
-  else if (kdown & KEY_Y && !(kheld & KEY_ZL)) // Jump cursor to value1
+  else if (kdown & HidNpadButton_Y && !(kheld & HidNpadButton_ZL)) // Jump cursor to value1
   {
     m_selectedEntry = m_selectedEntry - m_selectedEntry %6 + 4;
   }
-  else if (kdown & KEY_Y && (kheld & KEY_ZL)) // Jump cursor to offset
+  else if (kdown & HidNpadButton_Y && (kheld & HidNpadButton_ZL)) // Jump cursor to offset
   {
     m_selectedEntry = m_selectedEntry - m_selectedEntry %6 ;
   }
-  else if (kdown & KEY_X && (kheld & KEY_ZL)) // Toggle HEX mode
+  else if (kdown & HidNpadButton_X && (kheld & HidNpadButton_ZL)) // Toggle HEX mode
   {
     if (m_searchValueFormat == FORMAT_HEX)
       m_searchValueFormat = FORMAT_DEC;
     else
       m_searchValueFormat = FORMAT_HEX;
   }
-  else if (kdown & KEY_A && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_A && !(kheld & HidNpadButton_ZL))
   {
     switch (m_selectedEntry % 6)
     {
@@ -2531,7 +2531,7 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       break;
     }
   }
-  else if (kdown & KEY_A && (kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_A && (kheld & HidNpadButton_ZL))
   {
     ss.str("");
     ss << M_ENTRY.label;
@@ -2542,22 +2542,22 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
       strcpy(M_ENTRY.label, ss.str().c_str());
     }
   }
-  else if (kdown & KEY_UP && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_AnyUp && !(kheld & HidNpadButton_ZL))
   {
     if (m_selectedEntry > 5)
       m_selectedEntry -= 6;
   }
-  else if (kdown & KEY_DOWN && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_AnyDown && !(kheld & HidNpadButton_ZL))
   {
     if (m_selectedEntry < 54)
       m_selectedEntry += 6;
   }
-  else if (kdown & KEY_LEFT && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_AnyLeft && !(kheld & HidNpadButton_ZL))
   {
     if (m_selectedEntry % 6 > 0)
       m_selectedEntry--;
   }
-  else if (kdown & KEY_RIGHT && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_AnyRight && !(kheld & HidNpadButton_ZL))
   {
     if (m_selectedEntry % 6 < 5)
       m_selectedEntry++;
@@ -2579,13 +2579,13 @@ void GuiCheats::EditExtraSearchValues_input(u32 kdown, u32 kheld)
 }
 void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory explorer
 {
-  if (kdown & KEY_B && kheld & KEY_ZL)
+  if (kdown & HidNpadButton_B && kheld & HidNpadButton_ZL)
   {
     m_selectedEntry = m_selectedEntrySave;
     m_searchMenuLocation = SEARCH_NONE;
     m_addressmod = 0;
   }
-  else if (kdown & KEY_RSTICK && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_StickR && !(kheld & HidNpadButton_ZL))
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     searchValue_t value = {0};
@@ -2672,7 +2672,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     (new Snackbar("Multi search setup created!"))->show();
     GuiCheats::save_multisearch_setup();
   }
-  else if (kdown & KEY_B && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_B && !(kheld & HidNpadButton_ZL))
   {
     // if (m_jump_stack_index > 0)
     // {
@@ -2712,7 +2712,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       // }
     }
   }
-  else if (kdown & KEY_R && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_R && !(kheld & HidNpadButton_ZL))
   {
     if (m_z > m_bookmark.pointer.depth - m_depth_count)
     {
@@ -2737,7 +2737,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
         m_searchType = SEARCH_TYPE_UNSIGNED_32BIT;
     }
   }
-  else if (kdown & KEY_L && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_L && !(kheld & HidNpadButton_ZL))
   {
     if (m_z < m_bookmark.pointer.depth)
     {
@@ -2748,7 +2748,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       m_addressmod = 0;
     }
   }
-  else if (kdown & KEY_UP)
+  else if (kdown & HidNpadButton_AnyUp)
   {
     if (m_selectedEntry > 4)
       m_selectedEntry -= 5;
@@ -2757,7 +2757,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       m_EditorBaseAddr -= 0x10;
     }
   }
-  else if (kdown & KEY_DOWN)
+  else if (kdown & HidNpadButton_AnyDown)
   {
     if (m_selectedEntry < 35)
       m_selectedEntry += 5;
@@ -2766,7 +2766,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       m_EditorBaseAddr += 0x10;
     }
   }
-  else if (kdown & KEY_LEFT)
+  else if (kdown & HidNpadButton_AnyLeft)
   {
     if (m_addressmod >= dataTypeSizes[m_searchType] && dataTypeSizes[m_searchType] < 4)
       m_addressmod -= dataTypeSizes[m_searchType];
@@ -2780,7 +2780,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       }
     }
   }
-  else if (kdown & KEY_RIGHT)
+  else if (kdown & HidNpadButton_AnyRight)
   {
     if (m_addressmod + dataTypeSizes[m_searchType] < 4)
       m_addressmod += dataTypeSizes[m_searchType];
@@ -2793,7 +2793,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       }
     }
   }
-  else if (kdown & KEY_PLUS) // Add bookmark
+  else if (kdown & HidNpadButton_Plus) // Add bookmark
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     {
@@ -2842,15 +2842,15 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     (new Snackbar("Address added to bookmark!"))->show();
     printf("%s %s\n", "PLUS key pressed1 ", bookmark.label);
   }
-  else if (kdown & KEY_ZR && kheld & KEY_ZL) // Page Up
+  else if (kdown & HidNpadButton_ZR && kheld & HidNpadButton_ZL) // Page Up
   {
     m_EditorBaseAddr -= 0x80;
   }
-  else if (kdown & KEY_ZR) // Page down
+  else if (kdown & HidNpadButton_ZR) // Page down
   {
     m_EditorBaseAddr += 0x80;
   }
-  else if (kdown & KEY_R && kheld & KEY_ZL) // change type
+  else if (kdown & HidNpadButton_R && kheld & HidNpadButton_ZL) // change type
   {
     m_addressmod = 0;
     if (m_searchType < SEARCH_TYPE_FLOAT_64BIT)
@@ -2859,7 +2859,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       m_searchType = static_cast<searchType_t>(i);
     }
   }
-  else if (kdown & KEY_L && kheld & KEY_ZL) // Chang type
+  else if (kdown & HidNpadButton_L && kheld & HidNpadButton_ZL) // Chang type
   {
     m_addressmod = 0;
     if (m_searchType > SEARCH_TYPE_UNSIGNED_8BIT)
@@ -2868,17 +2868,17 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       m_searchType = static_cast<searchType_t>(i);
     }
   }
-  else if (kdown & KEY_L && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_L && !(kheld & HidNpadButton_ZL))
   {
   }
-  else if (kdown & KEY_X) // Hex mode toggle
+  else if (kdown & HidNpadButton_X) // Hex mode toggle
   {
     if (m_searchValueFormat == FORMAT_DEC)
       m_searchValueFormat = FORMAT_HEX;
     else
       m_searchValueFormat = FORMAT_DEC;
   }
-  else if (kdown & KEY_Y && !(kheld & KEY_ZL)) // Goto
+  else if (kdown & HidNpadButton_Y && !(kheld & HidNpadButton_ZL)) // Goto
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     u64 pointed_address;
@@ -2961,7 +2961,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
     //   m_memoryDumpBookmark->flushBuffer();
     // }
   }
-  else if (kdown & KEY_Y && (kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_Y && (kheld & HidNpadButton_ZL))
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     // u64 pointed_address = address;
@@ -3002,7 +3002,7 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
       }
     }
   }
-  else if ((kdown & KEY_A) && !(kheld & KEY_ZL))
+  else if ((kdown & HidNpadButton_A) && !(kheld & HidNpadButton_ZL))
   {
     u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
     char input[19];
@@ -3031,11 +3031,11 @@ void GuiCheats::editor_input(u32 kdown, u32 kheld) //ME2 Key input for memory ex
         m_debugger->writeMemory((void *)&value, dataTypeSizes[m_searchType], address);
       }
     }
-  } else if ((kdown & KEY_LSTICK) && !(kheld & KEY_ZL)) {
+  } else if ((kdown & HidNpadButton_StickL) && !(kheld & HidNpadButton_ZL)) {
       u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
       m_copy._u64 = 0;
       m_debugger->readMemory((void *)&m_copy, dataTypeSizes[m_searchType], address);
-  } else if ((kdown & KEY_A) && (kheld & KEY_ZL)) {
+  } else if ((kdown & HidNpadButton_A) && (kheld & HidNpadButton_ZL)) {
       u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
       m_debugger->writeMemory((void *)&m_copy, dataTypeSizes[m_searchType], address);
   }
@@ -3257,18 +3257,18 @@ void GuiCheats::drawSearchRAMMenu()
 }
 void GuiCheats::easymode_input(u32 kdown, u32 kheld)
 {
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
   {
     Gui::g_requestExit = true;
   }
-  else if ((kdown & KEY_R) && !(kheld & KEY_ZL))
+  else if ((kdown & HidNpadButton_R) && !(kheld & HidNpadButton_ZL))
   {
     Config::getConfig()->easymode = false;
     m_debugger->detatch();
     dmntchtForceOpenCheatProcess();
     m_menuLocation = CANDIDATES;
   }
-  else if ((kdown & KEY_R) && (kheld & KEY_ZL))
+  else if ((kdown & HidNpadButton_R) && (kheld & HidNpadButton_ZL))
   {
     Config::getConfig()->easymode = false;
     Config::getConfig()->options[0] = false;
@@ -3277,37 +3277,37 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
     dmntchtForceOpenCheatProcess();
     m_menuLocation = CANDIDATES;
   }
-  else if (kdown & KEY_L)
+  else if (kdown & HidNpadButton_L)
   {
     Gui::g_nextGui = GUI_Sysmodule;
   }
   //   Gui::g_nextGui = GUI_MEMORY_EDITOR;
-  else if (kdown & KEY_MINUS)
+  else if (kdown & HidNpadButton_Minus)
   {
     Gui::g_nextGui = GUI_FIRST_RUN;
   }
-  else if (kdown & KEY_PLUS)
+  else if (kdown & HidNpadButton_Plus)
   {
     Config::readConfig();
     Config::getConfig()->enablecheats = true;
     Config::writeConfig();
     _moveLonelyCheats(m_buildID, m_debugger->getRunningApplicationTID());
   }
-  else if (kdown & KEY_UP)
+  else if (kdown & HidNpadButton_AnyUp)
   {
     if (m_selectedEntry > 0)
       m_selectedEntry--;
     if (m_selectedEntry + 1 == cheatListOffset && cheatListOffset > 0)
       cheatListOffset-=8;
   }
-  else if (kdown & KEY_DOWN) //
+  else if (kdown & HidNpadButton_AnyDown) //
   {
     if (m_selectedEntry < (m_cheatCnt - 1))
       m_selectedEntry++;
     if (m_selectedEntry == (cheatListOffset + 8) && cheatListOffset < (m_cheatCnt - 8))
       cheatListOffset+=8;
   }
-  else if (kdown & KEY_ZR)
+  else if (kdown & HidNpadButton_ZR)
   {
     cheatListOffset += 8;
     m_selectedEntry += 8;
@@ -3319,7 +3319,7 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
     if (m_selectedEntry + 1 > m_cheatCnt)
       m_selectedEntry = m_cheatCnt - 1;
   }
-  else if (kdown & KEY_ZL)
+  else if (kdown & HidNpadButton_ZL)
   {
     if (cheatListOffset >= 8)
     {
@@ -3333,7 +3333,7 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
     }
     
   }
-  else if (kdown & KEY_A)
+  else if (kdown & HidNpadButton_A)
   {
     if (m_cheatCnt == 0)
       return;
@@ -3362,7 +3362,7 @@ void GuiCheats::easymode_input(u32 kdown, u32 kheld)
 }
 void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
 {
-  if (kdown & KEY_Y)
+  if (kdown & HidNpadButton_Y)
   {
     m_searchMenuLocation = SEARCH_editRAM2;
     u64 m_pick = m_selectedJumpSource + m_fromto32_offset;
@@ -3391,33 +3391,33 @@ void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
     m_bookmark.pointer.offset[m_z] = m_jump_stack[m_z].from - ((m_bookmark.heap) ? m_heapBaseAddr : m_mainBaseAddr);
     //   place head here;
   }
-  else if (kdown & KEY_UP)
+  else if (kdown & HidNpadButton_AnyUp)
   {
     if (m_selectedJumpSource > 0)
       m_selectedJumpSource--;
     // if (m_selectedJumpSource + 1 == m_fromto32_offset && m_fromto32_offset > 0)
     //   m_fromto32_offset-=15;
   }
-  else if (kdown & KEY_DOWN) //
+  else if (kdown & HidNpadButton_AnyDown) //
   {
     if ((m_selectedJumpSource < 14) && (m_selectedJumpSource + m_fromto32_offset + 1 < m_fromto32_size))
       m_selectedJumpSource++;
     // if (m_selectedJumpSource == (m_fromto32_offset + 15) && m_fromto32_offset < (m_fromto32_size - 15))
     //   m_fromto32_offset+=15;
   }
-  else if (kdown & KEY_R)
+  else if (kdown & HidNpadButton_R)
   {
     if ( m_fromto32_offset  + 15 < m_fromto32_size )
       m_fromto32_offset += 15;
     if (m_selectedJumpSource + m_fromto32_offset >= m_fromto32_size)
       m_selectedJumpSource = m_fromto32_size - m_fromto32_offset -1;
   }
-  else if (kdown & KEY_L)
+  else if (kdown & HidNpadButton_L)
   {
     if (m_fromto32_offset >= 15)
       m_fromto32_offset -= 15;
   }
-  else if (kdown & KEY_X && (kheld & KEY_ZL))  
+  else if (kdown & HidNpadButton_X && (kheld & HidNpadButton_ZL))  
   {
     m_searchMenuLocation = SEARCH_editRAM2;
     m_redo_prep_pointersearch = true;
@@ -3425,7 +3425,7 @@ void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
     // GuiCheats::prep_pointersearch(m_debugger, m_memoryInfo);
     // GuiCheats::prep_backjump_stack(address);
   }
-  else if (kdown & KEY_X && !(kheld & KEY_ZL))
+  else if (kdown & HidNpadButton_X && !(kheld & HidNpadButton_ZL))
   {
     char input[19];
     if (Gui::requestKeyboardInput("Enter Max P Range", "Enter Range for next forward search prep, does not change existing P value.", "0x100", SwkbdType_QWERTY, input, 18))
@@ -3438,7 +3438,7 @@ void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
       m_redo_prep_pointersearch = true;
     }
   }
-  else if (kdown & KEY_B)
+  else if (kdown & HidNpadButton_B)
   {
     m_searchMenuLocation = SEARCH_editRAM2;
   }
@@ -3447,7 +3447,10 @@ void GuiCheats::pickjump_input(u32 kdown, u32 kheld)
 
 void GuiCheats::onInput(u32 kdown)
 {
-  kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
+  padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+  PadState pad;
+  padInitializeDefault(&pad);
+  kheld = padGetButtons(&pad);
   if (m_searchMenuLocation == SEARCH_editRAM2)
   {
     editor_input(kdown, kheld);
@@ -3507,7 +3510,7 @@ void GuiCheats::onInput(u32 kdown)
     m_editCheat = false;
     return;
   }
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
   {
     u8 saveE = m_selectedEntry;
     m_selectedEntry = 0;
@@ -3516,12 +3519,12 @@ void GuiCheats::onInput(u32 kdown)
     {
       // Gui::g_nextGui = GUI_MAIN;
       PSsaveSTATE();
-      if (kheld & KEY_R)
+      if (kheld & HidNpadButton_R)
       {
         Config::getConfig()->option_once = true;
         Config::writeConfig();
       }
-      if (kheld & KEY_ZL)
+      if (kheld & HidNpadButton_ZL)
       {
         unfreeze();
         if (!m_debugger -> m_dmnt)
@@ -3615,7 +3618,7 @@ void GuiCheats::onInput(u32 kdown)
   // BM2
   if (m_searchMenuLocation == SEARCH_POINTER)
   {
-    if (kdown & KEY_Y)
+    if (kdown & HidNpadButton_Y)
     {
       printf("starting PC dump\n");
       m_searchType = SEARCH_TYPE_UNSIGNED_64BIT;
@@ -3629,7 +3632,7 @@ void GuiCheats::onInput(u32 kdown)
       // PCdump();
     }
 
-    if ((kdown & KEY_PLUS) && !(kheld & KEY_ZL))
+    if ((kdown & HidNpadButton_Plus) && !(kheld & HidNpadButton_ZL))
     { // going for V2
       m_abort = false;
       // (new Snackbar("Starting pointer search"))->show();
@@ -3648,24 +3651,24 @@ void GuiCheats::onInput(u32 kdown)
       printf("Time taken =%ld\n", time(NULL) - m_Time1);
       (new Snackbar(st))->show();
     }
-    if ((kdown & KEY_PLUS) && (kheld & KEY_ZL))
+    if ((kdown & HidNpadButton_Plus) && (kheld & HidNpadButton_ZL))
     {
       m_pointersearch_canresume = false;
       delete m_PointerSearch;
       printf("set resume to false\n");
     }
 
-    if (kdown & KEY_UP)
+    if (kdown & HidNpadButton_AnyUp)
     {
       if (m_selectedEntry > 0)
         m_selectedEntry--;
     }
-    if (kdown & KEY_DOWN)
+    if (kdown & HidNpadButton_AnyDown)
     {
       if (m_selectedEntry < 5)
         m_selectedEntry++;
     }
-    if (kdown & KEY_R)
+    if (kdown & HidNpadButton_R)
     {
       if (m_selectedEntry == 0 && m_max_depth < MAX_POINTER_DEPTH)
       {
@@ -3690,7 +3693,7 @@ void GuiCheats::onInput(u32 kdown)
         m_numoffset++;
       };
     }
-    if (kdown & KEY_L)
+    if (kdown & HidNpadButton_L)
     {
       if (m_selectedEntry == 0 && m_max_depth > 1)
       {
@@ -3713,7 +3716,7 @@ void GuiCheats::onInput(u32 kdown)
   }
   if (m_searchMenuLocation == SEARCH_POINTER2)
   {
-    if (kdown & KEY_Y)
+    if (kdown & HidNpadButton_Y)
     {
       printf("starting PC dump\n");
       m_searchType = SEARCH_TYPE_UNSIGNED_64BIT;
@@ -3727,7 +3730,7 @@ void GuiCheats::onInput(u32 kdown)
       // PCdump();
     }
 
-    if ((kdown & KEY_PLUS) && !(kheld & KEY_ZL))
+    if ((kdown & HidNpadButton_Plus) && !(kheld & HidNpadButton_ZL))
     {
       m_abort = false;
       // (new Snackbar("Starting pointer search"))->show();
@@ -3746,24 +3749,24 @@ void GuiCheats::onInput(u32 kdown)
       printf("Time taken =%ld\n", time(NULL) - m_Time1);
       (new Snackbar(st))->show();
     }
-    if ((kdown & KEY_PLUS) && (kheld & KEY_ZL))
+    if ((kdown & HidNpadButton_Plus) && (kheld & HidNpadButton_ZL))
     {
       m_pointersearch_canresume = false;
       delete m_PointerSearch;
       printf("set resume to false\n");
     }
 
-    if (kdown & KEY_UP)
+    if (kdown & HidNpadButton_AnyUp)
     {
       if (m_selectedEntry > 0)
         m_selectedEntry--;
     }
-    if (kdown & KEY_DOWN)
+    if (kdown & HidNpadButton_AnyDown)
     {
       if (m_selectedEntry < 5)
         m_selectedEntry++;
     }
-    if (kdown & KEY_R)
+    if (kdown & HidNpadButton_R)
     {
       if (m_selectedEntry == 0 && m_max_depth < MAX_POINTER_DEPTH)
       {
@@ -3786,7 +3789,7 @@ void GuiCheats::onInput(u32 kdown)
         m_numoffset++;
       };
     }
-    if (kdown & KEY_L)
+    if (kdown & HidNpadButton_L)
     {
       if (m_selectedEntry == 0 && m_max_depth > 2)
       {
@@ -3809,7 +3812,7 @@ void GuiCheats::onInput(u32 kdown)
 
 
   if (m_searchMenuLocation == SEARCH_NONE) {
-      if (kdown & KEY_UP) {
+      if (kdown & HidNpadButton_AnyUp) {
           if (m_selectedEntry > 0)
               m_selectedEntry--;
 
@@ -3818,7 +3821,7 @@ void GuiCheats::onInput(u32 kdown)
                   cheatListOffset -= 8;
       }
 
-      if (kdown & KEY_DOWN)  //
+      if (kdown & HidNpadButton_AnyDown)  //
       {
           if (m_menuLocation == CANDIDATES) {
               if (m_selectedEntry < 7 && m_selectedEntry + m_addresslist_offset < ((m_memoryDump->size() / sizeof(u64)) - 1))
@@ -3832,13 +3835,13 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
       // start mod
-      if ((kdown & KEY_RSTICK) && m_menuLocation == CHEATS && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_StickR) && m_menuLocation == CHEATS && !(kheld & HidNpadButton_ZL)) {
           m_editCheat = true;
-          while ((hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD)) != 0) {
-              hidScanInput();
+          while (padGetButtons(&pad) != 0) {
+              padUpdate(&pad);
           }
       }
-      if ((kdown & KEY_RSTICK) && m_menuLocation == CHEATS && (kheld & KEY_ZL)) {  // remove condition key
+      if ((kdown & HidNpadButton_StickR) && m_menuLocation == CHEATS && (kheld & HidNpadButton_ZL)) {  // remove condition key
           if ((m_cheats[m_selectedEntry].definition.opcodes[0] & 0xF0000000) == 0x80000000 && (m_cheats[m_selectedEntry].definition.opcodes[m_cheats[m_selectedEntry].definition.num_opcodes - 1] & 0xF0000000) == 0x20000000) {
               for (u32 i = 0; i < m_cheats[m_selectedEntry].definition.num_opcodes - 1; i++) {
                   m_cheats[m_selectedEntry].definition.opcodes[i] = m_cheats[m_selectedEntry].definition.opcodes[i + 1];
@@ -3854,7 +3857,7 @@ void GuiCheats::onInput(u32 kdown)
               dmntchtAddCheat(&(m_cheats[i].definition), m_cheats[i].enabled, &outid);
           }
       }
-      if ((kdown & KEY_LSTICK) && m_menuLocation == CHEATS && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_StickL) && m_menuLocation == CHEATS && !(kheld & HidNpadButton_ZL)) {
           // Edit cheats
           // WIP
           // if (m_cheats[m_selectedEntry].definition.opcodes[0])
@@ -3876,27 +3879,27 @@ void GuiCheats::onInput(u32 kdown)
           // m_searchValue[1]._u64 = 0x8000000000;
       }
       // shortcuts
-      if ((kdown & KEY_RSTICK_UP) && (kheld & KEY_R)) {
+      if ((kdown & HidNpadButton_StickRUp) && (kheld & HidNpadButton_R)) {
           inc_candidate_entries();
           return;
       }
-      if ((kdown & KEY_RSTICK_LEFT) && (kheld & KEY_R)) {
+      if ((kdown & HidNpadButton_StickRLeft) && (kheld & HidNpadButton_R)) {
           freeze_candidate_entries();
           return;
       }
-      if ((kdown & KEY_RSTICK_RIGHT) && (kheld & KEY_R)) {
+      if ((kdown & HidNpadButton_StickRRight) && (kheld & HidNpadButton_R)) {
           unfreeze_candidate_entries();
           return;
       }
-      if ((kdown & KEY_LSTICK_RIGHT) && (kheld & KEY_R)) {
+      if ((kdown & HidNpadButton_StickLRight) && (kheld & HidNpadButton_R)) {
           write_candidate_entries();
           return;
       }
-      if ((kdown & KEY_RSTICK_DOWN) && (kheld & KEY_R)) {
+      if ((kdown & HidNpadButton_StickRDown) && (kheld & HidNpadButton_R)) {
           jump_to_memoryexplorer();
           return;
       }
-      if ((kdown & KEY_X) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_X) && (kheld & HidNpadButton_ZL)) {
           m_menuLocation = CANDIDATES;
           m_searchType = SEARCH_TYPE_UNSIGNED_64BIT;
           m_searchMode = SEARCH_MODE_POINTER;
@@ -3907,12 +3910,12 @@ void GuiCheats::onInput(u32 kdown)
           m_searchValue[1]._u64 = 0x8000000000;
           Config::getConfig()->exclude_ptr_candidates = false;
       }
-      if ((kdown & KEY_LSTICK) && m_menuLocation == CHEATS && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_StickL) && m_menuLocation == CHEATS && (kheld & HidNpadButton_ZL)) {
           dumpcodetofile();
           (new Snackbar("Writing change to file"))->show();
       }
 
-      if ((kdown & KEY_PLUS) && m_menuLocation == CHEATS && (m_cheatCnt > 0) && (m_memoryDump1 != nullptr) && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_Plus) && m_menuLocation == CHEATS && (m_cheatCnt > 0) && (m_memoryDump1 != nullptr) && !(kheld & HidNpadButton_ZL)) {
           // printf("start adding cheat to bookmark\n");
           // m_cheatCnt
           DmntCheatDefinition cheat = m_cheats[m_selectedEntry].definition;
@@ -4099,7 +4102,7 @@ void GuiCheats::onInput(u32 kdown)
       }
       // end mod
 
-      if ((kdown & KEY_LEFT) && (m_menuLocation == CANDIDATES) && (m_cheatCnt > 0)) {
+      if ((kdown & HidNpadButton_AnyLeft) && (m_menuLocation == CANDIDATES) && (m_cheatCnt > 0)) {
           m_menuLocation = CHEATS;
           if (m_memoryDump1 == nullptr) {
               m_selectedEntrySaveSR = m_selectedEntry;
@@ -4112,7 +4115,7 @@ void GuiCheats::onInput(u32 kdown)
           m_selectedEntry = m_selectedEntrySaveCL;
           // cheatListOffset = 0;
       }
-      if ((kdown & KEY_RIGHT) && (m_menuLocation == CHEATS) && (m_memoryDump->size() > 0)) {
+      if ((kdown & HidNpadButton_AnyRight) && (m_menuLocation == CHEATS) && (m_memoryDump->size() > 0)) {
           m_selectedEntrySaveCL = m_selectedEntry;
           m_menuLocation = CANDIDATES;
           if (m_memoryDump1 == nullptr) {
@@ -4129,7 +4132,7 @@ void GuiCheats::onInput(u32 kdown)
 
       if (m_menuLocation == CANDIDATES) { /* Candidates menu */
           if (m_memoryDump->size() > 0) {
-              if (kdown & KEY_X && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR && !(kheld & KEY_ZL)) {
+              if (kdown & HidNpadButton_X && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR && !(kheld & HidNpadButton_ZL)) {
                   if (!(m_debugger->m_dmnt)) {
                       m_debugger->detatch();
                       dmntchtForceOpenCheatProcess();
@@ -4164,7 +4167,7 @@ void GuiCheats::onInput(u32 kdown)
                   }
               }
               // add bookmark
-              if ((kdown & KEY_PLUS) && (kheld & KEY_ZL)) {
+              if ((kdown & HidNpadButton_Plus) && (kheld & HidNpadButton_ZL)) {
                   if (m_memoryDump1 != nullptr) {
                       m_memoryDump = m_memoryDump1;
                       m_memoryDump1 = nullptr;
@@ -4184,7 +4187,7 @@ void GuiCheats::onInput(u32 kdown)
                   }
               }
 
-              if (kdown & KEY_PLUS && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR && !(kheld & KEY_ZL)) {
+              if (kdown & HidNpadButton_Plus && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR && !(kheld & HidNpadButton_ZL)) {
                   if (m_memoryDump1 != nullptr) {  //Bookmark case
                       bookmark_t bookmark;
                       m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &bookmark, sizeof(bookmark_t));
@@ -4222,7 +4225,7 @@ void GuiCheats::onInput(u32 kdown)
               // add bookmark end
               // show memory editor
 
-              if (kdown & KEY_RSTICK && (kheld & KEY_ZL) && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
+              if (kdown & HidNpadButton_StickR && (kheld & HidNpadButton_ZL) && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
                   m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
                   m_BookmarkAddr = m_EditorBaseAddr;
                   m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
@@ -4230,7 +4233,7 @@ void GuiCheats::onInput(u32 kdown)
                   m_selectedEntrySave = m_selectedEntry;
                   m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
               }
-              if (kdown & KEY_RSTICK && !(kheld & KEY_ZL) && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
+              if (kdown & HidNpadButton_StickR && !(kheld & HidNpadButton_ZL) && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
                   m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
                   m_BookmarkAddr = m_EditorBaseAddr;
                   if (m_memoryDump1 != nullptr)
@@ -4269,7 +4272,7 @@ void GuiCheats::onInput(u32 kdown)
                   printf("bookmarkdepth =%ld m_z=%d\n", m_bookmark.pointer.depth, m_z);
               }
 
-              if ((kdown & KEY_LSTICK) && (m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) && (m_memoryDump1 != nullptr)) {
+              if ((kdown & HidNpadButton_StickL) && (m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) && (m_memoryDump1 != nullptr)) {
                   printf("\nstart scan range select ....................\n");
                   m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
                   MemoryInfo meminfo = {0};
@@ -4323,7 +4326,7 @@ void GuiCheats::onInput(u32 kdown)
                   // printf("Time taken =%ld\n", time(NULL) - m_Time1);
               }
               // end
-              if ((kdown & KEY_A) && (kheld & KEY_ZL)) {
+              if ((kdown & HidNpadButton_A) && (kheld & HidNpadButton_ZL)) {
                   if (m_memoryDump1 != nullptr) {  // in bookmark mode
                       m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
                       // m_searchMenuLocation = SEARCH_POINTER;
@@ -4349,7 +4352,7 @@ void GuiCheats::onInput(u32 kdown)
                       // pointercheck();
                       // (new Snackbar("Searching pointer "))->show();
                   }
-              } else if (kdown & KEY_A && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
+              } else if (kdown & HidNpadButton_A && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR) {
                   searchType_t savetype = m_searchType;
                   if (m_memoryDump1 != nullptr) {
                       bookmark_t bookmark;
@@ -4399,7 +4402,7 @@ void GuiCheats::onInput(u32 kdown)
                       }
 
                       (new ListSelector("Edit value at ", "\uE0E0 Edit value     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
-                                                                                                            if (k & KEY_A) {
+                                                                                                            if (k & HidNpadButton_A) {
                                                                                                                 char input[16];
                                                                                                                 char initialString[21];
                                                                                                                 u64 selectedAddress;
@@ -4428,7 +4431,7 @@ void GuiCheats::onInput(u32 kdown)
               }
           }
       } else { /* Cheats menu */
-          if (kdown & KEY_A) {
+          if (kdown & HidNpadButton_A) {
               if (m_cheatCnt == 0)
                   return;
 
@@ -4455,7 +4458,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
 
-      if ((kdown & KEY_MINUS) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_Minus) && (kheld & HidNpadButton_ZL)) {
           if (m_memoryDump1 != nullptr) {
               m_memoryDump = m_memoryDump1;
               m_memoryDump1 = nullptr;
@@ -4479,7 +4482,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
 
-      if ((kdown & KEY_MINUS) && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_Minus) && !(kheld & HidNpadButton_ZL)) {
           //make sure not using bookmark m_searchType
           if (m_menuLocation == CANDIDATES) {
               if (m_memoryDump1 != nullptr) {  //Bookmark case
@@ -4510,7 +4513,7 @@ void GuiCheats::onInput(u32 kdown)
                       }
 
                       (new ListSelector("Frozen Addresses", "\uE0E0 Unfreeze     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
-                                                                                                            if (k & KEY_A) {
+                                                                                                            if (k & HidNpadButton_A) {
                                                                                                                 auto itr = m_frozenAddresses.begin();
                                                                                                                 std::advance(itr, selectedItem);
 
@@ -4544,8 +4547,8 @@ void GuiCheats::onInput(u32 kdown)
               m_cheatDelete[m_selectedEntry] = !m_cheatDelete[m_selectedEntry];
           }
       }
-      // start mod KEY_PLUS
-      // if (kdown & KEY_PLUS) {
+      // start mod HidNpadButton_Plus
+      // if (kdown & HidNpadButton_Plus) {
       // printf("%s\n","PLUS key pressed");
       // printf("%s\n",titleNameStr.c_str());
       // printf("%s\n",tidStr.c_str());
@@ -4553,7 +4556,7 @@ void GuiCheats::onInput(u32 kdown)
       // Gui::g_nextGui = GUI_MAIN;
       // return;
       // }
-      if ((kdown & KEY_R) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_R) && (kheld & HidNpadButton_ZL)) {
           if (m_menuLocation == CANDIDATES && m_memoryDump1 != nullptr) {
               m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
               if (m_bookmark.type < SEARCH_TYPE_POINTER) {
@@ -4571,7 +4574,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       };
 
-      if ((kdown & KEY_L) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_L) && (kheld & HidNpadButton_ZL)) {
           if (m_menuLocation == CANDIDATES && m_memoryDump1 != nullptr) {
               m_AttributeDumpBookmark->getData((m_selectedEntry + m_addresslist_offset) * sizeof(bookmark_t), &m_bookmark, sizeof(bookmark_t));
               if (m_bookmark.type > SEARCH_TYPE_UNSIGNED_8BIT) {
@@ -4589,7 +4592,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       };
 
-      if ((kdown & KEY_R) && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_R) && !(kheld & HidNpadButton_ZL)) {
           if (m_searchValueFormat == FORMAT_HEX)
               m_searchValueFormat = FORMAT_DEC;
           else
@@ -4598,7 +4601,7 @@ void GuiCheats::onInput(u32 kdown)
               printf("%s\n", "HEX");
           printf("%s\n", "R key pressed");
       }
-      if ((kdown & KEY_L) && !(kheld & KEY_ZL))  //toggle bookmark view bookmark : (m_memoryDump1 != nullptr)
+      if ((kdown & HidNpadButton_L) && !(kheld & HidNpadButton_ZL))  //toggle bookmark view bookmark : (m_memoryDump1 != nullptr)
       {
           if (m_memoryDump1 == nullptr) {
               // WIP
@@ -4656,7 +4659,7 @@ void GuiCheats::onInput(u32 kdown)
           //   m_selectedEntry = 0;
       }
 
-      if ((kdown & KEY_ZR) && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_ZR) && !(kheld & HidNpadButton_ZL)) {
           if (m_menuLocation == CHEATS) {
               cheatListOffset += 8;
               m_selectedEntry += 8;
@@ -4676,7 +4679,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
 
-      if ((kdown & KEY_ZR) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_ZR) && (kheld & HidNpadButton_ZL)) {
           if (m_menuLocation == CHEATS) {
               if (cheatListOffset >= 8) {
                   cheatListOffset -= 8;
@@ -4694,7 +4697,7 @@ void GuiCheats::onInput(u32 kdown)
 
       // End Mod
       // hidScanInput();
-      if ((kdown & KEY_Y) && (kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_Y) && (kheld & HidNpadButton_ZL)) {
           if (m_searchMenuLocation == SEARCH_NONE) {
               if (m_memoryDump1 != nullptr) {  // in bookmark mode
                   m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
@@ -4709,12 +4712,12 @@ void GuiCheats::onInput(u32 kdown)
               }
           }
       }
-      // if ((kdown & KEY_X) && (kheld & KEY_ZL))
+      // if ((kdown & HidNpadButton_X) && (kheld & HidNpadButton_ZL))
       // {
       //   printf("resume \n");
       //   resumepointersearch2();
       // }
-      if ((kdown & KEY_Y) && !(kheld & KEY_ZL)) {
+      if ((kdown & HidNpadButton_Y) && !(kheld & HidNpadButton_ZL)) {
           if (m_menuLocation == CHEATS) {
               m_selectedEntrySaveCL = m_selectedEntry;
           } else if (m_memoryDump1 == nullptr) {
@@ -4772,7 +4775,7 @@ void GuiCheats::onInput(u32 kdown)
           (m_searchMenuLocation == SEARCH_REGION && m_searchRegion == SEARCH_REGION_NONE) ||
           (m_searchMenuLocation == SEARCH_VALUE) ||
           (m_searchMenuLocation == SEARCH_editRAM)) {
-          if (kdown & KEY_UP) {
+          if (kdown & HidNpadButton_AnyUp) {
               switch (m_searchMenuLocation) {
                   case SEARCH_TYPE:
                   // [[fallthrough]]
@@ -4806,7 +4809,7 @@ void GuiCheats::onInput(u32 kdown)
               }
           }
 
-          if (kdown & KEY_DOWN) {
+          if (kdown & HidNpadButton_AnyDown) {
               switch (m_searchMenuLocation) {
                   case SEARCH_TYPE:
                   // [[fallthrough]]
@@ -4841,7 +4844,7 @@ void GuiCheats::onInput(u32 kdown)
               }
           }
 
-          if (kdown & KEY_LEFT) {
+          if (kdown & HidNpadButton_AnyLeft) {
               switch (m_searchMenuLocation) {
                   case SEARCH_TYPE:
                   // [[fallthrough]]
@@ -4870,7 +4873,7 @@ void GuiCheats::onInput(u32 kdown)
               }
           }
 
-          if (kdown & KEY_RIGHT) {
+          if (kdown & HidNpadButton_AnyRight) {
               switch (m_searchMenuLocation) {
                   case SEARCH_TYPE:
                   // [[fallthrough]]
@@ -4900,7 +4903,7 @@ void GuiCheats::onInput(u32 kdown)
           }
 
           if (m_searchMenuLocation == SEARCH_editRAM) {
-              if (kdown & KEY_PLUS) {
+              if (kdown & HidNpadButton_Plus) {
                   u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
 
                   bookmark_t bookmark;
@@ -4935,27 +4938,27 @@ void GuiCheats::onInput(u32 kdown)
                   (new Snackbar("Address added to bookmark!"))->show();
                   printf("%s\n", "PLUS key pressed3");
               }
-              if (kdown & KEY_ZR) {
+              if (kdown & HidNpadButton_ZR) {
                   m_EditorBaseAddr += 0x80;
               }
-              if (kdown & KEY_ZL) {
+              if (kdown & HidNpadButton_ZL) {
                   m_EditorBaseAddr -= 0x80;
               }
-              if (kdown & KEY_R) {
+              if (kdown & HidNpadButton_R) {
                   m_addressmod++;
                   m_addressmod = m_addressmod % 4;
               }
-              if (kdown & KEY_L) {
+              if (kdown & HidNpadButton_L) {
                   m_addressmod--;
                   m_addressmod = m_addressmod % 4;
               }
-              if (kdown & KEY_X) {
+              if (kdown & HidNpadButton_X) {
                   if (m_searchValueFormat == FORMAT_DEC)
                       m_searchValueFormat = FORMAT_HEX;
                   else
                       m_searchValueFormat = FORMAT_DEC;
               }
-              if (kdown & KEY_Y)  // BM9
+              if (kdown & HidNpadButton_Y)  // BM9
               {
                   u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
                   std::stringstream ss;
@@ -4978,7 +4981,7 @@ void GuiCheats::onInput(u32 kdown)
           }
 
           // inc and dec search value
-          if ((kdown & KEY_ZR) && (m_searchMenuLocation == SEARCH_VALUE)) {
+          if ((kdown & HidNpadButton_ZR) && (m_searchMenuLocation == SEARCH_VALUE)) {
               switch (m_searchType) {
                   case SEARCH_TYPE_FLOAT_32BIT:
                       m_searchValue[m_searchValueIndex]._f32++;
@@ -4991,7 +4994,7 @@ void GuiCheats::onInput(u32 kdown)
               }
               m_selectedEntry = 1;
           };
-          if ((kdown & KEY_ZL) && (m_searchMenuLocation == SEARCH_VALUE)) {
+          if ((kdown & HidNpadButton_ZL) && (m_searchMenuLocation == SEARCH_VALUE)) {
               switch (m_searchType) {
                   case SEARCH_TYPE_FLOAT_32BIT:
                       m_searchValue[m_searchValueIndex]._f32--;
@@ -5005,7 +5008,7 @@ void GuiCheats::onInput(u32 kdown)
               m_selectedEntry = 1;
           };
           if (m_searchMenuLocation == SEARCH_VALUE) {
-              if (kdown & KEY_DUP) {
+              if (kdown & HidNpadButton_Up) {
                   m_searchMode = SEARCH_MODE_SAME;
                   {
                       std::string s = m_edizon_dir + "/datadump2.datB";
@@ -5019,26 +5022,26 @@ void GuiCheats::onInput(u32 kdown)
                           Config::writeConfig();
                       }
                   };
-              } else if (kdown & KEY_DDOWN) {
+              } else if (kdown & HidNpadButton_Down) {
                   m_searchMode = SEARCH_MODE_DIFF;
-              } else if (kdown & KEY_DLEFT) {
+              } else if (kdown & HidNpadButton_Left) {
                 if (m_searchMode == SEARCH_MODE_DEC)
                     m_searchMode = SEARCH_MODE_DEC_BY;
                 else
                     m_searchMode = SEARCH_MODE_DEC;
-              } else if (kdown & KEY_DRIGHT) {
+              } else if (kdown & HidNpadButton_Right) {
                 if (m_searchMode == SEARCH_MODE_INC)
                     m_searchMode = SEARCH_MODE_INC_BY;
                 else
                     m_searchMode = SEARCH_MODE_INC;
-              } else if (kdown & KEY_PLUS) {
+              } else if (kdown & HidNpadButton_Plus) {
                 if (m_searchMode == SEARCH_MODE_RANGE)
                     m_searchMode = SEARCH_MODE_TWO_VALUES;
                 else if (m_searchMode == SEARCH_MODE_TWO_VALUES && Config::getConfig()->two_value_range > 0)
                     m_searchMode = SEARCH_MODE_TWO_VALUES_PLUS;
                 else
                     m_searchMode = SEARCH_MODE_RANGE;
-              } else if (kdown & KEY_MINUS) {
+              } else if (kdown & HidNpadButton_Minus) {
                   if (m_searchMode == SEARCH_MODE_RANGE) {
                       m_searchMode = SEARCH_MODE_EQ;
                       m_searchValue[0]._u64 = 0;
@@ -5050,14 +5053,14 @@ void GuiCheats::onInput(u32 kdown)
                       m_searchMode = SEARCH_MODE_EQ;
                   }
                   m_searchValueIndex = 0;
-              } else if (kdown & KEY_RSTICK) {
+              } else if (kdown & HidNpadButton_StickR) {
                   m_searchMode = SEARCH_MODE_RANGE;
                   m_searchType = SEARCH_TYPE_FLOAT_32BIT;
                   m_searchValue[0]._f32 = 0.1;
                   m_searchValue[1]._f32 = 2000;
                   m_searchRegion = SEARCH_REGION_HEAP_AND_MAIN;
                   m_selectedEntry = 1;
-              } else if (kdown & KEY_LSTICK) {
+              } else if (kdown & HidNpadButton_StickL) {
                   if (m_searchType == SEARCH_TYPE_FLOAT_32BIT) {
                       m_searchType = SEARCH_TYPE_FLOAT_64BIT;
                   } else
@@ -5066,7 +5069,7 @@ void GuiCheats::onInput(u32 kdown)
                   m_selectedEntry = 0;
                   m_searchValue[0]._u64 = 0;
                   m_searchValue[1]._u64 = 0;
-              } else if (kdown & KEY_Y) {
+              } else if (kdown & HidNpadButton_Y) {
                   if (m_searchType == SEARCH_TYPE_UNSIGNED_32BIT) {
                       m_searchType = SEARCH_TYPE_UNSIGNED_8BIT;
                   } else if (m_searchType == SEARCH_TYPE_UNSIGNED_8BIT) {
@@ -5080,24 +5083,24 @@ void GuiCheats::onInput(u32 kdown)
                   m_searchValue[0]._u64 = 0;
                   m_searchValue[1]._u64 = 0;
                   m_searchRegion = SEARCH_REGION_HEAP_AND_MAIN;
-              } else if (kdown & KEY_RSTICK_UP)  //search shortcut
+              } else if (kdown & HidNpadButton_StickRUp)  //search shortcut
               {
                   m_searchType = SEARCH_TYPE_UNSIGNED_64BIT;
                   m_searchValueFormat = FORMAT_HEX;
                   m_searchRegion = SEARCH_REGION_MAIN;
                   m_searchValue[0]._u64 = m_heapBaseAddr;
                   m_searchValue[1]._u64 = m_heapEnd;
-              } else if (kdown & KEY_RSTICK_LEFT) {
+              } else if (kdown & HidNpadButton_StickRLeft) {
                   if (m_searchValue[0]._u64 == 0)
                       m_searchValue[0] = m_copy;
                   else
                       m_searchValue[0]._u64 = 0;
-              } else if (kdown & KEY_RSTICK_RIGHT) {
+              } else if (kdown & HidNpadButton_StickRRight) {
                   if (m_searchValue[1]._u64 == 0)
                       m_searchValue[1] = m_copy;
                   else
                       m_searchValue[1]._u64 = 0;
-              } else if (kdown & KEY_R) {
+              } else if (kdown & HidNpadButton_R) {
                   if (m_searchType == SEARCH_TYPE_FLOAT_32BIT) {
                       m_searchValue[0]._f32 = 0 - m_searchValue[0]._f32;
                       m_searchValue[1]._f32 = 0 - m_searchValue[1]._f32;
@@ -5107,7 +5110,7 @@ void GuiCheats::onInput(u32 kdown)
                   }
               };
           }
-          if (kdown & KEY_A) {
+          if (kdown & HidNpadButton_A) {
               if (m_searchMenuLocation == SEARCH_editRAM) {  // BM3
                   // EditRAM routine
                   // to update to use L and R to select type and display it on the top line
@@ -5307,18 +5310,18 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
 
-      if (kdown & KEY_X && !(kheld & KEY_ZL)) {
+      if (kdown & HidNpadButton_X && !(kheld & HidNpadButton_ZL)) {
           if (m_searchMenuLocation == SEARCH_VALUE) {
               if (m_searchValueFormat == FORMAT_DEC)
                   m_searchValueFormat = FORMAT_HEX;
               else
                   m_searchValueFormat = FORMAT_DEC;
           }
-      } else if (kdown & KEY_X && (kheld & KEY_ZL)) {
+      } else if (kdown & HidNpadButton_X && (kheld & HidNpadButton_ZL)) {
           // key available
       }
 
-      if (kdown & KEY_L) {
+      if (kdown & HidNpadButton_L) {
           if (m_searchMenuLocation == SEARCH_VALUE) {
               m_searchMenuLocation = SEARCH_REGION;
               m_selectedEntry = m_searchRegion == SEARCH_REGION_NONE ? 0 : static_cast<u32>(m_searchRegion);
@@ -5331,7 +5334,7 @@ void GuiCheats::onInput(u32 kdown)
           }
       }
 
-      if (kdown & KEY_R) {
+      if (kdown & HidNpadButton_R) {
           if (m_searchMenuLocation == SEARCH_TYPE) {
               m_searchMenuLocation = SEARCH_MODE;
               m_selectedEntry = m_searchMode == SEARCH_MODE_NONE ? 0 : static_cast<u32>(m_searchMode);
@@ -5347,11 +5350,11 @@ void GuiCheats::onInput(u32 kdown)
   }
 }
 
-void GuiCheats::onTouch(touchPosition &touch)
+void GuiCheats::onTouch(HidTouchState &touch)
 {
 }
 
-void GuiCheats::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish)
+void GuiCheats::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish)
 {
 }
 static bool _isAddressFrozen(uintptr_t address)
@@ -7762,12 +7765,17 @@ void GuiCheats::pointersearch2(u64 targetaddress, u64 depth) //MemoryDump **disp
     m_PS_resume = false;
   }
 
+  padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+  PadState pad;
+  padInitializeDefault(&pad);
+  padUpdate(&pad);
+
   while (PS_index < PS_num_sources)
   {
-    hidScanInput();
-    u32 kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
-    // u32 kdown = hidKeysDown(CONTROLLER_PLAYER_1) | hidKeysDown(CONTROLLER_HANDHELD);
-    if ((kheld & KEY_B) && (kheld & KEY_ZL))
+    padUpdate(&pad);
+    u32 kheld = padGetButtons(&pad);
+    // u32 kdown = hidKeysDown(HidNpadIdType_No1) | hidKeysDown(HidNpadIdType_Handheld);
+    if ((kheld & HidNpadButton_B) && (kheld & HidNpadButton_ZL))
     {
       m_PS_pause = true;
       PS_lastdepth = PS_depth;

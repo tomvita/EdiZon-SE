@@ -12,7 +12,7 @@ public:
   void draw(Gui *gui, u16 x, u16 y);
 
   void onInput(u32 kdown);
-  void onTouch(touchPosition &touch);
+  void onTouch(HidTouchState &touch);
 
 private:
   s64 m_currValue;
