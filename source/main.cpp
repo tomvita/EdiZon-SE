@@ -102,7 +102,7 @@ void update()
       currGui->update();
     mutexUnlock(&mutexCurrGui);
 
-    if (kheld & (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN))
+    if (kheld & (HidNpadButton_AnyLeft | HidNpadButton_AnyRight | HidNpadButton_AnyUp | HidNpadButton_AnyDown))
       inputTicker++;
     else
       inputTicker = 0;
@@ -296,11 +296,11 @@ int main(int argc, char **argv)
 
   Config::readConfig(); 
   initTitles();
-  // while (!(kheld & KEY_ZL))
+  // while (!(kheld & HidNpadButton_ZL))
   // {
   //   hidScanInput();
-  //   kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
-  //   kdown = hidKeysDown(CONTROLLER_PLAYER_1)|hidKeysDown(CONTROLLER_HANDHELD);
+  //   kheld = hidKeysHeld(HidNpadIdType_No1) | hidKeysHeld(HidNpadIdType_Handheld);
+  //   kdown = hidKeysDown(HidNpadIdType_No1)|hidKeysDown(HidNpadIdType_Handheld);
   //   Gui::beginDraw();
   //   Gui::drawRectangle(0, 0, Gui::g_framebuffer_width, Gui::g_framebuffer_height, currTheme.backgroundColor);
   //   Gui::drawTextAligned(fontHuge, Gui::g_framebuffer_width / 2, Gui::g_framebuffer_height / 2 - 100, currTheme.textColor, "\uE12C", ALIGNED_CENTER);
@@ -308,9 +308,9 @@ int main(int argc, char **argv)
   //   Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 Back", ALIGNED_RIGHT);
   //   Gui::endDraw();
   // }
-  // if (kheld & KEY_ZR)
+  // if (kheld & HidNpadButton_ZR)
   //   m_edizon_dir = "/switch/EdiZon1";
-  // if (kheld & KEY_L)
+  // if (kheld & HidNpadButton_L)
   //   m_edizon_dir = "/switch/EdiZon2";
   // printf("%s\n", m_edizon_dir.c_str());
 
@@ -329,11 +329,15 @@ int main(int argc, char **argv)
   updateThreadRunning = true;
   std::thread updateThread(update);
 
+  padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+  PadState pad;
+  padInitializeDefault(&pad);
+  
   while (appletMainLoop())
   {
-    hidScanInput();
-    kheld = hidKeysHeld(CONTROLLER_PLAYER_1)|hidKeysHeld(CONTROLLER_HANDHELD);
-    kdown = hidKeysDown(CONTROLLER_PLAYER_1)|hidKeysDown(CONTROLLER_HANDHELD);
+    padUpdate(&pad);
+    kheld = padGetButtons(&pad);
+    kdown = padGetButtonsDown(&pad);
 
     if (Gui::g_nextGui != GUI_INVALID)
     {
@@ -410,7 +414,7 @@ int main(int argc, char **argv)
           else
             currGui->onInput(kheld);
         }
-        else if (kdown || hidKeysUp(CONTROLLER_P1_AUTO))
+        else if (kdown || padGetButtonsUp(&pad))
         {
           if (Gui::g_currMessageBox != nullptr)
             Gui::g_currMessageBox->onInput(kdown);
@@ -427,30 +431,32 @@ int main(int argc, char **argv)
       inputTicker = 0;
     }
 
-    static touchPosition touchPosStart, touchPosCurr, touchPosOld;
+    static HidTouchScreenState touchPosStart, touchPosCurr, touchPosOld;
     static u8 touchCount, touchCountOld;
     static bool touchHappend = false;
 
-    touchCount = hidTouchCount();
+    HidTouchScreenState state = {0};
+    hidGetTouchScreenStates(&state, 0);
+    touchCount = state.count;
 
     if (touchCount > 0)
-      hidTouchRead(&touchPosCurr, 0);
+      hidGetTouchScreenStates(&touchPosCurr, 0);
 
     if (touchCount > 0 && touchCountOld == 0)
-      hidTouchRead(&touchPosStart, 0);
+      hidGetTouchScreenStates(&touchPosStart, 0);
 
-    if (abs(static_cast<s16>(touchPosStart.px - touchPosCurr.px)) < 10 && abs(static_cast<s16>(touchPosStart.py - touchPosCurr.py)) < 10)
+    if (abs(static_cast<s16>(touchPosStart.touches[0].x - touchPosCurr.touches[0].x)) < 10 && abs(static_cast<s16>(touchPosStart.touches[0].y - touchPosCurr.touches[0].y)) < 10)
     {
       if (touchCount == 0 && touchCountOld > 0)
       {
         touchHappend = true;
 
         if (Gui::g_currMessageBox != nullptr)
-          Gui::g_currMessageBox->onTouch(touchPosCurr);
+          Gui::g_currMessageBox->onTouch(touchPosCurr.touches[0]);
         else if (Gui::g_currListSelector != nullptr)
-          Gui::g_currListSelector->onTouch(touchPosCurr);
+          Gui::g_currListSelector->onTouch(touchPosCurr.touches[0]);
         else
-          currGui->onTouch(touchPosCurr);
+          currGui->onTouch(touchPosCurr.touches[0]);
       }
     }
     else if (touchCount > 0)

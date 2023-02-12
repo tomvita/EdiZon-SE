@@ -87,7 +87,7 @@ static size_t writeToFile(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 void GuiAbout::onInput(u32 kdown) {
-  if (kdown & KEY_B) {
+  if (kdown & HidNpadButton_B) {
     if (threadRunning) {
       threadWaitForExit(&networkThread);
       threadClose(&networkThread);
@@ -103,7 +103,7 @@ void GuiAbout::onInput(u32 kdown) {
       Gui::g_nextGui = GUI_MAIN;
   }
 
-  if (kdown & KEY_MINUS && updateAvailable && true) {
+  if (kdown & HidNpadButton_Minus && updateAvailable && true) {
 
     (new MessageBox("Updating EdiZon.\n \nThis may take a while...", MessageBox::NONE))->show();
     requestDraw();
@@ -149,11 +149,11 @@ void GuiAbout::onInput(u32 kdown) {
   }
 }
 
-void GuiAbout::onTouch(touchPosition &touch) {
+void GuiAbout::onTouch(HidTouchState &touch) {
 
 }
 
-void GuiAbout::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void GuiAbout::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 
 }
 

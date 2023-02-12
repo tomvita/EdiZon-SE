@@ -9,7 +9,7 @@ if (m_searchValueIndex==1) m_searchValueIndex--;
 
 display m_searchValue[1] if (m_searchMode == SEARCH_MODE_RANGE) 
 
-change Key_A action to 
+change HidNpadButton_A action to 
 m_searchValue[m_searchValueIndex]=
 
 m_searchMenuLocation = SEARCH_editRAM;

@@ -744,7 +744,7 @@ void GuiCheats::drawSearchRAMMenu()
 
 void GuiCheats::onInput(u32 kdown)
 {
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
   {
 
     if (m_searchMenuLocation == SEARCH_NONE)
@@ -787,7 +787,7 @@ void GuiCheats::onInput(u32 kdown)
 
   if (m_searchMenuLocation == SEARCH_NONE)
   {
-    if (kdown & KEY_UP)
+    if (kdown & HidNpadButton_AnyUp)
     {
       if (m_selectedEntry > 0)
         m_selectedEntry--;
@@ -797,7 +797,7 @@ void GuiCheats::onInput(u32 kdown)
           cheatListOffset--;
     }
 
-    if (kdown & KEY_DOWN) //
+    if (kdown & HidNpadButton_AnyDown) //
     {
       if (m_menuLocation == CANDIDATES)
       {
@@ -814,7 +814,7 @@ void GuiCheats::onInput(u32 kdown)
       }
     }
     // start mod
-    if ((kdown & KEY_LSTICK) && m_menuLocation == CHEATS)
+    if ((kdown & HidNpadButton_StickL) && m_menuLocation == CHEATS)
     {
       // m_searchMenuLocation = SEARCH_editRAM;
       // printf("L Stick pressed, start pointer search  *************\n");
@@ -833,7 +833,7 @@ void GuiCheats::onInput(u32 kdown)
       m_searchValue[1]._u64 = 0x8000000000;
     }
 
-    if ((kdown & KEY_PLUS) && m_menuLocation == CHEATS)
+    if ((kdown & HidNpadButton_Plus) && m_menuLocation == CHEATS)
     {
       printf("start checking pointer\n");
       pointercheck();
@@ -842,7 +842,7 @@ void GuiCheats::onInput(u32 kdown)
 
     if (m_memoryDump->size() > 0)
     {
-      if (kdown & KEY_LEFT)
+      if (kdown & HidNpadButton_AnyLeft)
         if (m_cheatCnt > 0)
         {
           m_menuLocation = CHEATS;
@@ -850,7 +850,7 @@ void GuiCheats::onInput(u32 kdown)
           cheatListOffset = 0;
         }
 
-      if (kdown & KEY_RIGHT)
+      if (kdown & HidNpadButton_AnyRight)
       {
         m_menuLocation = CANDIDATES;
         m_selectedEntry = 0;
@@ -862,7 +862,7 @@ void GuiCheats::onInput(u32 kdown)
     { /* Candidates menu */
       if (m_memoryDump->size() > 0)
       {
-        if (kdown & KEY_X && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
+        if (kdown & HidNpadButton_X && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
         {
           u64 address = 0;
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &address, sizeof(u64));
@@ -905,7 +905,7 @@ void GuiCheats::onInput(u32 kdown)
           }
         }
         // add bookmark
-        if (kdown & KEY_PLUS && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
+        if (kdown & HidNpadButton_Plus && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
         {
           u64 address = 0;
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &address, sizeof(u64));
@@ -925,13 +925,13 @@ void GuiCheats::onInput(u32 kdown)
         // add bookmark end
         // show memory editor
         // BM1
-        if (kdown & KEY_RSTICK && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
+        if (kdown & HidNpadButton_StickR && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
         {
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
           m_searchMenuLocation = SEARCH_editRAM;
           m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
         }
-        if ((kdown & KEY_LSTICK) && (m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR))
+        if ((kdown & HidNpadButton_StickL) && (m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR))
         {
           printf("start pointer search ....................\n");
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &m_EditorBaseAddr, sizeof(u64));
@@ -949,7 +949,7 @@ void GuiCheats::onInput(u32 kdown)
           // m_selectedEntry = (m_EditorBaseAddr % 16) / 4 + 11;
         }
         // end
-        if (kdown & KEY_A && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
+        if (kdown & HidNpadButton_A && m_memoryDump->getDumpInfo().dumpType == DumpType::ADDR)
         {
           u64 address = 0;
           m_memoryDump->getData((m_selectedEntry + m_addresslist_offset) * sizeof(u64), &address, sizeof(u64));
@@ -1005,7 +1005,7 @@ void GuiCheats::onInput(u32 kdown)
             }
 
             (new ListSelector("Edit value at ", "\uE0E0 Edit value     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
-                                                                                                if (k & KEY_A)
+                                                                                                if (k & HidNpadButton_A)
                                                                                                 {
                                                                                                   char input[16];
                                                                                                   char initialString[21];
@@ -1038,7 +1038,7 @@ void GuiCheats::onInput(u32 kdown)
     }
     else
     { /* Cheats menu */
-      if (kdown & KEY_A)
+      if (kdown & HidNpadButton_A)
       {
         if (m_cheatCnt == 0)
           return;
@@ -1056,7 +1056,7 @@ void GuiCheats::onInput(u32 kdown)
       }
     }
 
-    if (kdown & KEY_MINUS)
+    if (kdown & HidNpadButton_Minus)
     {
       //make sure not using bookmark m_searchType
       if (m_memoryDump1 != nullptr)
@@ -1083,7 +1083,7 @@ void GuiCheats::onInput(u32 kdown)
         }
 
         (new ListSelector("Frozen Addresses", "\uE0E0 Unfreeze     \uE0E1 Back", options))->setInputAction([&](u32 k, u16 selectedItem) {
-                                                                                            if (k & KEY_A)
+                                                                                            if (k & HidNpadButton_A)
                                                                                             {
                                                                                               auto itr = m_frozenAddresses.begin();
                                                                                               std::advance(itr, selectedItem);
@@ -1111,8 +1111,8 @@ void GuiCheats::onInput(u32 kdown)
         m_menuLocation = CHEATS;
       }
     }
-    // start mod KEY_PLUS
-    // if (kdown & KEY_PLUS) {
+    // start mod HidNpadButton_Plus
+    // if (kdown & HidNpadButton_Plus) {
     // printf("%s\n","PLUS key pressed");
     // printf("%s\n",titleNameStr.c_str());
     // printf("%s\n",tidStr.c_str());
@@ -1120,7 +1120,7 @@ void GuiCheats::onInput(u32 kdown)
     // Gui::g_nextGui = GUI_MAIN;
     // return;
     // }
-    if (kdown & KEY_R)
+    if (kdown & HidNpadButton_R)
     {
       if (m_searchValueFormat == FORMAT_HEX)
         m_searchValueFormat = FORMAT_DEC;
@@ -1130,7 +1130,7 @@ void GuiCheats::onInput(u32 kdown)
         printf("%s\n", "HEX");
       printf("%s\n", "R key pressed");
     }
-    if (kdown & KEY_L) //toggle bookmark view bookmark : (m_memoryDump1 != nullptr)
+    if (kdown & HidNpadButton_L) //toggle bookmark view bookmark : (m_memoryDump1 != nullptr)
     {
       if (m_memoryDump1 == nullptr)
       {
@@ -1152,7 +1152,7 @@ void GuiCheats::onInput(u32 kdown)
       }
       printf("%s\n", "L key pressed");
     }
-    if (kdown & KEY_ZR)
+    if (kdown & HidNpadButton_ZR)
     {
       m_addresslist_offset += 8;
       if (m_addresslist_offset >= (m_memoryDump->size() / sizeof(u64)))
@@ -1162,7 +1162,7 @@ void GuiCheats::onInput(u32 kdown)
       // printf("%s\n", "ZR key pressed");
     }
 
-    if (kdown & KEY_ZL)
+    if (kdown & HidNpadButton_ZL)
     {
       if (m_addresslist_offset >= 8)
         m_addresslist_offset -= 8;
@@ -1170,7 +1170,7 @@ void GuiCheats::onInput(u32 kdown)
     }
 
     // End Mod
-    if (kdown & KEY_Y)
+    if (kdown & HidNpadButton_Y)
     {
       if (m_searchMenuLocation == SEARCH_NONE)
       {
@@ -1219,7 +1219,7 @@ void GuiCheats::onInput(u32 kdown)
         (m_searchMenuLocation == SEARCH_VALUE) ||
         (m_searchMenuLocation == SEARCH_editRAM))
     {
-      if (kdown & KEY_UP)
+      if (kdown & HidNpadButton_AnyUp)
       {
         switch (m_searchMenuLocation)
         {
@@ -1248,7 +1248,7 @@ void GuiCheats::onInput(u32 kdown)
         }
       }
 
-      if (kdown & KEY_DOWN)
+      if (kdown & HidNpadButton_AnyDown)
       {
         switch (m_searchMenuLocation)
         {
@@ -1278,7 +1278,7 @@ void GuiCheats::onInput(u32 kdown)
         }
       }
 
-      if (kdown & KEY_LEFT)
+      if (kdown & HidNpadButton_AnyLeft)
       {
         switch (m_searchMenuLocation)
         {
@@ -1301,7 +1301,7 @@ void GuiCheats::onInput(u32 kdown)
         }
       }
 
-      if (kdown & KEY_RIGHT)
+      if (kdown & HidNpadButton_AnyRight)
       {
         switch (m_searchMenuLocation)
         {
@@ -1326,7 +1326,7 @@ void GuiCheats::onInput(u32 kdown)
 
       if (m_searchMenuLocation == SEARCH_editRAM)
       {
-        if (kdown & KEY_PLUS)
+        if (kdown & HidNpadButton_Plus)
         {
           u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
 
@@ -1341,32 +1341,32 @@ void GuiCheats::onInput(u32 kdown)
           m_memoryDumpBookmark->flushBuffer();
           printf("%s\n", "PLUS key pressed");
         }
-        if (kdown & KEY_ZR)
+        if (kdown & HidNpadButton_ZR)
         {
           m_EditorBaseAddr += 0x80;
         }
-        if (kdown & KEY_ZL)
+        if (kdown & HidNpadButton_ZL)
         {
           m_EditorBaseAddr -= 0x80;
         }
-        if (kdown & KEY_R)
+        if (kdown & HidNpadButton_R)
         {
           m_addressmod++;
           m_addressmod = m_addressmod % 4;
         }
-        if (kdown & KEY_L)
+        if (kdown & HidNpadButton_L)
         {
           m_addressmod--;
           m_addressmod = m_addressmod % 4;
         }
-        if (kdown & KEY_X)
+        if (kdown & HidNpadButton_X)
         {
           if (m_searchValueFormat == FORMAT_DEC)
             m_searchValueFormat = FORMAT_HEX;
           else
             m_searchValueFormat = FORMAT_DEC;
         }
-        if (kdown & KEY_Y) // BM9
+        if (kdown & HidNpadButton_Y) // BM9
         {
           u64 address = m_EditorBaseAddr - (m_EditorBaseAddr % 16) - 0x20 + (m_selectedEntry - 1 - (m_selectedEntry / 5)) * 4 + m_addressmod;
           std::stringstream ss;
@@ -1390,18 +1390,18 @@ void GuiCheats::onInput(u32 kdown)
       }
 
       // inc and dec search value
-      if ((kdown & KEY_ZR) && (m_searchMenuLocation == SEARCH_VALUE) && (m_searchType == SEARCH_TYPE_UNSIGNED_32BIT))
+      if ((kdown & HidNpadButton_ZR) && (m_searchMenuLocation == SEARCH_VALUE) && (m_searchType == SEARCH_TYPE_UNSIGNED_32BIT))
       {
         m_searchValue[0]._u32++;
         m_selectedEntry = 1;
       };
-      if ((kdown & KEY_ZL) && (m_searchMenuLocation == SEARCH_VALUE) && (m_searchType == SEARCH_TYPE_UNSIGNED_32BIT))
+      if ((kdown & HidNpadButton_ZL) && (m_searchMenuLocation == SEARCH_VALUE) && (m_searchType == SEARCH_TYPE_UNSIGNED_32BIT))
       {
         m_searchValue[0]._u32--;
         m_selectedEntry = 1;
       };
 
-      if (kdown & KEY_A)
+      if (kdown & HidNpadButton_A)
       {
         if (m_searchMenuLocation == SEARCH_editRAM)
         { // BM3
@@ -1582,7 +1582,7 @@ void GuiCheats::onInput(u32 kdown)
       }
     }
 
-    if (kdown & KEY_X)
+    if (kdown & HidNpadButton_X)
     {
       if (m_searchMenuLocation == SEARCH_VALUE)
       {
@@ -1593,7 +1593,7 @@ void GuiCheats::onInput(u32 kdown)
       }
     }
 
-    if (kdown & KEY_L)
+    if (kdown & HidNpadButton_L)
     {
       if (m_searchMenuLocation == SEARCH_VALUE)
       {
@@ -1612,7 +1612,7 @@ void GuiCheats::onInput(u32 kdown)
       }
     }
 
-    if (kdown & KEY_R)
+    if (kdown & HidNpadButton_R)
     {
       if (m_searchMenuLocation == SEARCH_TYPE)
       {
@@ -1634,11 +1634,11 @@ void GuiCheats::onInput(u32 kdown)
   }
 }
 
-void GuiCheats::onTouch(touchPosition &touch)
+void GuiCheats::onTouch(HidTouchState &touch)
 {
 }
 
-void GuiCheats::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish)
+void GuiCheats::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish)
 {
 }
 static bool _isAddressFrozen(uintptr_t address)

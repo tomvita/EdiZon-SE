@@ -88,7 +88,7 @@ void update() {
       currGui->update();
     mutexUnlock(&mutexCurrGui);
 
-    if (kheld & (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN)) inputTicker++;
+    if (kheld & if (kheld & (HidNpadButton_AnyLeft | HidNpadButton_AnyRight | HidNpadButton_AnyUp | HidNpadButton_AnyDown)) inputTicker++;
     else inputTicker = 0;
 
     svcSleepThread(1.0E6 - std::chrono::duration<double, std::nano>(std::chrono::steady_clock::now() - begin).count());
@@ -290,7 +290,7 @@ int main(int argc, char** argv) {
     if(touchCount > 0 && touchCountOld == 0)
       hidTouchRead(&touchPosStart, 0);
 
-    if (abs(static_cast<s16>(touchPosStart.px - touchPosCurr.px)) < 10 && abs(static_cast<s16>(touchPosStart.py - touchPosCurr.py)) < 10) {
+    if (abs(static_cast<s16>(touchPosStart.x - touchPosCurr.x)) < 10 && abs(static_cast<s16>(touchPosStart.py - touchPosCurr.py)) < 10) {
       if (touchCount == 0 && touchCountOld > 0) {
         touchHappend = true;
 

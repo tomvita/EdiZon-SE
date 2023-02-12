@@ -43,11 +43,11 @@ public:
 
   static void drawWidgets(Gui *gui, WidgetItems &widgets, u16 start, u16 end);
   static void handleInput(u32 kdown, WidgetItems &widgets);
-  static void handleTouch(touchPosition &touch, WidgetItems &widgets);
+  static void handleTouch(HidTouchState &touch, WidgetItems &widgets);
 
   virtual void draw(Gui *gui, u16 x, u16 y) = 0;
   virtual void onInput(u32 kdown) = 0;
-  virtual void onTouch(touchPosition &touch) = 0;
+  virtual void onTouch(HidTouchState &touch) = 0;
 
   s64 getIntegerValue();
   std::string getStringValue();

@@ -81,14 +81,14 @@ ListSelector* ListSelector::setInputAction(std::function<void(u32, u16)> inputAc
 }
 
 void ListSelector::onInput(u32 kdown) {
- if (kdown & KEY_B)
+ if (kdown & HidNpadButton_B)
    startYOffsetNext = 500;
 
- if (kdown & KEY_UP)
+ if (kdown & HidNpadButton_AnyUp)
    if (selectedItem > 0)
      selectedItem--;
 
- if (kdown & KEY_DOWN)
+ if (kdown & HidNpadButton_AnyDown)
    if (selectedItem < (static_cast<s16>(m_listItems.size() - 1)))
      selectedItem++;
 
@@ -96,10 +96,10 @@ void ListSelector::onInput(u32 kdown) {
 
 }
 
-void ListSelector::onTouch(touchPosition &touch) {
-  if(touch.px > 250 && touch.px < Gui::g_framebuffer_width - 250) {
-    if(touch.py > 325 && touch.py < (325 + 60 * 5)) {
-      s8 touchPos = ((touch.py - 325) / 60.0F); //325 + 60 * (currItem + 2)
+void ListSelector::onTouch(HidTouchState &touch) {
+  if(touch.x > 250 && touch.x < Gui::g_framebuffer_width - 250) {
+    if(touch.y > 325 && touch.y < (325 + 60 * 5)) {
+      s8 touchPos = ((touch.y - 325) / 60.0F); //325 + 60 * (currItem + 2)
 
       if((selectedItem + touchPos - 2) >= 0 && (selectedItem + touchPos - 2) <= (static_cast<s16>(m_listItems.size() - 1)))
         selectedItem += (touchPos - 2);
@@ -107,7 +107,7 @@ void ListSelector::onTouch(touchPosition &touch) {
   }
 }
 
-void ListSelector::onGesture(touchPosition startPosition, touchPosition endPosition, bool finish) {
+void ListSelector::onGesture(HidTouchScreenState startPosition, HidTouchScreenState endPosition, bool finish) {
 
 }
 

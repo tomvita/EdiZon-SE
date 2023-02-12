@@ -81,25 +81,25 @@ void Widget::handleInput(u32 kdown, WidgetItems &widgets) {
     currWidgets[Widget::g_selectedWidgetIndex].widget->onInput(kdown);
 
   if (Widget::g_selectedRow == CATEGORIES) {
-    if (kdown & KEY_A || kdown & KEY_LSTICK_RIGHT || kdown & KEY_RSTICK_RIGHT) {
+    if (kdown & HidNpadButton_A || kdown & HidNpadButton_StickLRight || kdown & HidNpadButton_StickRRight) {
       Widget::g_selectedRow = WIDGETS;
       Widget::g_selectedWidgetIndex = Widget::g_widgetPage * WIDGETS_PER_PAGE;
     }
   }
 
-  if (kdown & KEY_RSTICK) {
+  if (kdown & HidNpadButton_StickR) {
     if (g_stepSizeMultiplier == 10000) g_stepSizeMultiplier = 1;
     else g_stepSizeMultiplier *= 10;
   }
 }
 
-void Widget::handleTouch(touchPosition &touch, WidgetItems &widgets) {
+void Widget::handleTouch(HidTouchState &touch, WidgetItems &widgets) {
   std::vector<WidgetItem> &currWidgets = widgets[Widget::g_selectedCategory];
   
   u16 widgetInset = (Gui::g_framebuffer_width - WIDGET_WIDTH) / 2.0F;
 
-  if (touch.px > 30 && touch.px < 330) { /* Touch of categories area */
-    u8 categoryIndex = std::floor((touch.py - 159) / 60.0F) + g_categoryYOffset;
+  if (touch.x > 30 && touch.x < 330) { /* Touch of categories area */
+    u8 categoryIndex = std::floor((touch.y - 159) / 60.0F) + g_categoryYOffset;
 
     Widget::g_selectedRow = CATEGORIES;
 
@@ -116,9 +116,9 @@ void Widget::handleTouch(touchPosition &touch, WidgetItems &widgets) {
     if (Widget::g_selectedWidgetIndex > 6 && Widget::g_categoryYOffset < Widget::g_categories.size() - 8)
       Widget::g_categoryYOffset++;
 
-  } else if (touch.px > widgetInset + X_OFFSET && touch.px < widgetInset + X_OFFSET + WIDGET_WIDTH
-            && touch.py > 150 && touch.py < 150 + (WIDGET_HEIGHT + WIDGET_SEPARATOR) * WIDGETS_PER_PAGE) { /* Touch of widgets area */
-    u16 widgetIndex = std::min(static_cast<u32>((touch.py - 150) / (WIDGET_HEIGHT + WIDGET_SEPARATOR) + Widget::g_widgetPage * WIDGETS_PER_PAGE), static_cast<u32>(currWidgets.size()));
+  } else if (touch.x > widgetInset + X_OFFSET && touch.x < widgetInset + X_OFFSET + WIDGET_WIDTH
+            && touch.y > 150 && touch.y < 150 + (WIDGET_HEIGHT + WIDGET_SEPARATOR) * WIDGETS_PER_PAGE) { /* Touch of widgets area */
+    u16 widgetIndex = std::min(static_cast<u32>((touch.y - 150) / (WIDGET_HEIGHT + WIDGET_SEPARATOR) + Widget::g_widgetPage * WIDGETS_PER_PAGE), static_cast<u32>(currWidgets.size()));
     
     Widget::g_selectedRow = WIDGETS;
 
