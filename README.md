@@ -53,7 +53,7 @@ The save management and editing part of the original is mostly unmodified except
   2. Unpack the downloaded zip file, put the files on your Nintendo Switch's SD card and let the folders merge.
   3. Use a free open source CFW like [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere) to launch the hbmenu and start EdiZon from there.
      1. If you want to use the cheat manager you absolutely have to use [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere) as only their cheats are supported.
-     2. For the best experience, open the `/atmosphere/system_settings.ini` file and change `dmnt_cheats_enabled_by_default = u8!0x1` to `dmnt_cheats_enabled_by_default = u8!0x0`. If the file does not exist you can copy the template from /atmosphere/config_templates/system_settings.ini and change the line, remember to remove the ";" in front.
+     2. For the best experience, open the `/atmosphere/config/system_settings.ini` file and change `dmnt_cheats_enabled_by_default = u8!0x1` to `dmnt_cheats_enabled_by_default = u8!0x0`. If the file does not exist you can copy the template from /atmosphere/config_templates/system_settings.ini and change the line, remember to remove the ";" in front.
     
 # Trouble shooting
 
