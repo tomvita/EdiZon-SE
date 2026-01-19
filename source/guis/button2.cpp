@@ -83,15 +83,15 @@ bool Button2::onInput(u32 kdown) {
     return false;
 
   if (!m_isActivated) {
-    if ((kdown & KEY_A) && m_activatable) {
+    if ((kdown & HidNpadButton_A) && m_activatable) {
       m_isActivated = true;
       kdown = 0;
     } else {
-      if (kdown & KEY_UP)    Button2::select(m_adjacentButton[0]);
-      if (kdown & KEY_DOWN)  Button2::select(m_adjacentButton[1]);
-      if (kdown & KEY_LEFT)  Button2::select(m_adjacentButton[2]);
-      if (kdown & KEY_RIGHT) Button2::select(m_adjacentButton[3]);
-      if (kdown & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) return true;
+      if (kdown & HidNpadButton_Up)    Button2::select(m_adjacentButton[0]);
+      if (kdown & HidNpadButton_Down)  Button2::select(m_adjacentButton[1]);
+      if (kdown & HidNpadButton_Left)  Button2::select(m_adjacentButton[2]);
+      if (kdown & HidNpadButton_Right) Button2::select(m_adjacentButton[3]);
+      if (kdown & (HidNpadButton_Up | HidNpadButton_Down | HidNpadButton_Left | HidNpadButton_Right)) return true;
     }
   }
 
@@ -111,7 +111,7 @@ void Button2::onTouch(touchPosition &touch) {
   if (touch.px >= resultX && touch.px <= (resultX + m_w) && touch.py >= resultY && touch.py <= (resultY + m_h)) {
     if (m_isSelected) {
       if (m_activatable) m_isActivated = true;
-      else m_inputAction(KEY_A, &m_isActivated);
+      else m_inputAction(HidNpadButton_A, &m_isActivated);
       return;
     }
 

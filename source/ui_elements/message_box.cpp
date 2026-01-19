@@ -60,22 +60,22 @@ void MessageBox::draw(Gui *gui) {
 
 void MessageBox::onInput(u32 kdown) {
   if (m_options == MessageBox::OKAY) {
-    if (kdown & KEY_A || kdown & KEY_B) {
+    if (kdown & HidNpadButton_A || kdown & HidNpadButton_B) {
       this->hide();
     }
   }
   else if (m_options == MessageBox::YES_NO) {
-    if (kdown & KEY_LEFT)
+    if (kdown & HidNpadButton_Left)
       m_selectedOption = fmax(0, m_selectedOption - 1);
 
-    if (kdown & KEY_RIGHT)
+    if (kdown & HidNpadButton_Right)
       m_selectedOption = fmin(1, m_selectedOption + 1);
 
-    if (kdown & KEY_A) {
+    if (kdown & HidNpadButton_A) {
       m_selectionAction(m_selectedOption);
     }
 
-    if (kdown & KEY_B) {
+    if (kdown & HidNpadButton_B) {
       m_selectionAction(0);
       this->hide();
     }

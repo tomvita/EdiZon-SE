@@ -81,13 +81,13 @@ void Widget::handleInput(u32 kdown, WidgetItems &widgets) {
     currWidgets[Widget::g_selectedWidgetIndex].widget->onInput(kdown);
 
   if (Widget::g_selectedRow == CATEGORIES) {
-    if (kdown & KEY_A || kdown & KEY_LSTICK_RIGHT || kdown & KEY_RSTICK_RIGHT) {
+    if (kdown & HidNpadButton_A || kdown & KEY_LSTICK_RIGHT || kdown & KEY_RSTICK_RIGHT) {
       Widget::g_selectedRow = WIDGETS;
       Widget::g_selectedWidgetIndex = Widget::g_widgetPage * WIDGETS_PER_PAGE;
     }
   }
 
-  if (kdown & KEY_RSTICK) {
+  if (kdown & HidNpadButton_StickR) {
     if (g_stepSizeMultiplier == 10000) g_stepSizeMultiplier = 1;
     else g_stepSizeMultiplier *= 10;
   }

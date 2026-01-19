@@ -58,9 +58,9 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
   if (Gui::g_currMessageBox != nullptr)
     Gui::g_currMessageBox->setProgress(50.0F + ((ulnow / static_cast<float>(ultotal)) * 100) / 2.0F);
 
-  hidScanInput();
+  padUpdate(&g_pad);
 
-  return hidKeysDown(CONTROLLER_P1_AUTO) & KEY_B;
+  return padGetButtonsDown(&g_pad) & HidNpadButton_B;
 }
 
 std::string UploadManager::upload(std::string path, std::string fileName, Title *title, std::string hash) {
@@ -169,8 +169,8 @@ bool UploadManager::zip(std::vector<std::string> paths, std::vector<u8> *zipData
     if (Gui::g_currMessageBox != nullptr)
       Gui::g_currMessageBox->setProgress(((++currFile / static_cast<float>(paths.size())) * 100) / 2.0F);
 
-    hidScanInput();
-    if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_B)
+    padUpdate(&g_pad);
+    if (padGetButtonsDown(&g_pad) & HidNpadButton_B)
       return false;
 
     file.close();

@@ -88,7 +88,7 @@ static size_t writeToFile(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 void Guicheatdb::onInput(u32 kdown) {
-  if (kdown & KEY_B) {
+  if (kdown & HidNpadButton_B) {
     if (threadRunning) {
       threadWaitForExit(&networkThread);
       threadClose(&networkThread);
@@ -101,7 +101,7 @@ void Guicheatdb::onInput(u32 kdown) {
       Gui::g_requestExit = true;
   }
 
-  if (kdown & KEY_MINUS && updateAvailable)  {
+  if (kdown & HidNpadButton_Minus && updateAvailable)  {
 
     mkdir(CHEATS_DIR, 0777);
     (new MessageBox("Updating cheat database.\n \nThis may take a while...", MessageBox::NONE))->show();

@@ -6,7 +6,7 @@
 
 #define MHz *1E6
 
-static HidsysUniquePadId g_uniquePadIds[4]; // HidsysUniquePadId was u64 change for new libnx
+static HidsysUniquePadId g_uniquePadIds[4]; 
 static s32 g_uniquePadCnt;
 static HidsysNotificationLedPattern g_patternOn, g_patternOff;
 
@@ -42,8 +42,6 @@ void getCurrBatteryPercentage(char *buffer) {
 s32 total_entries;
 HidsysUniquePadId unique_pad_ids[4] = {0};
 void ledInit() {
-  // hidsysGetUniquePadsFromNpad(hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1, g_uniquePadIds, 2, &g_uniquePadCnt);
-  // hidsysGetUniquePadsFromNpad(hidGetHandheldMode() ? CONTROLLER_HANDHELD : CONTROLLER_PLAYER_1, g_uniquePadIds, 2, &g_uniquePadCnt);
     // PadState pad;
     // padInitializeDefault(&pad);
   hidsysGetUniquePadIds(g_uniquePadIds, 4, &g_uniquePadCnt);

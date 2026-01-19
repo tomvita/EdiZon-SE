@@ -40,71 +40,71 @@ void GuiChooseMission::draw() {
 // u32 kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
 void GuiChooseMission::onInput(u32 kdown)
 {
-  if (kdown & KEY_L)
+  if (kdown & HidNpadButton_L)
   {
     m_edizon_dir = "/switch/EdiZon/1";
   }
-  else if (kdown & KEY_R)
+  else if (kdown & HidNpadButton_R)
   {
     m_edizon_dir = "/switch/EdiZon/2";
   }
-    if (kdown & KEY_ZL)
+    if (kdown & HidNpadButton_ZL)
   {
     m_edizon_dir = "/switch/EdiZon/3";
   }
-  else if (kdown & KEY_ZR)
+  else if (kdown & HidNpadButton_ZR)
   {
     m_edizon_dir = "/switch/EdiZon/4";
   }
-  else if (kdown & KEY_B)
+  else if (kdown & HidNpadButton_B)
   {
     m_edizon_dir = "/switch/EdiZon";
   }
-  else if (kdown & KEY_X)
+  else if (kdown & HidNpadButton_X)
   {
     // Config::getConfig()->options[0] = !Config::getConfig()->options[0];
     Config::getConfig()->extra_value = !Config::getConfig()->extra_value;
   }
-  else if (kdown & KEY_Y)
+  else if (kdown & HidNpadButton_Y)
   {
     // Config::getConfig()->options[1] = !Config::getConfig()->options[1];
     Gui::g_nextGui = GUI_Sysmodule;
     // Config::getConfig()->show_previous_values = !Config::getConfig()->show_previous_values;
   }
-  else if (kdown & KEY_MINUS)
+  else if (kdown & HidNpadButton_Minus)
   {
     Config::getConfig()->options[2] = !Config::getConfig()->options[2];
   }
-  else if (kdown & KEY_DUP)
+  else if (kdown & HidNpadButton_Up)
   {
     Config::getConfig()->disablerangeonunknown = !Config::getConfig()->disablerangeonunknown;
   }
-  else if (kdown & KEY_DRIGHT)
+  else if (kdown & HidNpadButton_Right)
   {
     Config::getConfig()->enablecheats = !Config::getConfig()->enablecheats;
   }
-  else if (kdown & KEY_DLEFT)
+  else if (kdown & HidNpadButton_Left)
   {
     Config::getConfig()->separatebookmark = !Config::getConfig()->separatebookmark;
   }
-    else if (kdown & KEY_DDOWN)
+    else if (kdown & HidNpadButton_Down)
   {
     Gui::g_nextGui = GUI_CHEATDB;
   }
-  else if (kdown & KEY_PLUS)
+  else if (kdown & HidNpadButton_Plus)
   {
     Gui::g_nextGui = GUI_ABOUT;
   }
-  else if (kdown & KEY_LSTICK) 
+  else if (kdown & HidNpadButton_StickL) 
   {
     Config::getConfig()->deletebookmark = !Config::getConfig()->deletebookmark;
   }
-  else if (kdown & KEY_RSTICK) 
+  else if (kdown & HidNpadButton_StickR) 
   {
     Gui::g_nextGui = GUI_MORE;
     // Config::getConfig()->freeze = !Config::getConfig()->freeze;
   }
-  else if (kdown & KEY_A)
+  else if (kdown & HidNpadButton_A)
   {
     Gui::g_nextGui = GUI_CHEATS;
     memcpy(Config::getConfig()->edizon_dir, m_edizon_dir.c_str(), m_edizon_dir.size());

@@ -207,9 +207,9 @@ void GuiMain::draw() {
 }
 
 void GuiMain::onInput(u32 kdown) {
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
     Gui::g_requestExit = true;
-  else if (kdown & KEY_L)
+  else if (kdown & HidNpadButton_L)
   {
     Gui::g_nextGui = GUI_CHOOSE_MISSION;
   }
@@ -217,24 +217,24 @@ void GuiMain::onInput(u32 kdown) {
   if (Title::g_titles.size() == 0) return;
 
   if (m_selected.extraOption == -1) { /* one of the titles is selected */
-    if (kdown & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT | KEY_A | KEY_X)) {
+    if (kdown & (HidNpadButton_Up | HidNpadButton_Down | HidNpadButton_Left | HidNpadButton_Right | HidNpadButton_A | HidNpadButton_X)) {
       if (m_selected.titleIndex == -1 || (m_selected.titleIndex / 2 + 1) * 256 < xOffset || (m_selected.titleIndex / 2) * 256 > xOffset + 6 * 256) {
         m_selected.titleIndex = std::ceil(xOffset / 256.0F) * 2;
         return;
       }
     }
 
-    if (kdown & KEY_LEFT) {
+    if (kdown & HidNpadButton_Left) {
       if (static_cast<s16>(m_selected.titleIndex - 2) >= 0)
         m_selected.titleIndex -= 2;
-    } else if (kdown & KEY_RIGHT) {
+    } else if (kdown & HidNpadButton_Right) {
       if (static_cast<u16>(m_selected.titleIndex + 2) < ((!m_editableOnly) ?  Title::g_titles.size() : EditorConfigParser::g_editableTitles.size()))
         m_selected.titleIndex += 2;
-    } else if (kdown & KEY_UP) {
+    } else if (kdown & HidNpadButton_Up) {
       if ((m_selected.titleIndex % 2) == 1) {
             m_selected.titleIndex--;
       }
-    } else if (kdown & KEY_DOWN) {
+    } else if (kdown & HidNpadButton_Down) {
       if ((m_selected.titleIndex % 2) == 0) {
         if (static_cast<u16>(m_selected.titleIndex + 1) < ((!m_editableOnly) ?  Title::g_titles.size() : EditorConfigParser::g_editableTitles.size()))
           m_selected.titleIndex++;
@@ -252,7 +252,7 @@ void GuiMain::onInput(u32 kdown) {
       } 
     }
 
-    if (kdown & KEY_A) {
+    if (kdown & HidNpadButton_A) {
       if (m_selected.titleId == Title::g_activeTitle) {
         (new Snackbar("The save files of a running game cannot be accessed."))->show();
         return;
@@ -270,7 +270,7 @@ void GuiMain::onInput(u32 kdown) {
       } else (new Snackbar("No save file for this user available!"))->show();
     }
 
-    if (kdown & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT)) {
+    if (kdown & (HidNpadButton_Up | HidNpadButton_Down | HidNpadButton_Left | HidNpadButton_Right)) {
       if (m_selected.titleIndex != -1) {
         if (m_selected.titleIndex / 2 - (xOffset / 256) > 3)
           xOffsetNext = std::min(static_cast<u32>((m_selected.titleIndex / 2 - 3) * 256), static_cast<u32>(std::ceil(((!m_editableOnly) ?  Title::g_titles.size() : EditorConfigParser::g_editableTitles.size()) / 2.0F - 5) * 256));
@@ -280,7 +280,7 @@ void GuiMain::onInput(u32 kdown) {
       }
     }
 
-    if (kdown & KEY_X) {
+    if (kdown & HidNpadButton_X) {
       if (m_selected.titleId == Title::g_activeTitle) {
         (new Snackbar("The save files of a running game cannot be accessed."))->show();
         return;
@@ -358,19 +358,19 @@ void GuiMain::onInput(u32 kdown) {
       }
     }
   } else { /* One of the extra options (Cheats, Tutorial or Credits) is selected */
-    if (kdown & KEY_UP) {
+    if (kdown & HidNpadButton_Up) {
       m_selected.titleIndex = std::min(static_cast<u32>(std::ceil(xOffset / 256.0F) * 2 + 2 * m_selected.extraOption + 3), static_cast<u32>(((!m_editableOnly) ?  Title::g_titles.size() : EditorConfigParser::g_editableTitles.size()) - 1));
       m_selected.extraOption = -1;
     }
-    else if (kdown & KEY_LEFT) {
+    else if (kdown & HidNpadButton_Left) {
       if (m_selected.extraOption > 0)
         m_selected.extraOption--;
-    } else if (kdown & KEY_RIGHT) {
+    } else if (kdown & HidNpadButton_Right) {
       if (m_selected.extraOption < 2)
         m_selected.extraOption++;
     }
 
-    if (kdown & KEY_A) {
+    if (kdown & HidNpadButton_A) {
       switch(m_selected.extraOption) {
         case 0:
           Gui::g_nextGui = GUI_CHEATS;
@@ -386,13 +386,13 @@ void GuiMain::onInput(u32 kdown) {
     }
   }    
 
-  if (kdown & KEY_ZL) {
+  if (kdown & HidNpadButton_ZL) {
     m_editableOnly = !m_editableOnly;
     m_selected.titleIndex = 0;
     xOffsetNext = 0;
   }
 
-  m_backupAll = (kdown & KEY_ZR) > 0;
+  m_backupAll = (kdown & HidNpadButton_ZR) > 0;
 }
 
 void GuiMain::onTouch(touchPosition &touch) {

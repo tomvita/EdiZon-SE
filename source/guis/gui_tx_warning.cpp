@@ -31,10 +31,10 @@ void GuiTXWarning::draw() {
 }
 
 void GuiTXWarning::onInput(u32 kdown) {
-  if (kdown & KEY_B)
+  if (kdown & HidNpadButton_B)
     Gui::g_requestExit = true;
 
-  if (kdown & KEY_A)
+  if (kdown & HidNpadButton_A)
     Gui::g_nextGui = GUI_MAIN;
 }
 

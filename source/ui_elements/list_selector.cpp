@@ -81,14 +81,14 @@ ListSelector* ListSelector::setInputAction(std::function<void(u32, u16)> inputAc
 }
 
 void ListSelector::onInput(u32 kdown) {
- if (kdown & KEY_B)
+ if (kdown & HidNpadButton_B)
    startYOffsetNext = 500;
 
- if (kdown & KEY_UP)
+ if (kdown & HidNpadButton_Up)
    if (selectedItem > 0)
      selectedItem--;
 
- if (kdown & KEY_DOWN)
+ if (kdown & HidNpadButton_Down)
    if (selectedItem < (static_cast<s16>(m_listItems.size() - 1)))
      selectedItem++;
 

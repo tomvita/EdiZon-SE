@@ -43,8 +43,28 @@ static Mutex mutexCurrGui;
 static Gui *currGui = nullptr;
 static s64 inputTicker = 0;
 
-static u32 kheld = 0, kheldOld = 0;
-static u32 kdown = 0;
+static u64 kheld = 0, kheldOld = 0;
+static u64 kdown = 0;
+
+PadState g_pad;
+
+u64 getStickButtons(PadState *pad) {
+    u64 buttons = 0;
+    HidAnalogStickState left = padGetStickPos(pad, 0);
+    HidAnalogStickState right = padGetStickPos(pad, 1);
+
+    if (left.y > 20000) buttons |= HidNpadButton_Up | HidNpadButton_StickLUp;
+    if (left.y < -20000) buttons |= HidNpadButton_Down | HidNpadButton_StickLDown;
+    if (left.x < -20000) buttons |= HidNpadButton_Left | HidNpadButton_StickLLeft;
+    if (left.x > 20000) buttons |= HidNpadButton_Right | HidNpadButton_StickLRight;
+
+    if (right.y > 20000) buttons |= HidNpadButton_Up | HidNpadButton_StickRUp;
+    if (right.y < -20000) buttons |= HidNpadButton_Down | HidNpadButton_StickRDown;
+    if (right.x < -20000) buttons |= HidNpadButton_Left | HidNpadButton_StickRLeft;
+    if (right.x > 20000) buttons |= HidNpadButton_Right | HidNpadButton_StickRRight;
+
+    return buttons;
+}
 
 void initTitles()
 {
@@ -102,7 +122,7 @@ void update()
       currGui->update();
     mutexUnlock(&mutexCurrGui);
 
-    if (kheld & (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN))
+    if (kheld & (HidNpadButton_Left | HidNpadButton_Right | HidNpadButton_Up | HidNpadButton_Down))
       inputTicker++;
     else
       inputTicker = 0;
@@ -202,6 +222,9 @@ void serviceInitialize()
   pcvInitialize();
   clkrstInitialize();
   ledInit();
+  hidInitializeTouchScreen();
+  padConfigureInput(2, HidNpadStyleSet_NpadStandard);
+  padInitializeAny(&g_pad);
 
   curl_global_init(CURL_GLOBAL_ALL);
 
@@ -296,7 +319,7 @@ int main(int argc, char **argv)
 
   Config::readConfig(); 
   initTitles();
-  // while (!(kheld & KEY_ZL))
+  // while (!(kheld & HidNpadButton_ZL))
   // {
   //   hidScanInput();
   //   kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD);
@@ -308,9 +331,9 @@ int main(int argc, char **argv)
   //   Gui::drawTextAligned(font20, Gui::g_framebuffer_width - 50, Gui::g_framebuffer_height - 50, currTheme.textColor, "\uE0E1 Back", ALIGNED_RIGHT);
   //   Gui::endDraw();
   // }
-  // if (kheld & KEY_ZR)
+  // if (kheld & HidNpadButton_ZR)
   //   m_edizon_dir = "/switch/EdiZon1";
-  // if (kheld & KEY_L)
+  // if (kheld & HidNpadButton_L)
   //   m_edizon_dir = "/switch/EdiZon2";
   // printf("%s\n", m_edizon_dir.c_str());
 
@@ -331,9 +354,10 @@ int main(int argc, char **argv)
 
   while (appletMainLoop())
   {
-    hidScanInput();
-    kheld = hidKeysHeld(CONTROLLER_PLAYER_1) | hidKeysHeld(CONTROLLER_HANDHELD) | hidKeysHeld(CONTROLLER_PLAYER_2);
-    kdown = hidKeysDown(CONTROLLER_PLAYER_1) | hidKeysDown(CONTROLLER_HANDHELD) | hidKeysDown(CONTROLLER_PLAYER_2);
+    padUpdate(&g_pad);
+    u64 stickButtons = getStickButtons(&g_pad);
+    kheld = padGetButtons(&g_pad) | stickButtons;
+    kdown = (padGetButtonsDown(&g_pad) | stickButtons) & ~kheldOld;
 
     if (Gui::g_nextGui != GUI_INVALID)
     {
@@ -410,7 +434,7 @@ int main(int argc, char **argv)
           else
             currGui->onInput(kheld);
         }
-        else if (kdown || hidKeysUp(CONTROLLER_P1_AUTO))
+        else if (kdown || (padGetButtonsUp(&g_pad) & HidNpadButton_Any))
         {
           if (Gui::g_currMessageBox != nullptr)
             Gui::g_currMessageBox->onInput(kdown);
@@ -431,52 +455,50 @@ int main(int argc, char **argv)
     static u8 touchCount, touchCountOld;
     static bool touchHappend = false;
 
-    touchCount = hidTouchCount();
+    HidTouchScreenState touchState;
+    if (hidGetTouchScreenStates(&touchState, 1)) {
+        touchCount = touchState.count;
 
-    if (touchCount > 0)
-      hidTouchRead(&touchPosCurr, 0);
+        if (touchCount > 0) {
+            touchPosCurr.px = touchState.touches[0].x;
+            touchPosCurr.py = touchState.touches[0].y;
+        }
+    } else {
+        touchCount = 0;
+    }
 
     if (touchCount > 0 && touchCountOld == 0)
-      hidTouchRead(&touchPosStart, 0);
+      touchPosStart = touchPosCurr;
 
     if (abs(static_cast<s16>(touchPosStart.px - touchPosCurr.px)) < 10 && abs(static_cast<s16>(touchPosStart.py - touchPosCurr.py)) < 10)
     {
-      if (touchCount == 0 && touchCountOld > 0)
-      {
+      if (touchCount > 0)
         touchHappend = true;
 
-        if (Gui::g_currMessageBox != nullptr)
-          Gui::g_currMessageBox->onTouch(touchPosCurr);
-        else if (Gui::g_currListSelector != nullptr)
-          Gui::g_currListSelector->onTouch(touchPosCurr);
-        else
-          currGui->onTouch(touchPosCurr);
+      if (touchCount == 0 && touchHappend)
+      {
+        currGui->onTouch(touchPosCurr);
+        touchHappend = false;
       }
     }
-    else if (touchCount > 0)
+    else
     {
-      if (Gui::g_currMessageBox != nullptr)
-        Gui::g_currMessageBox->onGesture(touchPosStart, touchPosCurr, false);
-      else if (Gui::g_currListSelector != nullptr)
-        Gui::g_currListSelector->onGesture(touchPosStart, touchPosCurr, false);
-      else
+      if (touchCount > 0)
         currGui->onGesture(touchPosStart, touchPosCurr, false);
-    }
 
-    if (touchCount == 0 && touchCountOld > 0 && !touchHappend)
-    {
-      if (Gui::g_currMessageBox != nullptr)
-        Gui::g_currMessageBox->onGesture(touchPosStart, touchPosCurr, true);
-      else if (Gui::g_currListSelector != nullptr)
-        Gui::g_currListSelector->onGesture(touchPosStart, touchPosCurr, true);
-      else
-        currGui->onGesture(touchPosStart, touchPosCurr, true);
+      if (touchCount == 0)
+      {
+        if (Gui::g_currMessageBox != nullptr)
+            Gui::g_currMessageBox->onGesture(touchPosStart, touchPosCurr, true);
+        else if (Gui::g_currListSelector != nullptr)
+            Gui::g_currListSelector->onGesture(touchPosStart, touchPosCurr, true);
+        else
+            currGui->onGesture(touchPosStart, touchPosCurr, true);
+      }
     }
 
     touchCountOld = touchCount;
     touchPosOld = touchPosCurr;
-    touchHappend = false;
-
     kheldOld = kheld;
 
     if (Gui::g_requestExit)

@@ -23,7 +23,7 @@ void WidgetComment::draw(Gui *gui, u16 x, u16 y) {
 }
 
 void WidgetComment::onInput(u32 kdown) {
-  if (kdown & KEY_A) 
+  if (kdown & HidNpadButton_A) 
     (new MessageBox(m_text, MessageBox::OKAY))->show();
 }
 

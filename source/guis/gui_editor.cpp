@@ -404,7 +404,7 @@ void uploadBackup(std::string path, std::string fileName) {
 void GuiEditor::onInput(u32 kdown) {
 if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
 
-  if (kdown & KEY_MINUS) {
+  if (kdown & HidNpadButton_Minus) {
     if (m_configFileResult != 0) return;
     m_saveFiles.clear();
 
@@ -419,7 +419,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       saveFileNames.push_back(saveFile.fileName);
 
     (new ListSelector("Edit save file", "\uE0E0  Select      \uE0E1  Back", saveFileNames))->setInputAction([&](u32 k, u16 selectedItem) {
-      if (k & KEY_A) {
+      if (k & HidNpadButton_A) {
         if (m_saveFiles.size() != 0) {
           size_t length;
           Widget::g_selectedWidgetIndex = 0;
@@ -476,11 +476,11 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       })->show();
     }
 
-    if (kdown & KEY_B) {
+    if (kdown & HidNpadButton_B) {
       Gui::g_nextGui = GUI_MAIN;
     }
 
-    if (kdown & KEY_X) {
+    if (kdown & HidNpadButton_X) {
       s16 res;
 
       time_t t = time(nullptr);
@@ -517,11 +517,11 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       }
     }
 
-    if (kdown & KEY_Y) {
+    if (kdown & HidNpadButton_Y) {
       updateBackupList();
 
       (new ListSelector("Restore Backup", "\uE0F0  Upload     \uE0E0  Restore     \uE0E2  Delete     \uE0E1  Back", m_backupTitles))->setInputAction([&](u32 k, u16 selectedItem){
-        if (k & KEY_A) {
+        if (k & HidNpadButton_A) {
           if (m_backupTitles.size() != 0) {
               (new MessageBox("Are you sure you want to inject this backup?", MessageBox::YES_NO))->setSelectionAction([&](s8 selection) {
                 if (selection) {
@@ -538,7 +538,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
           }
         }
 
-        if (k & KEY_X) {
+        if (k & HidNpadButton_X) {
           std::stringstream path;
           deleteDirRecursively(m_backupPaths[Gui::g_currListSelector->selectedItem].c_str(), false);
           updateBackupList();
@@ -547,7 +547,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
             Gui::g_currListSelector->selectedItem--;
         }
 
-        if (k & KEY_MINUS) {
+        if (k & HidNpadButton_Minus) {
           uploadBackup(m_backupPaths[Gui::g_currListSelector->selectedItem], m_backupFolderNames[Gui::g_currListSelector->selectedItem]);
 
           Gui::g_currListSelector->hide();
@@ -555,7 +555,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       })->show();
     }
 
-    if (kdown & KEY_ZL) {
+    if (kdown & HidNpadButton_ZL) {
       Title *nextTitle = nullptr;
       bool isCurrTitle = false;
 
@@ -577,7 +577,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       Gui::g_nextGui = GUI_EDITOR;
     }
 
-    if (kdown & KEY_ZR) {
+    if (kdown & HidNpadButton_ZR) {
       Account *nextAccount = nullptr;
       bool isCurrAccount = false;
 
@@ -600,19 +600,19 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
   } /* Savefile loaded */
   else {
     if (Widget::g_selectedRow == WIDGETS) { /* Widgets row */
-      if (kdown & KEY_L) {
+      if (kdown & HidNpadButton_L) {
         if (Widget::g_widgetPage > 0)
           Widget::g_widgetPage--;
         Widget::g_selectedWidgetIndex = WIDGETS_PER_PAGE * Widget::g_widgetPage;
       }
 
-      if (kdown & KEY_R) {
+      if (kdown & HidNpadButton_R) {
         if (Widget::g_widgetPage < Widget::g_widgetPageCnt[Widget::g_selectedCategory] - 1)
           Widget::g_widgetPage++;
         Widget::g_selectedWidgetIndex = WIDGETS_PER_PAGE * Widget::g_widgetPage ;
       }
 
-      if (kdown & KEY_B || kdown & KEY_LSTICK_LEFT || kdown & KEY_RSTICK_LEFT) {
+      if (kdown & HidNpadButton_B || kdown & KEY_LSTICK_LEFT || kdown & KEY_RSTICK_LEFT) {
         Widget::g_selectedRow = CATEGORIES;
         Widget::g_selectedWidgetIndex = std::distance(Widget::g_categories.begin(), std::find(Widget::g_categories.begin(), Widget::g_categories.end(), Widget::g_selectedCategory));
       }
@@ -630,7 +630,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       }
 
     } else { /* Categories row */
-      if (kdown & KEY_B) {
+      if (kdown & HidNpadButton_B) {
         (new MessageBox("Are you sure you want to discard your changes?", MessageBox::YES_NO))->setSelectionAction([&](s8 selection) {
           if (selection) {
             m_interpreter->deinitialize();
@@ -674,7 +674,7 @@ if (GuiEditor::g_currSaveFileName == "") { /* No savefile loaded */
       }
     }
     /* Categories and widgets row */
-    if (kdown & KEY_X) {
+    if (kdown & HidNpadButton_X) {
       (new MessageBox(EditorConfigParser::g_betaTitles[Title::g_currTitle->getTitleID()] ? "Do you want to apply these changes? \n Make sure you have a working backup of your \n save data as this config is still in beta!" :"Do you want to apply these changes?", MessageBox::YES_NO))->setSelectionAction([&](s8 selection) {
         if (selection) {
           std::vector<u8> buffer;
